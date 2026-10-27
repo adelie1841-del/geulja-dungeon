@@ -2702,8 +2702,10 @@ function frame(now){
 }
 resize();loadLevel(0);syncNick();setMode('friendly');initAccount();
 if(document.fonts){document.fonts.load(`bold 16px "Nanum Gothic Coding"`).then(resetAtlas).catch(()=>{});document.fonts.ready.then(resetAtlas).catch(()=>{})}
-requestAnimationFrame(frame);
+window.__GD=c=>eval(c);
+  requestAnimationFrame(frame);
 })();
 </script>
+<script src="admin.js"></script>
 </body>
 </html>
