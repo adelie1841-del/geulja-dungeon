@@ -21,7 +21,7 @@ function hookFb(){
 }
 function loadCfg(){if(cfgLoaded||!isAdm())return;cfgLoaded=true;
   firebase.database().ref('db/data/users/'+me+'/admin').once('value').then(s=>{const v=s.val();if(v&&typeof v==='object'){Object.assign(cfg,v);sdOn=!!cfg.sd;try{localStorage.setItem('gd-admin',JSON.stringify(cfg))}catch(e){}if(menuOpen)renderMenu()}}).catch(()=>{})}
-function hello(){loadCfg();topBtn.hidden=false;try{say('👑 운영자 모드 — ` 운영자 메뉴 · F 산데비스탄 · Y 신의 심판',3.2)}catch(e){}}
+function hello(){loadCfg();topBtn.hidden=false;try{say('👑 운영자 모드 — ` 운영자 메뉴 · F 산데비스탄 · O 신의 심판',3.2)}catch(e){}}
 const ranked=()=>MODE==='pvp'&&matchMode==='rank';
 const live=()=>isAdm()&&state==='play'&&!ranked()&&!(MODE==='pvp'&&!pv.alive);
 function canUse(){if(!isAdm()||state!=='play')return false;if(ranked()){say('랭크전에서는 운영자 능력이 꺼져요',1.6);return false}return !(MODE==='pvp'&&!pv.alive)}
@@ -189,7 +189,7 @@ function renderMenu(){
   <h3>상시 효과</h3><div class="grid">${PERK.map(p=>`<label class="ck"><input type="checkbox" data-k="${p[0]}" ${cfg[p[0]]?'checked':''}> ${p[2]}</label>`).join('')}</div>
   <h3>오라 색</h3><div class="aur">${AURA.map((a,i)=>`<button type="button" data-aura="${i}" aria-pressed="${(cfg.aura|0)===i}" style="${a[1]>=0?`color:hsl(${a[1]},90%,65%)`:''}">${a[0]}</button>`).join('')}</div>
   <h3>등장 문구 <span class="note">(대전 입장 때 다른 사람 화면에 떠요)</span></h3><input type="text" id="admMsg" maxlength="24" placeholder="예: 운영자 강림" value="${esc(cfg.msg||'')}">
-  <h3>조작</h3><ul><li><kbd>Y</kbd> 전용 무기 <b>신의 심판</b> — 일직선의 적을 모두 꿰뚫는 광선, 한 발에 처치, 탄 무한</li><li><kbd>F</kbd> 산데비스탄 켜기/끄기</li><li><kbd>L</kbd> 천벌 — 조준점 낙뢰 + 주변 5명 연쇄</li><li><kbd>U</kbd> 심판의 날 — 반경 15칸 모든 적에게 낙뢰</li><li><kbd>J</kbd> 순간이동 — 바라보는 곳으로</li><li><kbd>K</kbd> 운영자 보급 — 체력·방어·탄약·아이템 가득</li><li><kbd>\`</kbd> 이 메뉴</li></ul>
+  <h3>조작</h3><ul><li><kbd>O</kbd> 전용 무기 <b>신의 심판</b> — 일직선의 적을 모두 꿰뚫는 광선, 한 발에 처치, 탄 무한</li><li><kbd>F</kbd> 산데비스탄 켜기/끄기</li><li><kbd>L</kbd> 천벌 — 조준점 낙뢰 + 주변 5명 연쇄</li><li><kbd>U</kbd> 심판의 날 — 반경 15칸 모든 적에게 낙뢰</li><li><kbd>J</kbd> 순간이동 — 바라보는 곳으로</li><li><kbd>K</kbd> 운영자 보급 — 체력·방어·탄약·아이템 가득</li><li><kbd>\`</kbd> 이 메뉴</li></ul>
   <div class="row"><button type="button" class="save" data-act="save">저장</button><button type="button" data-act="close">닫기</button><span class="note" id="admSt" role="status"></span></div></div>`;
 }
 function openMenu(){if(!isAdm())return;menuOpen=true;renderMenu();menu.hidden=false;try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}if(state==='play'&&MODE!=='pvp')pause()}
@@ -209,7 +209,7 @@ addEventListener('keydown',e=>{
   if(e.code==='Backquote'){e.preventDefault();e.stopImmediatePropagation();menuOpen?closeMenu():openMenu();return}
   if(menuOpen){if(e.code==='Escape'){closeMenu();e.stopImmediatePropagation()}return}
   if(state!=='play')return;
-  const m={KeyF:toggleSd,KeyL:smite,KeyK:supply,KeyJ:blink,KeyU:judge,KeyY:equipAW}[e.code];
+  const m={KeyF:toggleSd,KeyL:smite,KeyK:supply,KeyJ:blink,KeyU:judge,KeyO:equipAW}[e.code];
   if(m){e.preventDefault();e.stopImmediatePropagation();m()}
 },true);
 // ---------- 모바일 버튼 ----------
