@@ -323,6 +323,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
     <button id="snd" type="button">소리 켬</button>
     <button id="tsBtn" type="button" class="touch-only">시점 감도 보통</button>
     <button id="qBtn" type="button">화질 자동</button>
+    <button id="gmBtn" type="button">그래픽 글자</button>
     </div>
   </div>
   <div class="stage" id="stage">
@@ -371,7 +372,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
       <p id="ovText"><span class="touch-help">왼쪽 화면을 누르고 끌어서 이동 · 오른쪽 화면을 끌어서 둘러보기 · <b>공격</b>·<b>점프</b> 버튼을 누른 채 끌면 그대로 조준<br>아래 가운데 칸을 눌러 무기 바꾸기·아이템 쓰기 · 조준·앉기는 한 번 눌러 켜고 다시 눌러 꺼요 · 위쪽 <b>메뉴</b>에서 시점 감도·전체 화면<br>머리·몸통·다리마다 피해가 달라요 · 바닥의 ◆ 아이템은 <b>아이템</b> 버튼으로 사용</span><span class="key-help"><kbd>W A S D</kbd> 이동 · <kbd>마우스</kbd>/<kbd>← →</kbd> 회전 · <kbd>클릭</kbd>/<kbd>Enter</kbd> 공격 · <kbd>Space</kbd> 점프 · <kbd>C</kbd> 웅크리기 (상자 위로 점프해서 올라설 수 있어요)<br>
         <b style="color:#9fd8ff">검술</b> 연타 = 베기→역베기→찌르기 · 길게 눌렀다 놓기 = 회전베기 · <kbd>E</kbd> 돌진베기 · <kbd>Z</kbd>(검 들고 우클릭) 막기 (맞기 직전에 막으면 튕겨내기)<br>
         <b style="color:#ffc857">총</b> <kbd>우클릭</kbd>/<kbd>V</kbd> 조준 · <kbd>R</kbd> 장전 · 스나이퍼 조준 중 <kbd>Shift</kbd> 숨 참기 · <b style="color:#ffc857">활</b> 길게 당겼다 놓기, 박힌 화살은 다시 주울 수 있음<br>
-        <kbd>Y</kbd> 총 구경 · <kbd>,</kbd> <kbd>.</kbd> 총 스킨 바꾸기 · <kbd>1</kbd> 주무기 <kbd>2</kbd> 보조무기 <kbd>3</kbd> 근접 · <kbd>B</kbd> 무기 선택 · <kbd>G</kbd> 수류탄 <kbd>H</kbd> 섬광탄 · 페인트총 <kbd>X</kbd> 색 바꿈 · <kbd>Q</kbd>/휠 무기 바꿈 · <kbd>P</kbd> 일시정지<br><kbd>F</kbd> 손전등 · <kbd>N</kbd> 밝기 · <kbd>Tab</kbd> 전체 지도 · <kbd>Shift</kbd> 달리기 · <kbd>[</kbd> <kbd>]</kbd> 마우스 감도 · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> 위아래 보기 · <kbd>Home</kbd> 시선 정면<br>
+        <kbd>Y</kbd> 총 구경 · <kbd>,</kbd> <kbd>.</kbd> 총 스킨 바꾸기 · <kbd>1</kbd> 주무기 <kbd>2</kbd> 보조무기 <kbd>3</kbd> 근접 · <kbd>B</kbd> 무기 선택 · <kbd>G</kbd> 수류탄 <kbd>H</kbd> 섬광탄 · 페인트총 <kbd>X</kbd> 색 바꿈 · <kbd>Q</kbd>/휠 무기 바꿈 · <kbd>P</kbd> 일시정지<br><kbd>F</kbd> 손전등 · <kbd>N</kbd> 밝기 · 눈이 아프면 위쪽 메뉴 <b>그래픽</b>을 <b>혼합</b>이나 <b>블록</b>으로 · <kbd>Tab</kbd> 전체 지도 · <kbd>Shift</kbd> 달리기 · <kbd>[</kbd> <kbd>]</kbd> 마우스 감도 · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> 위아래 보기 · <kbd>Home</kbd> 시선 정면<br>
         <b style="color:#5ff0c8">아이템</b> 바닥의 빛나는 ◆를 주워 <kbd>4</kbd> <kbd>5</kbd> <kbd>6</kbd>(또는 <kbd>T</kbd>)로 사용 · 산데비스탄·무적·도약·신속·광폭·재생·은신·무한탄<br>
         마우스가 잠기지 않는 화면에서는 끌어서 둘러볼 수 있어요<br>
         머리·몸통·다리마다 피해가 달라요. 다리를 맞히면 적이 느려지고, 멀수록 약해집니다. 스나이퍼는 모든 명중이 치명타<br>
@@ -408,7 +409,16 @@ function resetAtlas(){
   actx.font=`bold ${Math.floor(AS*0.94)}px ${FONT}`;actx.textAlign='center';actx.textBaseline='middle';
   aPer=Math.floor(2048/(AS+2));aCount=0;aMap.clear();
 }
+let GMODE=0,BGP=false;try{const g=+localStorage.getItem('gd-gmode');if(g>=0&&g<=2)GMODE=g}catch(e){}
+const GMODE_NAME=['글자','혼합','블록'];
 function G(g,h,s,l,x,y,bg,hzA){
+  if(GMODE===2||(GMODE===1&&BGP)){
+    if(hzA>0){l=l*(1-hzA)+HZL*hzA;s=s*(1-hzA*.8);h=h*(1-hzA)+HZH*hzA}
+    if(comfort){s*=.82;if(l>86)l=86}
+    l=(l*.5|0)*2;if(l<3)return;if(l>97)l=97;
+    ctx.fillStyle=`hsl(${((h/3)|0)*3},${((s/4)|0)*4}%,${l}%)`;ctx.fillRect(x,y,CELL,CELL);
+    if(bg&&CELL>=9){ctx.fillStyle='rgba(0,0,0,.14)';ctx.fillRect(x,y+CELL-1,CELL,1);ctx.fillRect(x+CELL-1,y,1,CELL)}
+    return}
   if(hzA>0){l=l*(1-hzA)+HZL*hzA;s=s*(1-hzA*.8);h=h*(1-hzA)+HZH*hzA}
   if(comfort){s*=.82;if(l>86)l=86}
   l=(l*.5|0)*2;if(l<3)return;if(l>97)l=97;h=((h/3)|0)*3;s=((s/4)|0)*4;
@@ -1226,6 +1236,8 @@ const joyEl=document.getElementById('joy'),knobEl=document.getElementById('knob'
 try{const v=+localStorage.getItem('gd-tsens');if(v>=.4&&v<=2.5)lookSens=v}catch(e){}
 const TSENS=[[.6,'매우 낮게'],[.8,'낮게'],[1,'보통'],[1.3,'높게'],[1.7,'매우 높게']];
 function syncTs(){const b=document.getElementById('tsBtn');if(!b)return;let best=TSENS[2];for(const t of TSENS)if(Math.abs(t[0]-lookSens)<Math.abs(best[0]-lookSens))best=t;b.textContent='시점 감도 '+best[1]}
+setTimeout(()=>{const b=document.getElementById('gmBtn');if(!b)return;const sync=()=>b.textContent='그래픽 '+GMODE_NAME[GMODE];sync();
+  b.addEventListener('click',()=>{GMODE=(GMODE+1)%3;try{localStorage.setItem('gd-gmode',GMODE)}catch(e){}sync();say(GMODE===0?'글자 그래픽':GMODE===1?'혼합 — 배경은 블록, 적·아이템은 글자':'블록 그래픽 — 눈이 가장 편해요',1.6)})},0);
 setTimeout(()=>{const b=document.getElementById('qBtn');if(!b)return;syncQ();b.addEventListener('click',()=>{const order=['auto','0','1','2','3'];QSET=order[(order.indexOf(QSET)+1)%5];try{localStorage.setItem('gd-q',QSET)}catch(e){}
   if(QSET==='auto'){const coarse=matchMedia('(pointer:coarse)').matches;setQL(coarse&&((navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3)?1:0)}else setQL(+QSET);syncQ()})},0);
 setTimeout(()=>{const b=document.getElementById('tsBtn');if(!b)return;syncTs();b.addEventListener('click',()=>{let i=TSENS.findIndex(t=>Math.abs(t[0]-lookSens)<.01);i=(i+1)%TSENS.length;lookSens=TSENS[i][0];try{localStorage.setItem('gd-tsens',lookSens)}catch(e){}syncTs()})},0);
@@ -1307,13 +1319,15 @@ function cycleSkinW(wi,d){if(!SKIN_W(WEAP[wi]))return false;SKSEL[wi]=(((SKSEL[w
 function cycleSkin(d){if(state!=='play')return;if(!cycleSkinW(cur,d)){say('이 무기는 스킨을 바꿀 수 없어요',1);return}sfx('magIn');say(`${WEAP[cur].name} 스킨: ${skinOf(cur).n}`,1.2);if(inspT<0)startInspect()}
 const revSpin=()=>!!skinOf(0).west;
 // ================= 총 구경 (Y) =================
-let inspT=-1;const INSP=2.6;
+let inspT=-1,INSFL=1,INSMO=0;const INSP=3.3;
 function startInspect(){const w=WEAP[cur];if(state!=='play'||reload||arRel||snpRel||gRel||gmRel||aiming||atkHeld||!SKIN_W(w))return;if(inspT>=0){inspT=-1;return}inspT=0;sfx('inspect')}
-function inspectPose(t){const e=easeIO;
-  if(t<.45){const k=e(t/.45);return [-2.4*k,-2.8*k,.6*k]}
-  if(t<1.3){const k=e((t-.45)/.85);return [-2.4+.5*k,-2.8-.3*k,.6-1.3*k]}
-  if(t<2.0){const k=(t-1.3)/.7;return [-1.9,-3.1+Math.sin(k*Math.PI)*.18,-.7+Math.sin(k*Math.PI*2)*.06]}
-  const k=e((t-2.0)/.6);return [-1.9*(1-k),-3.1*(1-k),-.7*(1-k)]}
+function inspectPose(t){const e=easeIO;let tx=0,ty=0,tr=0,fl=1,mo=0;
+  const up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;tx=-2.3*up;ty=-2.9*up;tr=.55*up;
+  if(t>=.4&&t<1.0){const f=e((t-.4)/.6);tr-=1.25*f}
+  else if(t>=1.0&&t<1.5){tr-=1.25;fl=Math.cos(e((t-1.0)/.5)*Math.PI)}
+  else if(t>=1.5&&t<2.3){const f=(t-1.5)/.8;tr-=1.25+Math.sin(f*Math.PI)*.12;fl=-1;mo=Math.sin(f*Math.PI)*2.2}
+  else if(t>=2.3&&t<2.9){const f=e((t-2.3)/.6);tr-=1.25*(1-f);fl=-Math.cos(f*Math.PI)}
+  return [tx,ty,tr,fl,mo]}
 function revSpinAngle(){let a=0;if(!revSpin())return 0;
   if(reload&&reload.ph===3)a-=Math.PI*2*easeIO(clamp(reload.t/.46,0,1));
   if(inspT>=1.35&&inspT<2.1)a-=Math.PI*4*easeIO((inspT-1.35)/.75);
@@ -1332,9 +1346,10 @@ function drawSmokeMags(dt){
   ctx.restore();
 }
 function drawInspectLabel(){if(inspT<0)return;const a=Math.min(1,inspT*3,(INSP-inspT)*3);ctx.save();ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='middle';
-  const y=H*.13+26,sk=skinOf(cur);ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(W/2-170,y-26,340,52);
+  const y=H*.13+26,sk=skinOf(cur),mt=META[cur];ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(W/2-190,y-26,380,mt?70:52);
   ctx.font=`20px ${DFONT}`;ctx.fillStyle='#ffc857';ctx.fillText(`${WEAP[cur].name} · ${sk.n}`,W/2,y-8);
-  ctx.font=`12px ${FONT}`;ctx.fillStyle='rgba(228,236,230,.75)';ctx.fillText(TOUCH?'스킨 버튼으로 바꾸기':', . 키로 스킨 바꾸기 · Y 그만 보기',W/2,y+14);ctx.restore()}
+  ctx.font=`12px ${FONT}`;ctx.fillStyle='rgba(228,236,230,.75)';ctx.fillText(TOUCH?'스킨 버튼으로 바꾸기':', . 키로 스킨 바꾸기 · Y 그만 보기',W/2,y+14);
+  if(mt){const bar=v=>'■'.repeat(Math.round(v/2))+'□'.repeat(5-Math.round(v/2));ctx.font=`11px ${FONT}`;ctx.fillStyle='#ffd27a';ctx.fillText(`피해 ${bar(mt.st[0])}  연사 ${bar(mt.st[1])}  사거리 ${bar(mt.st[2])}  ·  ${mt.mag}`,W/2,y+32)}ctx.restore()}
 function drawReloadRing(){let p=-1;
   if(reload)p=reload.ph===2||reload.ph===3?cyl/6:.05;else if(arRel)p=arRel.t/(arRel.empty?1.35:1.1);else if(snpRel)p=snpRel.t/1.3;else if(gRel)p=gRel.t/gRel.dur;else if(gmRel)p=gmRel.t/gmRel.dur;
   if(p<0)return;p=clamp(p,0,1);ctx.save();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.5)';ctx.beginPath();ctx.arc(W/2,H/2,26,0,Math.PI*2);ctx.stroke();
@@ -1925,15 +1940,15 @@ function update(dt){
   updateAmb(dt);
   if(inspT>=0){inspT+=dt;if(inspT>=INSP||atkHeld||aiming||reload||arRel||snpRel||gRel||gmRel||drawing)inspT=-1}
   if(gRel&&!gRel.dm&&gRel.t>=gRel.dur*.22){gRel.dm=1;spawnMag(gRel.w===8?'통':'탄',gRel.w===8?paintHue:null,-.2,1.6)}
-  if(arRel&&!arRel.dm&&arRel.t>=.3){arRel.dm=1;spawnMag('탄',null,-.3,2.2)}
-  if(snpRel&&!snpRel.dm&&snpRel.t>=.35){snpRel.dm=1;spawnMag('탄',null,-.6,2.2)}
+  if(arRel&&!arRel.dm&&arRel.t>=(arRel.empty?1.35:1.1)*.33){arRel.dm=1;spawnMag('탄',null,-.3,2.2)}
+  if(snpRel&&!snpRel.dm&&snpRel.t>=1.3*.33){snpRel.dm=1;spawnMag('탄',null,-.6,2.2)}
   for(const e of enemies)if(e.paint){e.paint.t-=dt;if(e.paint.t<=0)e.paint=null}
   if(gRel){gRel.t+=dt;if(gRel.w!==cur)gRel=null;else{if(!gRel.b&&gRel.t>=gRel.dur*.65){gRel.b=1;sfx('magIn')}
     if(gRel.t>=gRel.dur){if(gRel.w===6)pMag=12;else{const n=Math.min(40-paintMag,paintRes);paintMag+=n;paintRes-=n}gRel=null;sfx('bolt1')}}}
   arHeat=Math.max(0,arHeat-dt*(atkHeld&&cur===5?.6:1.8));
   gmHeat=Math.max(0,gmHeat-dt*(atkHeld&&WEAP[cur].gen?.5:1.6));
   if(gmRel){gmRel.t+=dt;if(gmRel.w!==cur)gmRel=null;else{const w=WEAP[gmRel.w],st=gmSt(gmRel.w);
-    if(!gmRel.dm&&gmRel.t>=gmRel.dur*.25){gmRel.dm=1;spawnMag(w.launcher?'유':'탄',w.launcher?100:null,-.3,2.2)}
+    if(!gmRel.dm&&gmRel.t>=gmRel.dur*.33){gmRel.dm=1;spawnMag(w.launcher?'유':'탄',w.launcher?100:null,-.3,2.2)}
     if(!gmRel.b&&gmRel.t>=gmRel.dur*.7){gmRel.b=1;sfx('magIn')}
     if(gmRel.t>=gmRel.dur){const n=Math.min(w.mag-st.mag,st.res);st.mag+=n;st.res-=n;gmRel=null;sfx('bolt1');say('장전 완료',.6)}}}
   for(let i=dmgNums.length-1;i>=0;i--){dmgNums[i].life-=dt;if(dmgNums[i].life<=0)dmgNums.splice(i,1)}
@@ -2175,6 +2190,7 @@ function render(){
     FLC[c]=flashOn?FLASH_I*(comfort?.85:1)*Math.exp(-(camX*camX)/(comfort?.11:.075)):0;
   }
   // 2차: 그리기
+  BGP=true;
   for(let c=0;c<COLS;c++){
     const ra=RC.ra[c],cosd=Math.cos(ra-P.a),rdx=Math.cos(ra)/cosd,rdy=Math.sin(ra)/cosd;
     const perp=RC.perp[c],hd=RC.dist[c],T=RC.T[c],U=RC.U[c],MX=RC.MX[c],MY=RC.MY[c],FACE=RC.F[c],JAMB=RC.J[c],SIDE=RC.S[c],fl=FLC[c];
@@ -2226,6 +2242,7 @@ function render(){
     }
   }
 
+  BGP=false;
   // 스프라이트 모으기
   const list=[];
   const dist=(x,y)=>(x-P.x)**2+(y-P.y)**2;
@@ -2503,15 +2520,15 @@ function drawArt(w,gc,lit,lay,skip,off){
   if(QL<2){ctx.fillStyle='rgba(255,250,230,.2)';for(const c of cells)if(c.top)ctx.fillRect(c.x-c.fs*.28,c.y-c.fs*.4,c.fs*.56,Math.max(1,c.fs*.07))}
 }
 function gunPlace(w,gc,lay,tx,ty,tr,adsOK){
-  if(inspT>=0){const q=inspectPose(inspT);tx+=q[0];ty+=q[1];tr+=q[2];adsOK=false}
+  if(inspT>=0){const q=inspectPose(inspT);tx+=q[0];ty+=q[1];tr+=q[2];adsOK=false;INSFL=q[3];INSMO=q[4]}else{INSFL=1;INSMO=0}
   springTo(tx,ty,tr,frameDt);
   const want=adsOK&&aiming?1:0;adsK+=(want-adsK)*Math.min(1,frameDt*12);
   const [bx,by]=gunBase(),sc0=lay.pos(w.art[0].indexOf('s'),0);
   const hx=W*w.hipX,hy=H+gc*w.hipY,ax=W/2-sc0[0],ay=H/2-sc0[1]+gc*.3,k=easeIO(adsK),wob=1-k*.85;
-  return {px:hx+(ax-hx)*k+(GS.x+bx*wob)*gc,py:hy+(ay-hy)*k+(GS.y+by*wob)*gc,rot:w.hipR*(1-k)+GS.r};
+  return {px:hx+(ax-hx)*k+(GS.x+bx*wob)*gc,py:hy+(ay-hy)*k+(GS.y+by*wob)*gc,rot:w.hipR*(1-k)+GS.r,fl:INSFL};
 }
-function withPose(p,fn){ctx.save();ctx.translate(p.px,p.py);ctx.rotate(p.rot);ctx.textAlign='center';ctx.textBaseline='middle';fn();ctx.restore()}
-function toScreen(p,lx,ly){const c=Math.cos(p.rot),s=Math.sin(p.rot);return [p.px+lx*c-ly*s,p.py+lx*s+ly*c]}
+function withPose(p,fn){ctx.save();ctx.translate(p.px,p.py);ctx.rotate(p.rot);if(p.fl!==undefined&&Math.abs(p.fl)<1)ctx.scale(Math.max(.06,Math.abs(p.fl))*Math.sign(p.fl||1),1);else if(p.fl<0)ctx.scale(-1,1);ctx.textAlign='center';ctx.textBaseline='middle';fn();ctx.restore()}
+function toScreen(p,lx,ly){const c=Math.cos(p.rot),s=Math.sin(p.rot);lx*=(p.fl===undefined?1:(Math.abs(p.fl)<1?Math.max(.06,Math.abs(p.fl))*Math.sign(p.fl||1):p.fl));return [p.px+lx*c-ly*s,p.py+lx*s+ly*c]}
 function drawHand(x,y,gc,lit,rows){
   ctx.save();ctx.font=`bold ${gc}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
   rows=rows||["hhh ","hhhhh"," hhhh","  hh"];
@@ -2562,16 +2579,16 @@ function drawSniper(){
   const w=WEAP[3],gc=clamp(Math.floor(H/15.5),18,48);revGC=gc;const lay=artLayout(w,gc);
   const bt=snpBolt?snpBolt.t:9;let tx=0,ty=0,tr=0;
   if(snpBolt&&bt>=0){tx=.35;ty=.55;tr=.16}
-  if(snpRel){tx=-.4;ty=1.1;tr=-.34}
+  const rp=snpRel?relPose(snpRel.t/1.3,false):null;if(rp){tx=rp.tx;ty=rp.ty;tr=rp.tr}
   const p=gunPlace(w,gc,lay,tx,ty,tr,!snpRel&&!(snpBolt&&bt>=0));
   if(adsK>.55)return;
   const lit=clamp(lightAt(P.x,P.y)*1.15,.45,1.35)+flash*4;
   const bo=boltOff();let mo=0;
-  if(snpRel){const t=snpRel.t;mo=t<.35?7*easeIO(t/.35):t<.9?99:t<1.25?7*(1-easeIO((t-.9)/.35)):0}
+  if(rp)mo=rp.mo;mo+=INSMO;
   withPose(p,()=>drawArt(w,gc,lit,lay,k=>k==='M'&&mo>50,k=>k==='k'?bo:k==='M'?[0,mo]:null));
   const kb=lay.pos(10,11.5),ks=toScreen(p,kb[0]+bo[0]*lay.step*kb[2],kb[1]+bo[1]*lay.rowH*kb[2]);revLast={x:ks[0],y:ks[1]};
   if(snpBolt&&bt>=0&&bt<.72)drawHand(ks[0]+gc*.9,ks[1]+gc*.2,gc,lit,["hhh","hhhh"," hhh"]);
-  if(snpRel&&snpRel.t>.85&&snpRel.t<1.3){const mp=lay.pos(3,12.5),ms=toScreen(p,mp[0],mp[1]+mo*lay.rowH*mp[2]);drawHand(ms[0]-gc*.2,ms[1]+gc*.5,gc,lit)}
+  if(rp)relHand(p,lay,[3,12.5],rp,gc,lit);
   if(flash>0)muzzleAt(w,lay,p,gc);
 }
 function gRelPose(){if(!gRel)return [0,0,0];const k=gRel.t/gRel.dur;const e=k<.2?easeIO(k/.2):k>.85?1-easeIO((k-.85)/.15):1;return [-.5*e,1.1*e,-.45*e]}
@@ -2596,26 +2613,37 @@ function drawPaintGun(){
 }
 function drawRifle(){
   const w=WEAP[5],gc=clamp(Math.floor(H/15.5),18,48);revGC=gc;const lay=artLayout(w,gc);
-  let tx=0,ty=0,tr=0;if(arRel){tx=-.4;ty=1;tr=-.34}
-  const p=gunPlace(w,gc,lay,tx,ty,tr,!arRel);
+  const rp=arRel?relPose(arRel.t/(arRel.empty?1.35:1.1),arRel.empty):null;
+  const p=gunPlace(w,gc,lay,rp?rp.tx:0,rp?rp.ty:0,rp?rp.tr:0,!arRel);
   const lit=clamp(lightAt(P.x,P.y)*1.15,.45,1.35)+flash*4;
-  let mo=0,ko=0;
-  if(arRel){const t=arRel.t;mo=t<.3?7*easeIO(t/.3):t<.75?99:t<1.05?7*(1-easeIO((t-.75)/.3)):0;if(arRel.empty&&t>1.1&&t<1.32)ko=Math.sin((t-1.1)/.22*Math.PI)*1.6}
+  const mo=(rp?rp.mo:0)+INSMO,ko=rp?rp.ko:0;
   withPose(p,()=>drawArt(w,gc,lit,lay,k=>(k==='m'||k==='M')&&mo>50,k=>(k==='m'||k==='M')?[0,mo]:k==='k'?[0,ko]:null));
   const ep=lay.pos(6,9),es=toScreen(p,ep[0],ep[1]);revLast={x:es[0],y:es[1]};
-  if(arRel&&arRel.t>.65&&arRel.t<1.08){const mp=lay.pos(4,12.5),ms=toScreen(p,mp[0],mp[1]+mo*lay.rowH*mp[2]);drawHand(ms[0]-gc*.3,ms[1]+gc*.6,gc,lit)}
+  if(rp)relHand(p,lay,[4,12.5],rp,gc,lit);
   if(ko>0){const kp=lay.pos(8,8.5),ks=toScreen(p,kp[0],kp[1]+ko*lay.rowH*kp[2]);drawHand(ks[0]+gc*.8,ks[1],gc,lit,["hhh","hhhh"," hh"])}
   if(flash>0)muzzleAt(w,lay,p,gc);
 }
+// 장전 모션: 기울이기 → 손이 탄창을 뽑아 떨어뜨림 → 손이 내려갔다 새 탄창 들고 올라와 끼움 → 탁 치기 → (빈 탄창이면) 노리쇠
+function relPose(k,empty){const e=easeIO;let tx=0,ty=0,tr=0,mo=0,hand=null,ko=0;
+  const tilt=k<.12?e(k/.12):k>.9?1-e((k-.9)/.1):1;tx=-.35*tilt;ty=-.25*tilt;tr=-.55*tilt;
+  if(k<.12){const f=e(k/.12);hand=[-2.2+1.6*f,3.4-2.5*f]}
+  else if(k<.32){const f=e((k-.12)/.2);mo=6.5*f;hand=[-.6,.9+mo*.62]}
+  else if(k<.5){const f=e((k-.32)/.18);mo=99;hand=[-.6-.4*f,5+3.5*f]}
+  else if(k<.78){const f=e((k-.5)/.28);mo=7*(1-f);hand=[-.6,.9+mo*.62]}
+  else if(k<.88){const f=Math.sin((k-.78)/.1*Math.PI);ty-=.3*f;tr+=.08*f;hand=[-.6+.9*f,.6-.3*f]}
+  else if(empty){ko=Math.sin(Math.min(1,(k-.88)/.12)*Math.PI)*1.6}
+  return {tx,ty,tr,mo,hand,ko}}
+function relHand(p,lay,mp,rp,gc,lit){if(!rp.hand)return;const m=lay.pos(mp[0],mp[1]),hs=toScreen(p,m[0]+rp.hand[0]*lay.step*m[2],m[1]+rp.hand[1]*lay.rowH*m[2]);drawHand(hs[0],hs[1],gc,lit)}
 function drawGenGun(w){
   const gc=clamp(Math.floor(H/15.5),18,48);revGC=gc;const lay=artLayout(w,gc);
-  let tx=0,ty=0,tr=0;if(gmRel){tx=-.4;ty=1;tr=-.34}
-  const p=gunPlace(w,gc,lay,tx,ty,tr,!gmRel);
+  const rp=gmRel?relPose(gmRel.t/gmRel.dur,gmRel.empty):null;
+  const p=gunPlace(w,gc,lay,rp?rp.tx:0,rp?rp.ty:0,rp?rp.tr:0,!gmRel);
   const lit=clamp(lightAt(P.x,P.y)*1.15,.45,1.35)+flash*4;
-  let mo=0;if(gmRel){const k=gmRel.t/gmRel.dur;mo=k<.25?7*easeIO(k/.25):k<.7?99:k<.95?7*(1-easeIO((k-.7)/.25)):0}
-  withPose(p,()=>drawArt(w,gc,lit,lay,k=>(k==='m'||k==='M')&&mo>50,k=>(k==='m'||k==='M')?[0,mo]:null));
+  const mo=(rp?rp.mo:0)+INSMO,ko=rp?rp.ko:0;
+  withPose(p,()=>drawArt(w,gc,lit,lay,k=>(k==='m'||k==='M')&&mo>50,k=>(k==='m'||k==='M')?[0,mo]:k==='k'?[0,ko]:null));
   const ep=lay.pos(w.ej?w.ej[0]:6,w.ej?w.ej[1]:9),es=toScreen(p,ep[0],ep[1]);revLast={x:es[0],y:es[1]};
-  if(gmRel){const k=gmRel.t/gmRel.dur;if(k>.6&&k<.95){const mp=lay.pos(w.mp?w.mp[0]:4,w.mp?w.mp[1]:12.5),ms=toScreen(p,mp[0],mp[1]+mo*lay.rowH*mp[2]);drawHand(ms[0]-gc*.3,ms[1]+gc*.6,gc,lit)}}
+  if(rp)relHand(p,lay,w.mp||[4,12.5],rp,gc,lit);
+  if(ko>0){const kp=lay.pos(w.ej?w.ej[0]+1:8,w.ej?w.ej[1]:8.5),ks=toScreen(p,kp[0],kp[1]+ko*lay.rowH*kp[2]);drawHand(ks[0]+gc*.8,ks[1],gc,lit,["hhh","hhhh"," hh"])}
   if(flash>0)muzzleAt(w,lay,p,gc);
 }
 function drawScope(){
