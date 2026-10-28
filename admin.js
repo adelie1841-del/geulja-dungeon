@@ -73,7 +73,7 @@ function blink(){ // 순간이동
 function supply(){
   if(!canUse()||!cool('sup',MODE==='pvp'?15:6))return;
   hp=Math.max(hp,100);armor=Math.max(armor,100);
-  shells+=16;arRes+=90;snpRes+=10;arrows+=12;spears=Math.max(spears,3);nadeN+=3;flashN+=3;paintRes=(paintRes||0)+80;cyl=6;pMag=12;arMag=30;snpMag=5;
+  shells+=16;arRes+=90;snpRes+=10;arrows+=12;spears=Math.max(spears,3);nadeN+=3;flashN+=3;paintRes=(paintRes||0)+80;cyl=6;pMag=12;arMag=30;snpMag=5;if(typeof gmRefillAll==='function')gmRefillAll();
   const ids=Object.keys(ITEMS).map(Number);while(bag.length<3)bag.push(ids[(Math.random()*ids.length)|0]);
   burst(P.x,P.y,.4,18,'빛',auraHue(cfg.aura),100,72,1,2.4,.7,.07,-1,false);sfx('pick');sfx('exit');say('👑 운영자 보급 도착!',1.6);
 }
