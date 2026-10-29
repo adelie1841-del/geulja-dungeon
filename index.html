@@ -382,7 +382,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
       <p id="ovText"><span class="touch-help">왼쪽 화면을 누르고 끌어서 이동 · 오른쪽 화면을 끌어서 둘러보기 · <b>공격</b>·<b>점프</b> 버튼을 누른 채 끌면 그대로 조준<br>아래 가운데 칸을 눌러 무기 바꾸기·아이템 쓰기 · 조준·앉기는 한 번 눌러 켜고 다시 눌러 꺼요 · 위쪽 <b>메뉴</b>에서 시점 감도·전체 화면<br>머리·몸통·다리마다 피해가 달라요 · 바닥의 ◆ 아이템은 <b>아이템</b> 버튼으로 사용</span><span class="key-help"><kbd>W A S D</kbd> 이동 · <kbd>마우스</kbd>/<kbd>← →</kbd> 회전 · <kbd>클릭</kbd>/<kbd>Enter</kbd> 공격 · <kbd>Space</kbd> 점프 · <kbd>C</kbd> 웅크리기 (상자 위로 점프해서 올라설 수 있어요)<br>
         <b style="color:#9fd8ff">검술</b> 연타 = 베기→역베기→찌르기 · 길게 눌렀다 놓기 = 회전베기 · <kbd>E</kbd> 돌진베기 · <kbd>Z</kbd>(검 들고 우클릭) 막기 (맞기 직전에 막으면 튕겨내기)<br>
         <b style="color:#ffc857">총</b> <kbd>우클릭</kbd>/<kbd>V</kbd> 조준 · <kbd>R</kbd> 장전 · 스나이퍼 조준 중 <kbd>Shift</kbd> 숨 참기 · <b style="color:#ffc857">활</b> 길게 당겼다 놓기, 박힌 화살은 다시 주울 수 있음<br>
-        <kbd>Y</kbd> 총 구경 · <kbd>.</kbd> 스킨 고르기 · <kbd>,</kbd> 다음 스킨 · <kbd>1</kbd> 주무기 <kbd>2</kbd> 보조무기 <kbd>3</kbd> 근접 · <kbd>B</kbd> 무기 선택 · <kbd>G</kbd> 수류탄 <kbd>H</kbd> 섬광탄 · 페인트총 <kbd>X</kbd> 색 바꿈 · <kbd>Q</kbd>/휠 무기 바꿈 · <kbd>P</kbd> 일시정지<br><kbd>F</kbd> 손전등 · <kbd>N</kbd> 밝기 · 눈이 아프면 위쪽 메뉴 <b>그래픽</b>을 <b>혼합 1·2</b>나 <b>블록</b>으로 · <kbd>Tab</kbd> 전체 지도 · <kbd>Shift</kbd> 달리기 · <kbd>[</kbd> <kbd>]</kbd> 마우스 감도 · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> 위아래 보기 · <kbd>Home</kbd> 시선 정면<br>
+        <kbd>Y</kbd> 총 구경 · <kbd>.</kbd> 스킨 고르기 · <kbd>,</kbd> 다음 스킨 · <kbd>1</kbd> 주무기 <kbd>2</kbd> 보조무기 <kbd>3</kbd> 근접 · <kbd>B</kbd> 무기 선택 · <kbd>G</kbd> 수류탄 <kbd>H</kbd> 섬광탄 · 페인트총 <kbd>X</kbd> 색 바꿈 · <kbd>Q</kbd>/휠 무기 바꿈 · <kbd>P</kbd> 일시정지<br><kbd>F</kbd> 손전등 · <kbd>N</kbd> 밝기 · 위쪽 메뉴 <b>그래픽</b>에서 <b>3D 세미 리얼</b>·<b>3D 던전 리얼</b>을 고를 수 있고, 눈이 아프면 <b>혼합 1·2</b>나 <b>블록</b>으로 · <kbd>Tab</kbd> 전체 지도 · <kbd>Shift</kbd> 달리기 · <kbd>[</kbd> <kbd>]</kbd> 마우스 감도 · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> 위아래 보기 · <kbd>Home</kbd> 시선 정면<br>
         <b style="color:#5ff0c8">아이템</b> 바닥의 빛나는 ◆를 주워 <kbd>4</kbd> <kbd>5</kbd> <kbd>6</kbd>(또는 <kbd>T</kbd>)로 사용 · 산데비스탄·무적·도약·신속·광폭·재생·은신·무한탄<br>
         마우스가 잠기지 않는 화면에서는 끌어서 둘러볼 수 있어요<br>
         머리·몸통·다리마다 피해가 달라요. 다리를 맞히면 적이 느려지고, 멀수록 약해집니다. 스나이퍼는 모든 명중이 치명타<br>
@@ -402,7 +402,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
 <script>
 (()=>{
 'use strict';
-const cv=document.getElementById('c'), ctx=cv.getContext('2d',{alpha:false});
+const cv=document.getElementById('c'), ctx=cv.getContext('2d',{alpha:true});
 const stage=document.getElementById('stage');
 const FONT='"Nanum Gothic Coding","D2Coding",ui-monospace,monospace';
 const DFONT='"Black Han Sans","Nanum Gothic Coding",sans-serif';
@@ -419,8 +419,8 @@ function resetAtlas(){
   actx.font=`bold ${Math.floor(AS*0.94)}px ${FONT}`;actx.textAlign='center';actx.textBaseline='middle';
   aPer=Math.floor(2048/(AS+2));aCount=0;aMap.clear();
 }
-let GMODE=0,GK=0;try{let g=localStorage.getItem('gd-gmode2');if(g===null){const o=localStorage.getItem('gd-gmode');g=o==='1'?2:o==='2'?3:0}g=+g;if(g>=0&&g<=3)GMODE=g}catch(e){}
-const GMODE_NAME=['글자','혼합 1','혼합 2','블록'];
+let GMODE=0,GK=0;try{let g=localStorage.getItem('gd-gmode2');if(g===null){const o=localStorage.getItem('gd-gmode');g=o==='1'?2:o==='2'?3:0}g=+g;if(g>=0&&g<=5)GMODE=g}catch(e){}
+const GMODE_NAME=['글자','혼합 1','혼합 2','블록','3D 세미 리얼','3D 던전 리얼'];
 function G(g,h,s,l,x,y,bg,hzA){
   if(GMODE===3||(GMODE===1&&GK===1)||(GMODE===2&&GK>=1&&GK<=3)){
     if(hzA>0){l=l*(1-hzA)+HZL*hzA;s=s*(1-hzA*.8);h=h*(1-hzA)+HZH*hzA}
@@ -1311,7 +1311,7 @@ try{const v=+localStorage.getItem('gd-tsens');if(v>=.4&&v<=2.5)lookSens=v}catch(
 const TSENS=[[.6,'매우 낮게'],[.8,'낮게'],[1,'보통'],[1.3,'높게'],[1.7,'매우 높게']];
 function syncTs(){const b=document.getElementById('tsBtn');if(!b)return;let best=TSENS[2];for(const t of TSENS)if(Math.abs(t[0]-lookSens)<Math.abs(best[0]-lookSens))best=t;b.textContent='시점 감도 '+best[1]}
 setTimeout(()=>{const b=document.getElementById('gmBtn');if(!b)return;const sync=()=>b.textContent='그래픽 '+GMODE_NAME[GMODE];sync();
-  b.addEventListener('click',()=>{GMODE=(GMODE+1)%4;try{localStorage.setItem('gd-gmode2',GMODE)}catch(e){}sync();say(['글자 그래픽','혼합 1 — 하늘·바닥만 블록','혼합 2 — 적과 총만 글자, 나머지는 블록','블록 그래픽 — 눈이 가장 편해요'][GMODE],1.8)})},0);
+  b.addEventListener('click',()=>{GMODE=(GMODE+1)%6;if(GMODE>=4&&!R3.init()){GMODE=0;say('이 기기에서는 3D를 쓸 수 없어요',2)}try{localStorage.setItem('gd-gmode2',GMODE)}catch(e){}sync();say(['글자 그래픽','혼합 1 — 하늘·바닥만 블록','혼합 2 — 적과 총만 글자, 나머지는 블록','블록 그래픽 — 눈이 가장 편해요','3D 세미 리얼 — 밝고 선명한 입체 그래픽','3D 던전 리얼 — 어둡고 무거운 분위기'][GMODE],1.8)});window.__gmSync=sync},0);
 setTimeout(()=>{const b=document.getElementById('qBtn');if(!b)return;syncQ();b.addEventListener('click',()=>{const order=['auto','0','1','2','3'];QSET=order[(order.indexOf(QSET)+1)%5];try{localStorage.setItem('gd-q',QSET)}catch(e){}
   if(QSET==='auto'){const coarse=matchMedia('(pointer:coarse)').matches;setQL(coarse&&((navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3)?1:0)}else setQL(+QSET);syncQ()})},0);
 setTimeout(()=>{const b=document.getElementById('tsBtn');if(!b)return;syncTs();b.addEventListener('click',()=>{let i=TSENS.findIndex(t=>Math.abs(t[0]-lookSens)<.01);i=(i+1)%TSENS.length;lookSens=TSENS[i][0];try{localStorage.setItem('gd-tsens',lookSens)}catch(e){}syncTs()})},0);
@@ -2053,6 +2053,7 @@ function burst(x,y,z,n,g,h,s,l,em,spd,life,size,grav,decal){
   {const pm=[400,240,130,80][QL];if(parts.length>pm)parts.splice(0,parts.length-pm)}
 }
 function addDecal(x,y,r,g,hue){
+  if(R3.ok)R3.decal(x,y,r,g,hue);
   const ix=x|0,iy=y|0;
   for(let yy=iy-1;yy<=iy+1;yy++)for(let xx=ix-1;xx<=ix+1;xx++){if(xx<0||yy<0||xx>=MW||yy>=MH)continue;const i=yy*MW+xx;const a=decalGrid[i]||(decalGrid[i]=[]);a.push({x,y,r,g:g||'피',hue});if(a.length>24)a.shift()}
 }
@@ -2295,10 +2296,1143 @@ function drawPt(x,y,z,size,g,h,s,l,em,dirX,dirY,hor){
   const hzP=hz(depth);for(let c=c0;c<c0+n;c++){if(c<0||c>=COLS||zbuf[c]<depth)continue;for(let r=r0;r<r0+n;r++){if(r<0||r>=ROWS)continue;G(g,h,s,L,c*CELL,r*CELL,0,hzP)}}
 }
 
+/*R3-BEGIN*/
+// ================= R3: 자체 WebGL 3D 렌더러 =================
+// 좌표: 게임 (x, y, 높이z) → GL (x, z, y). 레이캐스터와 같은 투영을 써서 2D 표시와 맞춘다.
+const R3=(()=>{
+let gl=null,ok=false,failed=false,cv3=null,isGL2=false;
+const R={get ok(){return ok},get failed(){return failed}};
+// ---------- 수학 ----------
+const M4={
+  I(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m},
+  mul(a,b,o){o=o||new Float32Array(16);const r=new Float32Array(16);
+    for(let c=0;c<4;c++)for(let rr=0;rr<4;rr++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+rr]*b[c*4+k];r[c*4+rr]=s}o.set(r);return o},
+  tr(x,y,z){const m=M4.I();m[12]=x;m[13]=y;m[14]=z;return m},
+  sc(x,y,z){const m=M4.I();m[0]=x;m[5]=y===undefined?x:y;m[10]=z===undefined?x:z;return m},
+  rx(a){const m=M4.I(),c=Math.cos(a),s=Math.sin(a);m[5]=c;m[6]=s;m[9]=-s;m[10]=c;return m},
+  ry(a){const m=M4.I(),c=Math.cos(a),s=Math.sin(a);m[0]=c;m[2]=-s;m[8]=s;m[10]=c;return m},
+  rz(a){const m=M4.I(),c=Math.cos(a),s=Math.sin(a);m[0]=c;m[1]=s;m[4]=-s;m[5]=c;return m},
+  pt(m,x,y,z){return [m[0]*x+m[4]*y+m[8]*z+m[12],m[1]*x+m[5]*y+m[9]*z+m[13],m[2]*x+m[6]*y+m[10]*z+m[14]]},
+  dir(m,x,y,z){return [m[0]*x+m[4]*y+m[8]*z,m[1]*x+m[5]*y+m[9]*z,m[2]*x+m[6]*y+m[10]*z]},
+  persp(fovy,asp,n,f){const t=1/Math.tan(fovy/2),m=new Float32Array(16);m[0]=t/asp;m[5]=t;m[10]=-(f+n)/(f-n);m[11]=-1;m[14]=-2*f*n/(f-n);return m},
+  ortho(l,r,b,t,n,f){const m=M4.I();m[0]=2/(r-l);m[5]=2/(t-b);m[10]=-2/(f-n);m[12]=-(r+l)/(r-l);m[13]=-(t+b)/(t-b);m[14]=-(f+n)/(f-n);return m},
+  look(ex,ey,ez,tx,ty,tz,ux,uy,uz){let fx=tx-ex,fy=ty-ey,fz=tz-ez;const fl=Math.hypot(fx,fy,fz);fx/=fl;fy/=fl;fz/=fl;
+    let rx=fy*uz-fz*uy,ry=fz*ux-fx*uz,rz=fx*uy-fy*ux;const rl=Math.hypot(rx,ry,rz)||1;rx/=rl;ry/=rl;rz/=rl;
+    const ux2=ry*fz-rz*fy,uy2=rz*fx-rx*fz,uz2=rx*fy-ry*fx,m=new Float32Array(16);
+    m[0]=rx;m[4]=ry;m[8]=rz;m[1]=ux2;m[5]=uy2;m[9]=uz2;m[2]=-fx;m[6]=-fy;m[10]=-fz;
+    m[12]=-(rx*ex+ry*ey+rz*ez);m[13]=-(ux2*ex+uy2*ey+uz2*ez);m[14]=fx*ex+fy*ey+fz*ez;m[15]=1;return m}
+};
+R.M4=M4;
+function hsl2rgb(h,s,l){h=((h%360)+360)%360/360;s=clamp(s/100,0,1);l=clamp(l/100,0,1);
+  if(s===0)return [l,l,l];const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;
+  const f=t=>{if(t<0)t+=1;if(t>1)t-=1;return t<1/6?p+(q-p)*6*t:t<1/2?q:t<2/3?p+(q-p)*(2/3-t)*6:p};return [f(h+1/3),f(h),f(h-1/3)]}
+R.hsl=hsl2rgb;
+const HX=(h,s,l)=>hsl2rgb(h,s,l);
+
+// ---------- 셰이더 ----------
+const NL=8;
+const VS_MAIN=`
+attribute vec3 aPos;attribute vec3 aNor;attribute vec2 aUV;attribute vec4 aCol;
+uniform mat4 uP,uV,uM;uniform float uTime,uWind;uniform mat4 uSM;
+varying vec3 vW;varying vec3 vN;varying vec2 vUV;varying vec4 vC;varying float vD;varying vec4 vSP;
+void main(){vec4 w=uM*vec4(aPos,1.0);
+  if(uWind>0.0){float k=max(0.0,aPos.y-0.5)*uWind;w.x+=sin(uTime*1.7+w.z*1.3)*0.05*k;w.z+=cos(uTime*1.3+w.x*1.1)*0.05*k;}
+  vW=w.xyz;vN=normalize(mat3(uM)*aNor);vUV=aUV;vC=aCol;vec4 v=uV*w;vD=-v.z;vSP=uSM*w;gl_Position=uP*v;}`;
+const FS_MAIN=`
+precision mediump float;
+uniform sampler2D uTex,uDet,uShadow;uniform float uTexOn,uDetS,uSpecK,uShin,uEmis,uAlpha,uShOn,uLit;
+uniform vec3 uSunDir,uSunCol,uSkyCol,uGndCol,uFogCol,uCam;uniform float uFogD,uFogH,uExpo;
+uniform vec4 uTint;uniform vec3 uMul;uniform vec3 uLP[${NL}];uniform vec4 uLC[${NL}];
+varying vec3 vW;varying vec3 vN;varying vec2 vUV;varying vec4 vC;varying float vD;varying vec4 vSP;
+float unpack(vec4 c){return dot(c,vec4(1.0,1.0/255.0,1.0/65025.0,1.0/16581375.0));}
+float shadowAt(){vec3 p=vSP.xyz/vSP.w*0.5+0.5;if(p.x<0.0||p.x>1.0||p.y<0.0||p.y>1.0||p.z>1.0)return 1.0;
+  float s=0.0;float b=0.0035;
+  for(int i=-1;i<=1;i++)for(int j=-1;j<=1;j++){float d=unpack(texture2D(uShadow,p.xy+vec2(float(i),float(j))/1024.0));s+=p.z-b>d?0.0:1.0;}
+  return s/9.0;}
+vec3 aces(vec3 x){return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0);}
+void main(){
+  vec4 tx=uTexOn>0.5?texture2D(uTex,vUV):vec4(1.0);
+  vec3 base=pow(vC.rgb*tx.rgb*uMul,vec3(2.2));
+  if(uDetS>0.0){base*=texture2D(uDet,vW.xz*uDetS).rgb*1.9;}
+  base=mix(base,pow(uTint.rgb,vec3(2.2)),uTint.a);
+  float em=max(vC.a<0.999?1.0-vC.a:0.0,uTexOn>0.5&&tx.a<0.99?(1.0-tx.a)*2.0:0.0)+uEmis;
+  vec3 N=normalize(vN);
+  vec3 V=normalize(uCam-vW);
+  vec3 col;
+  if(uLit<0.5){col=base;}else{
+  vec3 amb=mix(uGndCol,uSkyCol,N.y*0.5+0.5);
+  float sh=uShOn>0.5?shadowAt():1.0;
+  float nd=max(dot(N,uSunDir),0.0);
+  vec3 H=normalize(uSunDir+V);float sp=pow(max(dot(N,H),0.0),uShin)*uSpecK*nd;
+  vec3 lit=amb+uSunCol*nd*sh;vec3 spec=uSunCol*sp*sh;
+  for(int i=0;i<${NL};i++){vec3 d=uLP[i]-vW;float r=uLC[i].w;if(r<=0.0)continue;float dl=length(d);float a=clamp(1.0-dl/r,0.0,1.0);a*=a;
+    vec3 L=d/max(dl,0.001);float n2=max(dot(N,L)*0.8+0.2,0.0);lit+=uLC[i].rgb*n2*a;
+    vec3 H2=normalize(L+V);spec+=uLC[i].rgb*pow(max(dot(N,H2),0.0),uShin)*uSpecK*a*0.6;}
+  col=base*lit+spec;}
+  col+=base*em*3.0;
+  float f=1.0-exp(-pow(vD*uFogD,1.5));f=clamp(f+uFogH*clamp(0.6-vW.y,0.0,0.6),0.0,1.0);
+  col=mix(col,pow(uFogCol,vec3(2.2)),f);
+  col=aces(col*uExpo);
+  gl_FragColor=vec4(pow(col,vec3(1.0/2.2)),uAlpha*(uTexOn>0.5&&tx.a<0.45?0.0:1.0));
+  if(gl_FragColor.a<0.01)discard;}`;
+const VS_DEPTH=`attribute vec3 aPos;uniform mat4 uSM,uM;varying float vZ;void main(){vec4 p=uSM*uM*vec4(aPos,1.0);vZ=p.z/p.w*0.5+0.5;gl_Position=p;}`;
+const FS_DEPTH=`precision highp float;varying float vZ;
+vec4 pack(float d){vec4 e=fract(vec4(1.0,255.0,65025.0,16581375.0)*d);e-=e.yzww*vec4(1.0/255.0,1.0/255.0,1.0/255.0,0.0);return e;}
+void main(){gl_FragColor=pack(vZ);}`;
+const VS_SKY=`attribute vec2 aPos;varying vec2 vP;void main(){vP=aPos;gl_Position=vec4(aPos,0.9999,1.0);}`;
+const FS_SKY=`precision mediump float;varying vec2 vP;
+uniform vec3 uF,uR,uU;uniform vec4 uPj;uniform vec3 uZen,uHor,uSunC,uSunD,uCloud,uFogCol;uniform float uTime,uCloudK,uStars,uExpo;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float s=0.0,a=0.5;for(int i=0;i<5;i++){s+=a*n(p);p*=2.03;a*=0.5;}return s;}
+void main(){vec2 s=vec2((vP.x-uPj.x)/uPj.z,(vP.y-uPj.y)/uPj.w);
+  vec3 d=normalize(uF+uR*s.x+uU*s.y);
+  float up=d.y;
+  vec3 c=mix(uHor,uZen,pow(clamp(up,0.0,1.0),0.55));
+  if(up<0.0)c=mix(uHor,uFogCol,clamp(-up*6.0,0.0,1.0));
+  float sd=max(dot(d,uSunD),0.0);
+  c+=uSunC*(pow(sd,900.0)*4.0+pow(sd,60.0)*0.35+pow(sd,6.0)*0.12);
+  if(up>0.01){vec2 cp=d.xz/(up+0.08)*1.6+vec2(uTime*0.02,uTime*0.008);float cl=fbm(cp);cl=smoothstep(0.48-uCloudK*0.2,0.85,cl);
+    vec3 cc=mix(uCloud,uSunC*0.6+uCloud*0.6,pow(sd,4.0)*0.6);c=mix(c,cc,cl*clamp(up*4.0,0.0,1.0)*0.9);
+    if(uStars>0.0){float st=step(0.997,h(floor(d.xz/(up+0.2)*220.0)));c+=vec3(st)*uStars*(1.0-cl)*clamp(up*3.0,0.0,1.0);}}
+  gl_FragColor=vec4(c*uExpo,1.0);}`;
+const VS_PT=`attribute vec3 aPos;attribute vec4 aCol;attribute float aSz;uniform mat4 uP,uV;uniform float uPx;varying vec4 vC;
+void main(){vec4 v=uV*vec4(aPos,1.0);gl_Position=uP*v;float d=max(-v.z,0.05);gl_PointSize=clamp(aSz*uPx/d,1.0,256.0);vC=aCol;}`;
+const FS_PT=`precision mediump float;varying vec4 vC;uniform float uSoft;void main(){vec2 p=gl_PointCoord*2.0-1.0;float r=dot(p,p);if(r>1.0)discard;
+  float a=uSoft>0.5?(1.0-r)*(1.0-r):smoothstep(1.0,0.6,r);gl_FragColor=vec4(vC.rgb,vC.a*a);}`;
+
+function sh(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error('셰이더: '+gl.getShaderInfoLog(s));return s}
+function prog(vs,fs,attrs){const p=gl.createProgram();gl.attachShader(p,sh(gl.VERTEX_SHADER,vs));gl.attachShader(p,sh(gl.FRAGMENT_SHADER,fs));
+  attrs.forEach((a,i)=>gl.bindAttribLocation(p,i,a));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error('링크: '+gl.getProgramInfoLog(p));
+  const u={};const n=gl.getProgramParameter(p,gl.ACTIVE_UNIFORMS);for(let i=0;i<n;i++){const info=gl.getActiveUniform(p,i);const nm=info.name.replace(/\[0\]$/,'');u[nm]=gl.getUniformLocation(p,info.name)}
+  return {p,u}}
+let PM,PD,PS,PP;
+
+// ---------- 메시 ----------
+// 정점 형식: pos3 nor3 uv2 col4 = 12 float
+class GB{
+  constructor(){this.v=[];this.i=[];this.m=M4.I();this.st=[];this.c=[1,1,1,1];this.groups=[];this.tex=null}
+  save(){this.st.push(this.m.slice());return this}
+  restore(){this.m=this.st.pop();return this}
+  t(x,y,z){this.m=M4.mul(this.m,M4.tr(x,y,z));return this}
+  rx(a){this.m=M4.mul(this.m,M4.rx(a));return this}
+  ry(a){this.m=M4.mul(this.m,M4.ry(a));return this}
+  rz(a){this.m=M4.mul(this.m,M4.rz(a));return this}
+  s(x,y,z){this.m=M4.mul(this.m,M4.sc(x,y,z));return this}
+  col(r,g,b,e){this.c=[r,g,b,e===undefined?1:1-e];return this}
+  hsl(h,s,l,e){const c=hsl2rgb(h,s,l);return this.col(c[0],c[1],c[2],e)}
+  rgb(c,e){return this.col(c[0],c[1],c[2],e)}
+  use(tex){this.tex=tex||null;return this}
+  _g(){const g=this.groups[this.groups.length-1];if(!g||g.end!==undefined||g.tex!==this.tex){if(g&&g.end===undefined)g.end=this.i.length;this.groups.push({tex:this.tex,start:this.i.length})}}
+  vert(x,y,z,nx,ny,nz,u,v){const p=M4.pt(this.m,x,y,z),n=M4.dir(this.m,nx,ny,nz),l=Math.hypot(n[0],n[1],n[2])||1;
+    this.v.push(p[0],p[1],p[2],n[0]/l,n[1]/l,n[2]/l,u,v,this.c[0],this.c[1],this.c[2],this.c[3]);return this.v.length/12-1}
+  tri(a,b,c){this._g();this.i.push(a,b,c)}
+  quad(p0,p1,p2,p3,n,uv){const a=this.vert(...p0,...n,uv[0],uv[1]),b=this.vert(...p1,...n,uv[2],uv[1]),c=this.vert(...p2,...n,uv[2],uv[3]),d=this.vert(...p3,...n,uv[0],uv[3]);this.tri(a,b,c);this.tri(a,c,d)}
+  // 상자: 중심 (x,y,z), 크기 (sx,sy,sz). uvs: 텍스처 반복 배율
+  box(x,y,z,sx,sy,sz,uvs){const hx=sx/2,hy=sy/2,hz=sz/2,k=uvs||0;const U=(a,b)=>k?[0,0,a*k,b*k]:[0,0,1,1];
+    this.quad([x-hx,y-hy,z+hz],[x+hx,y-hy,z+hz],[x+hx,y+hy,z+hz],[x-hx,y+hy,z+hz],[0,0,1],U(sx,sy));
+    this.quad([x+hx,y-hy,z-hz],[x-hx,y-hy,z-hz],[x-hx,y+hy,z-hz],[x+hx,y+hy,z-hz],[0,0,-1],U(sx,sy));
+    this.quad([x+hx,y-hy,z+hz],[x+hx,y-hy,z-hz],[x+hx,y+hy,z-hz],[x+hx,y+hy,z+hz],[1,0,0],U(sz,sy));
+    this.quad([x-hx,y-hy,z-hz],[x-hx,y-hy,z+hz],[x-hx,y+hy,z+hz],[x-hx,y+hy,z-hz],[-1,0,0],U(sz,sy));
+    this.quad([x-hx,y+hy,z+hz],[x+hx,y+hy,z+hz],[x+hx,y+hy,z-hz],[x-hx,y+hy,z-hz],[0,1,0],U(sx,sz));
+    this.quad([x-hx,y-hy,z-hz],[x+hx,y-hy,z-hz],[x+hx,y-hy,z+hz],[x-hx,y-hy,z+hz],[0,-1,0],U(sx,sz));return this}
+  // 모서리를 깎은 상자 (부드러운 실루엣)
+  rbox(x,y,z,sx,sy,sz,b,uvs){b=Math.min(b,sx*.45,sy*.45,sz*.45);this.box(x,y,z,sx-2*b,sy,sz-2*b,uvs);this.box(x,y,z,sx,sy-2*b,sz-2*b,uvs);this.box(x,y,z,sx-2*b,sy-2*b,sz,uvs);
+    for(const ex of [-1,1])for(const ez of [-1,1])this.save().t(x+ex*(sx/2-b),y,z+ez*(sz/2-b)).cyl(b,b,sy-2*b,6,false).restore();
+    for(const ey of [-1,1])for(const ez of [-1,1])this.save().t(x,y+ey*(sy/2-b),z+ez*(sz/2-b)).rz(Math.PI/2).cyl(b,b,sx-2*b,6,false).restore();
+    for(const ex of [-1,1])for(const ey of [-1,1])this.save().t(x+ex*(sx/2-b),y+ey*(sy/2-b),z).rx(Math.PI/2).cyl(b,b,sz-2*b,6,false).restore();
+    for(const ex of [-1,1])for(const ey of [-1,1])for(const ez of [-1,1])this.save().t(x+ex*(sx/2-b),y+ey*(sy/2-b),z+ez*(sz/2-b)).sph(b,6,4).restore();return this}
+  // 원기둥 (Y축, 가운데 기준). r1 아래, r2 위
+  cyl(r1,r2,h,seg,caps,uvs){seg=seg||12;const y0=-h/2,y1=h/2,sl=(r1-r2)/h,k=uvs||1;
+    for(let i=0;i<seg;i++){const a0=i/seg*Math.PI*2,a1=(i+1)/seg*Math.PI*2,c0=Math.cos(a0),s0=Math.sin(a0),c1=Math.cos(a1),s1=Math.sin(a1);
+      const n0=[c0,sl,s0],n1=[c1,sl,s1];
+      const a=this.vert(c0*r1,y0,s0*r1,...n0,i/seg*k,0),b=this.vert(c1*r1,y0,s1*r1,...n1,(i+1)/seg*k,0),c=this.vert(c1*r2,y1,s1*r2,...n1,(i+1)/seg*k,h*k),d=this.vert(c0*r2,y1,s0*r2,...n0,i/seg*k,h*k);
+      this.tri(a,c,b);this.tri(a,d,c);
+      if(caps!==false){if(r2>0){const t0=this.vert(0,y1,0,0,1,0,.5,.5),t1=this.vert(c0*r2,y1,s0*r2,0,1,0,.5+c0*.5,.5+s0*.5),t2=this.vert(c1*r2,y1,s1*r2,0,1,0,.5+c1*.5,.5+s1*.5);this.tri(t0,t2,t1)}
+        if(r1>0){const t0=this.vert(0,y0,0,0,-1,0,.5,.5),t1=this.vert(c0*r1,y0,s0*r1,0,-1,0,.5+c0*.5,.5+s0*.5),t2=this.vert(c1*r1,y0,s1*r1,0,-1,0,.5+c1*.5,.5+s1*.5);this.tri(t0,t1,t2)}}}
+    return this}
+  sph(r,sw,shh,uvs){sw=sw||12;shh=shh||8;const k=uvs||1,base=this.v.length/12;
+    for(let j=0;j<=shh;j++){const t=j/shh*Math.PI,st=Math.sin(t),ct=Math.cos(t);for(let i=0;i<=sw;i++){const p=i/sw*Math.PI*2,x=Math.cos(p)*st,z=Math.sin(p)*st;this.vert(x*r,ct*r,z*r,x,ct,z,i/sw*k,j/shh*k)}}
+    for(let j=0;j<shh;j++)for(let i=0;i<sw;i++){const a=base+j*(sw+1)+i,b=a+1,c=a+sw+1,d=c+1;this.tri(a,b,c);this.tri(b,d,c)}return this}
+  // 회전체: prof=[[반지름,높이],...] 아래→위
+  lathe(prof,seg,uvs){seg=seg||14;const k=uvs||1,base=this.v.length/12,n=prof.length;
+    for(let j=0;j<n;j++){const [r,y]=prof[j],pr=prof[Math.max(0,j-1)],nx=prof[Math.min(n-1,j+1)];let dy=nx[1]-pr[1],dr=nx[0]-pr[0];const L=Math.hypot(dy,dr)||1;const nr=dy/L,ny=-dr/L;
+      for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2,c=Math.cos(a),s=Math.sin(a);this.vert(c*r,y,s*r,c*nr,ny,s*nr,i/seg*k,y*k)}}
+    for(let j=0;j<n-1;j++)for(let i=0;i<seg;i++){const a=base+j*(seg+1)+i,b=a+1,c=a+seg+1,d=c+1;this.tri(a,c,b);this.tri(b,c,d)}return this}
+  // 원환: 큰 반지름 R, 굵기 r, 호 arc
+  torus(R2,r,sR,sT,arc){arc=arc||Math.PI*2;const base=this.v.length/12;
+    for(let j=0;j<=sR;j++){const u=j/sR*arc,cu=Math.cos(u),su=Math.sin(u);for(let i=0;i<=sT;i++){const v=i/sT*Math.PI*2,cv=Math.cos(v),sv=Math.sin(v);
+      this.vert((R2+r*cv)*cu,r*sv,(R2+r*cv)*su,cv*cu,sv,cv*su,j/sR,i/sT)}}
+    for(let j=0;j<sR;j++)for(let i=0;i<sT;i++){const a=base+j*(sT+1)+i,b=a+1,c=a+sT+1,d=c+1;this.tri(a,b,c);this.tri(b,d,c)}return this}
+  // 2D 다각형(XY, 반시계)을 Z로 돌출
+  ext(poly,depth,uvs){{let ar=0;for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length];ar+=p[0]*q[1]-q[0]*p[1]}if(ar<0)poly=poly.slice().reverse()}const k=uvs||1,hz=depth/2,n=poly.length;const idx=earcut(poly);
+    for(const z of [hz,-hz]){const nz=z>0?1:-1,vs=poly.map(p=>this.vert(p[0],p[1],z,0,0,nz,p[0]*k,p[1]*k));for(let i=0;i<idx.length;i+=3){if(z>0)this.tri(vs[idx[i]],vs[idx[i+1]],vs[idx[i+2]]);else this.tri(vs[idx[i]],vs[idx[i+2]],vs[idx[i+1]])}}
+    for(let i=0;i<n;i++){const p=poly[i],q=poly[(i+1)%n];let nx=q[1]-p[1],ny=-(q[0]-p[0]);const l=Math.hypot(nx,ny)||1;nx/=l;ny/=l;
+      this.quad([p[0],p[1],hz],[q[0],q[1],hz],[q[0],q[1],-hz],[p[0],p[1],-hz],[nx,ny,0],[0,0,1,depth*k])}
+    return this}
+  // 끝이 둥근 막대 (a→b)
+  rod(ax,ay,az,bx,by,bz,r,seg){const dx=bx-ax,dy=by-ay,dz=bz-az,L=Math.hypot(dx,dy,dz)||1e-4;this.save().t((ax+bx)/2,(ay+by)/2,(az+bz)/2);
+    const yaw=Math.atan2(dx,dz),pit=Math.acos(clamp(dy/L,-1,1));this.ry(yaw).rx(pit).cyl(r,r,L,seg||8,false);this.restore();
+    this.save().t(ax,ay,az).sph(r,seg||8,4).restore();this.save().t(bx,by,bz).sph(r,seg||8,4).restore();return this}
+  build(){const g=this.groups[this.groups.length-1];if(g&&g.end===undefined)g.end=this.i.length;return this.i.length?makeMesh(this.v,this.i,this.groups):null}
+}
+R.GB=GB;
+function earcut(poly){const n=poly.length,V=[...Array(n).keys()],out=[];let area=0;for(let i=0;i<n;i++){const p=poly[i],q=poly[(i+1)%n];area+=p[0]*q[1]-q[0]*p[1]}
+  if(area<0)V.reverse();
+  const inside=(a,b,c,p)=>{const s=(u,v,w)=>(v[0]-u[0])*(w[1]-u[1])-(v[1]-u[1])*(w[0]-u[0]);return s(a,b,p)>=0&&s(b,c,p)>=0&&s(c,a,p)>=0};
+  let guard=0;while(V.length>3&&guard++<5000){let cut=false;for(let i=0;i<V.length;i++){const ia=V[(i+V.length-1)%V.length],ib=V[i],ic=V[(i+1)%V.length],a=poly[ia],b=poly[ib],c=poly[ic];
+      if((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])<=0)continue;let ok2=true;for(const j of V){if(j===ia||j===ib||j===ic)continue;if(inside(a,b,c,poly[j])){ok2=false;break}}
+      if(!ok2)continue;out.push(ia,ib,ic);V.splice(i,1);cut=true;break}if(!cut)break}
+  if(V.length===3)out.push(V[0],V[1],V[2]);return out}
+function makeMesh(v,i,groups){const vb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,vb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(v),gl.STATIC_DRAW);
+  const big=v.length/12>65535;const ib=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ib);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,big?new Uint32Array(i):new Uint16Array(i),gl.STATIC_DRAW);
+  for(const g of groups)if(g.end===undefined)g.end=i.length;
+  return {vb,ib,n:i.length,big,groups:groups.filter(g=>g.end>g.start),nv:v.length/12}}
+function freeMesh(m){if(!m)return;gl.deleteBuffer(m.vb);gl.deleteBuffer(m.ib)}
+R.free=freeMesh;
+
+// ---------- 텍스처 (절차적) ----------
+const TX={};let grainTex=null;
+function mkTex(c,repeat){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,false);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);const pot=(c.width&(c.width-1))===0&&(c.height&(c.height-1))===0;
+  if(pot){gl.generateMipmap(gl.TEXTURE_2D);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR)}else gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  const w=repeat&&pot?gl.REPEAT:gl.CLAMP_TO_EDGE;gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,w);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,w);
+  const af=gl.getExtension('EXT_texture_filter_anisotropic');if(af)gl.texParameterf(gl.TEXTURE_2D,af.TEXTURE_MAX_ANISOTROPY_EXT,Math.min(4,gl.getParameter(af.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+  return t}
+function canv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h||w;return [c,c.getContext('2d')]}
+// 타일링 되는 값 노이즈
+function tnoise(S,cells,seed){const g=new Float32Array(cells*cells);let s=seed*9301+49297;for(let i=0;i<g.length;i++){s=(s*9301+49297)%233280;g[i]=s/233280}
+  return (x,y)=>{const fx=x/S*cells,fy=y/S*cells,ix=Math.floor(fx),iy=Math.floor(fy),tx=fx-ix,ty=fy-iy,u=tx*tx*(3-2*tx),v=ty*ty*(3-2*ty);
+    const G=(a,b)=>g[((b%cells+cells)%cells)*cells+((a%cells+cells)%cells)];return G(ix,iy)*(1-u)*(1-v)+G(ix+1,iy)*u*(1-v)+G(ix,iy+1)*(1-u)*v+G(ix+1,iy+1)*u*v}}
+function fbmT(S,seed,oct){const ns=[];for(let o=0;o<(oct||4);o++)ns.push(tnoise(S,4<<o,seed+o*17));return (x,y)=>{let s=0,a=.5,t=0;for(const n of ns){s+=n(x,y)*a;t+=a;a*=.5}return s/t}}
+function pix(S,fn){const [c,x]=canv(S);const im=x.createImageData(S,S),d=im.data;for(let y=0;y<S;y++)for(let X=0;X<S;X++){const r=fn(X,y),i=(y*S+X)*4;d[i]=clamp(r[0],0,255);d[i+1]=clamp(r[1],0,255);d[i+2]=clamp(r[2],0,255);d[i+3]=r[3]===undefined?255:clamp(r[3],0,255)}x.putImageData(im,0,0);return c}
+const C255=(h,s,l)=>hsl2rgb(h,s,l).map(v=>v*255);
+function genTextures(){
+  const S=256;
+  // 벽돌 (창문 있는 집 벽, 창문 불 켜짐/꺼짐 2종)
+  const nB=fbmT(S,3,4),nB2=fbmT(S,8,3);
+  const brick=(win,litMask)=>pix(S,(x,y)=>{
+    const rows=10,rh=S/rows,row=Math.floor(y/rh),off=(row&1)?S/8:0,bw=S/4,bx=Math.floor(((x+off)%S)/bw),fu=((x+off)%S)%bw/bw,fv=(y%rh)/rh;
+    const n=nB(x,y),m=nB2(x*2%S,y*2%S),hb=hash(bx,row,7);
+    let c;
+    if(fv<.12||fu<.04)c=C255(30,8,30+n*18);
+    else{c=C255(10+hb*16,44+hb*12,30+hb*14+n*14-(fv>.85?6:0)+(fv<.3?4:0));c=c.map(v=>v*(.85+m*.3))}
+    if(win){const u=x/S,v=y/S,wu=(u>.16&&u<.42)||(u>.58&&u<.84),wv=(v>.14&&v<.38)||(v>.54&&v<.78);
+      const fu2=(u>.13&&u<.45)||(u>.55&&u<.87),fv2=(v>.11&&v<.41)||(v>.51&&v<.81);
+      if(wu&&wv){const pane=hash(u>.5?1:0,v>.5?1:0,litMask|0)>.45;const cross=Math.abs(u-.29)<.012||Math.abs(u-.71)<.012||Math.abs(v-.26)<.012||Math.abs(v-.66)<.012;
+        if(cross)return [...C255(28,30,22),255];
+        if(pane&&litMask)return [...C255(42,90,62+n*14),150];
+        const g=C255(205,26,24+(1-v)*14+n*10);return [...g,255]}
+      if(fu2&&fv2)return [...C255(28,22,52+n*10),255];}
+    return [...c,255]});
+  TX.brickW=mkTex(brick(true,0),true);TX.brickL=mkTex(brick(true,1),true);TX.brick=mkTex(brick(false,0),true);
+  // 돌 블록 벽
+  const nS=fbmT(S,11,5);
+  TX.stone=mkTex(pix(S,(x,y)=>{const rows=4,rh=S/rows,row=Math.floor(y/rh),sh=hash(row,1,2)*S*.5,bw=S/2,bx=Math.floor(((x+sh)%S)/bw),fu=((x+sh)%S)%bw/bw,fv=(y%rh)/rh,n=nS(x,y),hb=hash(bx,row,3);
+    const edge=Math.min(fu,1-fu)*bw/S*8,ev=Math.min(fv,1-fv)*rh/S*8;const e=Math.min(edge,ev);
+    if(e<.04)return [...C255(210,5,14+n*10),255];
+    const l=28+hb*16+n*22-(e<.12?8*(1-e/.12):0);return [...C255(208,6+hb*5,l),255]}),true);
+  // 나무판
+  const nW=fbmT(S,21,4);
+  TX.wood=mkTex(pix(S,(x,y)=>{const pl=Math.floor(x/(S/4)),fu=(x%(S/4))/(S/4),hb=hash(pl,5,5),g=Math.sin((y/S*30+nW(x,y)*6+hb*9)*Math.PI)*.5+.5,n=nW(x*2%S,y);
+    if(fu<.04)return [...C255(24,40,10),255];
+    const l=26+hb*10+g*8+n*8-(fu>.94?6:0);const knot=hash(pl,Math.floor(y/40),9)>.93&&Math.hypot(fu-.5,(y%40)/40-.5)<.12;return [...C255(24+hb*8,46,knot?l*.6:l),255]}),true);
+  // 철판
+  const nM=fbmT(S,31,4);
+  TX.metal=mkTex(pix(S,(x,y)=>{const fu=(x%(S/2))/(S/2),fv=(y%(S/2))/(S/2),n=nM(x,y);
+    if(fu<.025||fv<.025)return [...C255(210,8,10),255];
+    const rv=[[.08,.08],[.92,.08],[.08,.92],[.92,.92]].some(([a,b])=>Math.hypot(fu-a,fv-b)<.03);if(rv)return [...C255(205,8,62),255];
+    const l=30+n*14+(1-fv)*8+(Math.sin(y*.9+n*8)*.5+.5)*3;const rust=nM((x*3)%S,(y*3)%S)>.68?1:0;return rust?[...C255(22,45,26+n*10),255]:[...C255(208,10,l),255]}),true);
+  // 문 (나무 + 철띠), 잠긴 문
+  const door=(locked)=>pix(S,(x,y)=>{const u=x/S,v=y/S,pl=Math.floor(u*3),fu=u*3-pl,n=nW(x,y),hb=hash(pl,2,4);
+    if(u<.05||u>.95||v<.04||v>.96)return [...C255(210,8,22+n*10),255];
+    if(Math.abs(v-.2)<.035||Math.abs(v-.8)<.035){const rv=Math.abs(((u*8)%1)-.5)<.12&&Math.abs(v-.2)<.012||Math.abs(((u*8)%1)-.5)<.12&&Math.abs(v-.8)<.012;return [...C255(210,8,rv?55:28+n*8),255]}
+    if(locked&&Math.abs(u-.5)<.12&&Math.abs(v-.5)<.11){const ring=Math.hypot(u-.5,(v-.47)*1.3)<.04;return ring?[...C255(30,20,10),255]:[...C255(46,90,48+n*16),150]}
+    if(!locked&&Math.abs(u-.78)<.05&&Math.abs(v-.52)<.04)return [...C255(45,80,55),255];
+    if(fu<.05)return [...C255(24,40,10),255];
+    const g=Math.sin((v*26+n*5+hb*7)*Math.PI)*.5+.5;return [...C255(locked?6:26,locked?50:46,24+g*7+n*8+hb*6),255]});
+  TX.door=mkTex(door(false),true);TX.doorX=mkTex(door(true),true);
+  // 출구 (녹색 빛 문)
+  TX.exit=mkTex(pix(S,(x,y)=>{const u=x/S,v=y/S,n=nS(x,y);if(u<.06||u>.94||v<.04)return [...C255(140,10,18+n*10),255];
+    const sign=Math.abs(v-.45)<.12&&u>.15&&u<.85;if(sign){const g=Math.abs(((u-.15)/.7*2)%1-.5)<.4&&Math.abs(v-.45)<.06;return g?[...C255(130,90,70),130]:[...C255(140,40,14),255]}
+    return [...C255(140,30,16+n*12+(1-v)*8),185]}),true);
+  // 지붕 기와
+  TX.roof=mkTex(pix(S,(x,y)=>{const rh=S/8,row=Math.floor(y/rh),off=(row&1)?S/16:0,fu=((x+off)%(S/8))/(S/8),fv=(y%rh)/rh,n=nB(x,y);const arc=Math.sin(fu*Math.PI);
+    return [...C255(8,40,16+arc*18*(1-fv*.6)+n*8),255]}),true);
+  // 풀(디테일), 흙, 돌길, 나무껍질, 잎, 나무상자, 통
+  const nG=fbmT(S,41,5),nG2=tnoise(S,64,42);
+  TX.grass=mkTex(pix(S,(x,y)=>{const n=nG(x,y),b=nG2(x,y);const l=118+n*40+(b>.6?18:0)-(b<.25?16:0);return [l,l,l,255]}),true);
+  TX.grain=mkTex(pix(128,(x,y)=>{const n=hash(x,y,1)*.5+tnoise(128,16,5)(x,y)*.5;const l=110+n*36;return [l,l,l,255]}),true);
+  TX.bark=mkTex(pix(S,(x,y)=>{const n=nW((x*3)%S,y),r=Math.abs(Math.sin((x/S*14+n*3)*Math.PI));return [...C255(24,32,14+r*14+n*10),255]}),true);
+  const nL=fbmT(S,51,4);
+  TX.leaf=mkTex(pix(S,(x,y)=>{const n=nL(x,y),c=tnoise(S,32,52)(x,y);const hole=c<.18;return [...C255(100+n*26,45+c*15,20+c*26+n*10),hole?0:255]}),true);
+  TX.crate=mkTex(pix(S,(x,y)=>{const u=x/S,v=y/S,n=nW(x,y);const fr=u<.1||u>.9||v<.1||v>.9;const diag=Math.abs(u-v)<.06||Math.abs(u+v-1)<.06;
+    const pl=Math.floor(v*5),g=Math.sin((u*20+n*4+pl)*Math.PI)*.5+.5;if(fr||diag)return [...C255(30,48,38+g*6+n*8),255];return [...C255(28,42,26+g*6+n*8-(((v*5)%1)<.06?10:0)),255]}),true);
+  TX.plank=mkTex(pix(S,(x,y)=>{const n=nW(x,y),pl=Math.floor(x/(S/6)),fu=(x%(S/6))/(S/6),g=Math.sin((y/S*18+n*4+pl*1.7)*Math.PI)*.5+.5;return fu<.06?[...C255(10,50,14),255]:[...C255(8+hash(pl,1,1)*12,50,24+g*7+n*8),255]}),true);
+  TX.skin=mkTex(pix(64,(x,y)=>{const n=hash(x,y,3);const l=118+n*16;return [l,l,l,255]}),true);
+  grainTex=TX.grain;
+}
+
+// ---------- GL 초기화 ----------
+let quadVB,ptVB,ptCap=0,shadowFB=null,shadowTex=null,SHS=1024;
+function init(){
+  if(ok||failed)return ok;
+  try{
+    cv3=document.createElement('canvas');cv3.id='c3';cv3.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:none;pointer-events:none';
+    stage.insertBefore(cv3,cv);cv.style.position='relative';
+    const opt={antialias:true,alpha:false,depth:true,powerPreference:'high-performance',preserveDrawingBuffer:false};
+    gl=cv3.getContext('webgl2',opt);isGL2=!!gl;if(!gl)gl=cv3.getContext('webgl',opt)||cv3.getContext('experimental-webgl',opt);
+    if(!gl)throw new Error('WebGL 없음');
+    if(!isGL2&&!gl.getExtension('OES_element_index_uint'))console.warn('uint index 없음');
+    PM=prog(VS_MAIN,FS_MAIN,['aPos','aNor','aUV','aCol']);PD=prog(VS_DEPTH,FS_DEPTH,['aPos']);PS=prog(VS_SKY,FS_SKY,['aPos']);PP=prog(VS_PT,FS_PT,['aPos','aCol','aSz']);
+    quadVB=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,quadVB);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    ptVB=gl.createBuffer();
+    genTextures();
+    // 그림자 맵 (RGBA 깊이 압축)
+    shadowTex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,shadowTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,SHS,SHS,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    const rb=gl.createRenderbuffer();gl.bindRenderbuffer(gl.RENDERBUFFER,rb);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,SHS,SHS);
+    shadowFB=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,shadowFB);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,shadowTex,0);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,rb);
+    if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)shadowFB=null;
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    cv3.addEventListener('webglcontextlost',e=>{e.preventDefault();ok=false;failed=true;R.onFail&&R.onFail('그래픽 장치가 초기화됐어요')});
+    ok=true;
+  }catch(e){console.warn('3D 시작 실패',e);failed=true;ok=false;if(cv3)cv3.remove();R.onFail&&R.onFail(String(e.message||e))}
+  return ok;
+}
+R.init=init;
+R.show=on=>{if(cv3)cv3.style.display=on?'block':'none'};
+
+// ---------- 테마 ----------
+// 0: 세미 리얼, 1: 던전 리얼
+const THEMES=[
+ {n:'세미 리얼',expo:1.05,sunK:[1.0,1.25,.95],ambK:1.0,fogD:.022,fogH:0,stars:0,ptK:1,lantern:0,cloud:.45,sat:1,gnd:[.32,.36,.22]},
+ {n:'던전 리얼',expo:1.2,sunK:[.22,.26,.2],ambK:.24,fogD:.075,fogH:.25,stars:.9,ptK:2.2,lantern:1,cloud:.7,sat:.7,gnd:[.08,.08,.07]}];
+let theme=0;R.setTheme=t=>{theme=t?1:0};R.theme=()=>theme;
+const mixc=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
+const sat=(c,k)=>{const l=(c[0]+c[1]+c[2])/3;return [l+(c[0]-l)*k,l+(c[1]-l)*k,l+(c[2]-l)*k]};
+function env(){
+  const T=TODS[TOD],th=THEMES[theme];
+  const elev=[.32,.95,.1][TOD];
+  const sd=[Math.cos(SUNA)*Math.cos(elev),Math.sin(elev),Math.sin(SUNA)*Math.cos(elev)];
+  let zen=hsl2rgb(T.sky[0]+14,T.sky[1]+14,T.sky[2]-30),hor=hsl2rgb(T.hor[0],T.hor[1],T.hor[2]+6),sunC=hsl2rgb(T.sun[0],T.sun[1],70),cloud=hsl2rgb(T.cloud,12,TOD===2?74:92);
+  let sunCol=sunC.map(v=>v*th.sunK[TOD]);
+  if(theme===1){zen=mixc(zen,[.02,.03,.07],.85);hor=mixc(hor,[.12,.13,.17],.8);cloud=mixc(cloud,[.16,.17,.2],.8);sunC=[.55,.62,.8];sunCol=[.32,.38,.55].map(v=>v*th.sunK[TOD]*3)}
+  const fog=mixc(hor,zen,.15);
+  const skyA=mixc(zen,[1,1,1],.25).map(v=>v*th.ambK);
+  let o={sd,zen,hor,sunC,sunCol,cloud,fog,skyA,gndA:th.gnd.map(v=>v*th.ambK*1.3),fogD:th.fogD,fogH:th.fogH,expo:th.expo*BRIGHT[brightIdx]/.92,stars:th.stars,cloudK:th.cloud};
+  if(DK){o.sunCol=[0,0,0];o.skyA=[.012,.014,.02];o.gndA=[.005,.005,.006];o.fog=[0,0,0];o.fogD=.16;o.zen=[0,0,.004];o.hor=[.004,.004,.008];o.stars=0;o.sunC=[0,0,0]}
+  if(fxOn&&fxOn(1)){o.fog=mixc(o.fog,[.1,.5,.45],.3)}
+  return o;
+}
+
+// ---------- 월드 메시 ----------
+const WH=1.4;
+let world=null,floorMesh=null,worldKey=null,doorMesh={},floorTex=null,floorCv=null,floorCtx=null,FPX=24,floorDirty=null,decoMesh=null,wallSplatKey=-1,splatMesh=null;
+const FNV=[[0,-1],[1,0],[0,1],[-1,0]];
+function wallTexFor(t,x,y,f){
+  if(t==='#'){const d=decorAt(x,y,f,t);if(d===4)return hash(x*3+1,y*5+2,f)>.55?TX.brickL:TX.brickW;return TX.brick}
+  if(t==='S')return TX.stone;if(t==='W')return TX.wood;if(t==='M')return TX.metal;if(t==='O')return TX.exit;return TX.stone}
+function buildWorld(){
+  for(const k in doorMesh)freeMesh(doorMesh[k]);freeMesh(world);freeMesh(decoMesh);freeMesh(floorMesh);
+  const g=new GB();
+  const open=(x,y)=>x<0||y<0||x>=MW||y>=MH?false:!isWallCh(map[y][x]);
+  // 벽면: 아래쪽이 어두운 접지 그늘 + 위쪽 처마
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=map[y][x];if(!isWallCh(t))continue;
+    for(let f=0;f<4;f++){const nx=x+FNV[f][0],ny=y+FNV[f][1];if(!open(nx,ny))continue;
+      g.use(wallTexFor(t,x,y,f));
+      // 면의 두 끝점 (밖에서 볼 때 왼→오)
+      let ax,ay,bx,by;if(f===0){ax=x+1;ay=y;bx=x;by=y}else if(f===1){ax=x+1;ay=y+1;bx=x+1;by=y}else if(f===2){ax=x;ay=y+1;bx=x+1;by=y+1}else{ax=x;ay=y;bx=x;by=y+1}
+      const n=[FNV[f][0],0,FNV[f][1]];
+      const rows=[[0,.0,.62],[.28,.28,1],[WH,1,1]];
+      for(let r=0;r<rows.length-1;r++){const [h0,v0,c0]=rows[r],[h1,v1,c1]=rows[r+1];
+        const tv0=1-h0/WH,tv1=1-h1/WH;
+        g.c=[c0,c0,c0,1];const i0=g.vert(ax,h0,ay,...n,0,tv0),i1=g.vert(bx,h0,by,...n,1,tv0);g.c=[c1,c1,c1,1];const i2=g.vert(bx,h1,by,...n,1,tv1),i3=g.vert(ax,h1,ay,...n,0,tv1);
+        g.tri(i0,i2,i1);g.tri(i0,i3,i2)}
+      g.c=[1,1,1,1];
+      // 처마/몰딩
+      if(t==='#'){g.use(TX.roof);const mx=(ax+bx)/2+n[0]*.06,mz=(ay+by)/2+n[2]*.06;g.save().t(mx,WH-.02,mz);if(f===1||f===3)g.ry(Math.PI/2);g.box(0,0,0,1.02,.1,.14,1).restore()}
+      else if(t==='S'){g.use(TX.stone);const mx=(ax+bx)/2+n[0]*.04,mz=(ay+by)/2+n[2]*.04;g.save().t(mx,WH-.04,mz);if(f===1||f===3)g.ry(Math.PI/2);g.col(.8,.8,.82).box(0,0,0,1.0,.08,.1,1).restore();g.col(1,1,1)}
+    }
+    // 윗면
+    g.use(t==='#'?TX.roof:t==='W'?TX.wood:t==='M'?TX.metal:TX.stone);g.c=[.85,.85,.85,1];
+    const i0=g.vert(x,WH,y,0,1,0,0,0),i1=g.vert(x+1,WH,y,0,1,0,1,0),i2=g.vert(x+1,WH,y+1,0,1,0,1,1),i3=g.vert(x,WH,y+1,0,1,0,0,1);g.tri(i0,i2,i1);g.tri(i0,i3,i2);g.c=[1,1,1,1];
+  }
+  world=g.build();
+  // 바닥 (맵 전체를 덮는 색 지도 + 풀 디테일)
+  const fg=new GB();fg.use(floorTex);
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){if(!open(x,y))continue;
+    const i0=fg.vert(x,0,y,0,1,0,x/MW,y/MH),i1=fg.vert(x+1,0,y,0,1,0,(x+1)/MW,y/MH),i2=fg.vert(x+1,0,y+1,0,1,0,(x+1)/MW,(y+1)/MH),i3=fg.vert(x,0,y+1,0,1,0,x/MW,(y+1)/MH);fg.tri(i0,i2,i1);fg.tri(i0,i3,i2)}
+  floorMesh=fg.build();
+  exitL=[];for(let y=0;y<MH;y++)for(let x=0;x<MW;x++)if(map[y][x]==='O')for(let f=0;f<4;f++){const nx=x+FNV[f][0],ny=y+FNV[f][1];if(open(nx,ny)){exitL.push([x+.5+FNV[f][0]*.8,y+.5+FNV[f][1]*.8]);break}}
+  // 장식: 깃발, 횃불 받침, 밧줄
+  const d=new GB();
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){const t=map[y][x];if(t!=='#'&&t!=='S')continue;
+    for(let f=0;f<4;f++){const nx=x+FNV[f][0],ny=y+FNV[f][1];if(!open(nx,ny))continue;const dec=decorAt(x,y,f,t);if(!dec||dec===4)continue;
+      const cx=x+.5+FNV[f][0]*.5,cz=y+.5+FNV[f][1]*.5,yaw=Math.atan2(FNV[f][0],FNV[f][1]);
+      d.save().t(cx,0,cz).ry(yaw);
+      if(dec===1){d.use(null).hsl(46,80,48).rod(-.26,1.04,.06,.26,1.04,.06,.018,6);
+        d.hsl(356,62,30);const pts=[];for(let i=0;i<=8;i++){const u=i/8;pts.push([-.22+u*.44,1.02-Math.sin(u*Math.PI)*.0]);}
+        d.save().t(0,0,.07);d.ext([[-.22,1.02],[.22,1.02],[.22,.42],[0,.32],[-.22,.42]],.015);d.restore();
+        d.hsl(46,85,50,.15).save().t(0,.72,.085).sph(.06,10,6).restore()}
+      else if(dec===2){d.use(TX.metal).hsl(30,12,40).box(0,.58,.05,.1,.05,.1).rod(0,.58,.05,0,.72,.14,.02,6);d.use(TX.wood).hsl(28,50,40).rod(0,.7,.13,0,.86,.17,.025,6)}
+      else if(dec===3){d.use(null).hsl(32,35,38);for(const ux of [-.17,.17])d.rod(ux,0,.04,ux,.84,.04,.015,5)}
+      d.restore()}}
+  decoMesh=d.build();
+  // 문 패널
+  for(const L of [false,true]){const m=new GB();m.use(L?TX.doorX:TX.door).box(0,WH/2,0,1,WH,.1,0);
+    // 문 앞뒤 UV를 패널 전체로
+    doorMesh[L?'X':'D']=m.build()}
+  worldKey=map;
+}
+// 바닥 색 지도
+function paintFloor(){
+  const S=FPX=QL<=1?32:20,w=MW*S,h=MH*S;[floorCv,floorCtx]=canv(w,h);
+  const im=floorCtx.createImageData(w,h),dd=im.data;
+  const P_=(x,y)=>x<0||y<0||x>=MW||y>=MH?0:pathG[y*MW+x];
+  const wl=(x,y)=>x<0||y<0||x>=MW||y>=MH?1:isWallCh(map[y][x])?1:0;
+  const pv=(fx,fy)=>{const x0=Math.floor(fx-.5),y0=Math.floor(fy-.5),tx=fx-.5-x0,ty=fy-.5-y0;return P_(x0,y0)*(1-tx)*(1-ty)+P_(x0+1,y0)*tx*(1-ty)+P_(x0,y0+1)*(1-tx)*ty+P_(x0+1,y0+1)*tx*ty};
+  const DG=theme===1;
+  for(let py=0;py<h;py++)for(let px=0;px<w;px++){const fx=(px+.5)/S,fy=(py+.5)/S,i=(py*w+px)*4;
+    const m=vnoise(fx*.35,fy*.35),n=hash(Math.floor(fx*6),Math.floor(fy*6),11),n2=vnoise(fx*2.3,fy*2.3);
+    let c=DG?hsl2rgb(95+m*20,18+n*6,15+m*6+n2*6):hsl2rgb(86+m*26+n*6,36+n*10,24+n*6+m*6+n2*7);
+    const dirt=clamp((m-.68)/.1,0,1);if(dirt>0)c=mixc(c,DG?hsl2rgb(30,14,17+n2*6):hsl2rgb(30,30,28+n2*8),dirt);
+    let p=pv(fx,fy);p=clamp((p-.35)/.3,0,1);
+    if(p>0){const sx=fx*3,sy=fy*3+((Math.floor(fx*3)&1)?.5:0),cx=sx-Math.floor(sx),cy=sy-Math.floor(sy),edge=Math.min(cx,1-cx,cy,1-cy),st=hash(Math.floor(sx),Math.floor(sy),5);
+      const stone=edge<.08?(DG?hsl2rgb(30,8,9):hsl2rgb(30,14,20)):(DG?hsl2rgb(32,8,20+st*10+n2*5):hsl2rgb(32,20+st*8,36+st*12+n2*6));c=mixc(c,stone,p)}
+    // 벽 가장자리 그늘
+    const ix=Math.floor(fx),iy=Math.floor(fy),ux=fx-ix,uy=fy-iy;let ao=1;
+    const dmin=Math.min(wl(ix-1,iy)?ux:9,wl(ix+1,iy)?1-ux:9,wl(ix,iy-1)?uy:9,wl(ix,iy+1)?1-uy:9);if(dmin<.35)ao=.55+.45*(dmin/.35);
+    dd[i]=c[0]*255*ao;dd[i+1]=c[1]*255*ao;dd[i+2]=c[2]*255*ao;dd[i+3]=255}
+  floorCtx.putImageData(im,0,0);
+  if(floorTex)gl.deleteTexture(floorTex);floorTex=mkTex(floorCv,false);floorDirty=null;
+}
+// 데칼을 바닥 색 지도에 직접 칠한다
+R.decal=(x,y,r,g,hue)=>{if(!floorCtx)return;const S=FPX,c=floorCtx;c.save();
+  if(g==='칠'){c.fillStyle=`hsla(${hue},75%,45%,.85)`}else if(g==='검'){c.fillStyle='rgba(20,14,10,.55)'}else c.fillStyle='rgba(70,4,6,.6)';
+  const n=g==='검'?1:5;for(let k=0;k<n;k++){const a=Math.random()*6.28,d=k?r*.6*Math.random():0,rr=k?r*(.25+Math.random()*.3):r*.7;c.beginPath();c.ellipse((x+Math.cos(a)*d)*S,(y+Math.sin(a)*d)*S,rr*S,rr*S*.85,a,0,6.28);c.fill()}
+  c.restore();const x0=Math.max(0,Math.floor((x-r*1.4)*S)),y0=Math.max(0,Math.floor((y-r*1.4)*S)),x1=Math.min(floorCv.width,Math.ceil((x+r*1.4)*S)),y1=Math.min(floorCv.height,Math.ceil((y+r*1.4)*S));
+  if(!floorDirty)floorDirty=[x0,y0,x1,y1];else{floorDirty[0]=Math.min(floorDirty[0],x0);floorDirty[1]=Math.min(floorDirty[1],y0);floorDirty[2]=Math.max(floorDirty[2],x1);floorDirty[3]=Math.max(floorDirty[3],y1)}};
+function flushFloor(){if(!floorDirty)return;const [x0,y0,x1,y1]=floorDirty;floorDirty=null;if(x1<=x0||y1<=y0)return;
+  const im=floorCtx.getImageData(x0,y0,x1-x0,y1-y0);gl.bindTexture(gl.TEXTURE_2D,floorTex);gl.texSubImage2D(gl.TEXTURE_2D,0,x0,y0,gl.RGBA,gl.UNSIGNED_BYTE,im)}
+// 벽 페인트 자국
+function buildSplats(){freeMesh(splatMesh);splatMesh=null;if(!wallSplats.size)return;const g=new GB();g.use(null);
+  for(const [key,arr] of wallSplats){const [mx,my,f]=key.split(',').map(Number);if(f<0||f>3)continue;const n=FNV[f];
+    let ax,ay,bx,by;if(f===0){ax=mx+1;ay=my;bx=mx;by=my}else if(f===1){ax=mx+1;ay=my+1;bx=mx+1;by=my}else if(f===2){ax=mx;ay=my+1;bx=mx+1;by=my+1}else{ax=mx;ay=my;bx=mx;by=my+1}
+    for(const q of arr){const px=ax+(bx-ax)*q.u+n[0]*.012,pz=ay+(by-ay)*q.u+n[1]*.012,py=WH*(1-q.v);g.hsl(q.hue,75,45,.05);g.save().t(px,py,pz).ry(Math.atan2(n[0],n[1]));
+      const pts=[];for(let i=0;i<10;i++){const a=i/10*Math.PI*2,rr=q.r*(.8+.35*hash(i,mx,my));pts.push([Math.cos(a)*rr,Math.sin(a)*rr*1.1])}g.ext(pts,.004);g.restore()}}
+  splatMesh=g.build()}
+
+// ---------- 그리기 ----------
+let exitL=[],VP=null,VV=null,camPos=[0,0,0],ENV=null,shadowM=null,useShadow=false,pass='main',LP=new Float32Array(NL*3),LC=new Float32Array(NL*4),pxScale=1;
+const I4=M4.I();
+let curTex=null;
+function bindMesh(m,prg){gl.bindBuffer(gl.ARRAY_BUFFER,m.vb);gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,m.ib);
+  if(prg===PD){gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,48,0);for(let i=1;i<4;i++)gl.disableVertexAttribArray(i);return}
+  for(let i=0;i<4;i++)gl.enableVertexAttribArray(i);
+  gl.vertexAttribPointer(0,3,gl.FLOAT,false,48,0);gl.vertexAttribPointer(1,3,gl.FLOAT,false,48,12);gl.vertexAttribPointer(2,2,gl.FLOAT,false,48,24);gl.vertexAttribPointer(3,4,gl.FLOAT,false,48,32)}
+// o: {tint:[r,g,b,a], emis, spec, shin, alpha, wind, lit:false, noShadow, det}
+function draw(m,M,o){if(!m)return;o=o||{};
+  if(pass==='shadow'){if(o.noShadow||o.alpha<1)return;const u=PD.u;gl.uniformMatrix4fv(u.uM,false,M||I4);bindMesh(m,PD);gl.drawElements(gl.TRIANGLES,m.n,m.big?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT,0);return}
+  const u=PM.u;gl.uniformMatrix4fv(u.uM,false,M||I4);
+  gl.uniform4fv(u.uTint,o.tint||Z4);gl.uniform1f(u.uEmis,o.emis||0);gl.uniform1f(u.uSpecK,o.spec===undefined?.15:o.spec);gl.uniform1f(u.uShin,o.shin||24);
+  const al=o.alpha===undefined?1:o.alpha;gl.uniform1f(u.uAlpha,al);gl.uniform1f(u.uWind,o.wind||0);gl.uniform1f(u.uLit,o.lit===false?0:1);gl.uniform1f(u.uDetS,o.det||0);gl.uniform3fv(u.uMul,o.mul||ONE3);
+  const blend=al<1||o.add;if(blend){gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,o.add?gl.ONE:gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false)}
+  bindMesh(m,PM);
+  for(const g of m.groups){const t=g.tex||grainTex;if(t!==curTex){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,t);curTex=t}
+    gl.drawElements(gl.TRIANGLES,g.end-g.start,m.big?gl.UNSIGNED_INT:gl.UNSIGNED_SHORT,g.start*(m.big?4:2))}
+  if(blend){gl.disable(gl.BLEND);gl.depthMask(true)}}
+const ONE3=new Float32Array([1,1,1]);
+const Z4=new Float32Array(4);
+R.draw=draw;R.pass=()=>pass;
+// 점 입자
+let PTA=new Float32Array(8*2048),ptN=0,ptAdd=new Float32Array(8*1024),ptAN=0;
+function pt(x,y,z,size,r,g,b,a,add){if(add){if(ptAN>=1024)return;const o=ptAN++*8;ptAdd[o]=x;ptAdd[o+1]=z;ptAdd[o+2]=y;ptAdd[o+3]=r;ptAdd[o+4]=g;ptAdd[o+5]=b;ptAdd[o+6]=a;ptAdd[o+7]=size}
+  else{if(ptN>=2048)return;const o=ptN++*8;PTA[o]=x;PTA[o+1]=z;PTA[o+2]=y;PTA[o+3]=r;PTA[o+4]=g;PTA[o+5]=b;PTA[o+6]=a;PTA[o+7]=size}}
+R.pt=pt;
+function flushPts(arr,n,add){if(!n)return;gl.useProgram(PP.p);const u=PP.u;gl.uniformMatrix4fv(u.uP,false,VP);gl.uniformMatrix4fv(u.uV,false,VV);gl.uniform1f(u.uPx,pxScale);gl.uniform1f(u.uSoft,add?1:0);
+  gl.bindBuffer(gl.ARRAY_BUFFER,ptVB);gl.bufferData(gl.ARRAY_BUFFER,arr.subarray(0,n*8),gl.DYNAMIC_DRAW);
+  gl.enableVertexAttribArray(0);gl.enableVertexAttribArray(1);gl.enableVertexAttribArray(2);gl.disableVertexAttribArray(3);
+  gl.vertexAttribPointer(0,3,gl.FLOAT,false,32,0);gl.vertexAttribPointer(1,4,gl.FLOAT,false,32,12);gl.vertexAttribPointer(2,1,gl.FLOAT,false,32,28);
+  gl.depthMask(false);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,add?gl.ONE:gl.ONE_MINUS_SRC_ALPHA);gl.drawArrays(gl.POINTS,0,n);gl.depthMask(true);gl.disable(gl.BLEND)}
+
+// 카메라: 레이캐스터와 같은 투영
+function camera(o){
+  const d3=R.dpr,Wp=W,Hp=H,cxp=COLS*CELL/2+o.ox,hy=o.hor*CELL+o.oy,fx=proj*CELL,fy=2*K*proj*CELL,n=.03,f=60;
+  const P_=new Float32Array(16);P_[0]=2*fx/Wp;P_[8]=-(2*cxp/Wp-1);P_[5]=2*fy/Hp;P_[9]=-(1-2*hy/Hp);P_[10]=-(f+n)/(f-n);P_[11]=-1;P_[14]=-2*f*n/(f-n);
+  const a=P.a,ex=P.x,ey=eyeZ,ez=P.y,fwx=Math.cos(a),fwz=Math.sin(a),rx=-Math.sin(a),rz=Math.cos(a);
+  let V=new Float32Array(16);V[0]=rx;V[4]=0;V[8]=rz;V[1]=0;V[5]=1;V[9]=0;V[2]=-fwx;V[6]=0;V[10]=-fwz;V[12]=-(rx*ex+rz*ez);V[13]=-ey;V[14]=fwx*ex+fwz*ez;V[15]=1;
+  if(o.roll&&!RM)V=M4.mul(M4.rz(-o.roll),V);
+  VP=P_;VV=V;camPos=[ex,ey,ez];pxScale=fy*d3*.5;
+  R.cam={fx,fy,cxp,hy,fw:[fwx,0,fwz],rt:[rx,0,rz]};
+}
+// 화면 좌표 (CSS px). 화면 뒤면 null
+R.toScreen=(x,y,z)=>{const c=R.cam;if(!c)return null;const dx=x-P.x,dy=y-P.y,dep=dx*c.fw[0]+dy*c.fw[2];if(dep<.05)return null;const side=dx*c.rt[0]+dy*c.rt[2];
+  return {x:c.cxp+c.fx*side/dep,y:c.hy-c.fy*(z-eyeZ)/dep,d:dep}};
+
+function pickLights(e){
+  const cand=[];const th=THEMES[theme];
+  const fl=(L)=>(comfort?.95:.86)+(comfort?.05:.14)*Math.sin(time*9+L.ph)*Math.sin(time*13.7+L.ph*2);
+  if(!DK)for(const L of lights){const d=Math.hypot(L.x-P.x,L.y-P.y);if(d>18)continue;cand.push({x:L.x,y:L.y,z:.85,c:[1,.62,.3],i:L.i*fl(L)*th.ptK*1.3,r:L.r*1.25,d})}
+  for(const D of dyn){const d=Math.hypot(D.x-P.x,D.y-P.y);if(d>16)continue;const k=D.life/D.max;cand.push({x:D.x,y:D.y,z:.6,c:D.col||[1,.7,.4],i:D.i*k*2.2,r:D.r*1.3,d:d*.5})}
+  for(const p of projs){if(p.kind==='orb'||p.kind==='breath'){const d=Math.hypot(p.x-P.x,p.y-P.y);if(d<12)cand.push({x:p.x,y:p.y,z:p.z||.6,c:p.kind==='orb'?[.7,.3,1]:[1,.5,.15],i:1.2,r:2.6,d:d+2})}}
+  if(!DK)for(const [x,y] of exitL){const d=Math.hypot(x-P.x,y-P.y);if(d<14)cand.push({x,y,z:.7,c:[.3,1,.45],i:1.1,r:3.5,d})}
+  if(flash>0)cand.push({x:P.x+Math.cos(P.a)*.6,y:P.y+Math.sin(P.a)*.6,z:eyeZ-.05,c:[1,.75,.4],i:flash*14,r:4.5,d:-1});
+  if(th.lantern&&!DK)cand.push({x:P.x,y:P.y,z:eyeZ+.2,c:[1,.78,.52],i:.75,r:5.5,d:-.5});
+  if(DK)cand.push({x:P.x,y:P.y,z:eyeZ,c:[.5,.6,.8],i:.35,r:1.8,d:-.6});
+  if(flashOn)cand.push({x:P.x+Math.cos(P.a)*1.6,y:P.y+Math.sin(P.a)*1.6,z:eyeZ,c:[1,.95,.85],i:1.6,r:5,d:-.4});
+  if(DK)for(const ec of echoes){const age=time-ec.t;const rr=age*ec.sp;if(rr>ec.R*1.2)continue;const k=1-rr/(ec.R*1.2);cand.push({x:ec.x,y:ec.y,z:.5,c:[.55,.75,1],i:k*2.4*(ec.k||1),r:Math.max(1,rr),d:Math.hypot(ec.x-P.x,ec.y-P.y)*.3})}
+  if(R.extraLights)R.extraLights(cand);
+  cand.sort((a,b)=>a.d-b.d);
+  const n=Math.min(NL,QL>=3?4:QL>=2?6:NL);LP.fill(0);LC.fill(0);
+  for(let i=0;i<Math.min(n,cand.length);i++){const c=cand[i];LP[i*3]=c.x;LP[i*3+1]=c.z;LP[i*3+2]=c.y;LC[i*4]=c.c[0]*c.i;LC[i*4+1]=c.c[1]*c.i;LC[i*4+2]=c.c[2]*c.i;LC[i*4+3]=c.r}
+}
+function drawWorld(){
+  draw(world,I4,{spec:.14,shin:20});draw(floorMesh,I4,{det:.9,spec:.06,shin:10});
+  draw(decoMesh,I4,{spec:.2});
+  if(splatMesh)draw(splatMesh,I4,{spec:.4});
+  for(const d of doors.values()){const m=doorMesh[d.locked?'X':'D'];let M;
+    if(d.orient==='h')M=M4.tr(d.x+.5+d.open,0,d.y+.5);else M=M4.mul(M4.tr(d.x+.5,0,d.y+.5+d.open),M4.ry(Math.PI/2));
+    draw(m,M,{spec:.2})}
+}
+function floorDetail(){return 0}
+// 메인 프레임
+let lastW=0,lastH=0,lastQ=-1,lastTheme=-1,lastSplatN=-1;
+R.dpr=1;
+R.frame=(o)=>{
+  if(!ok)return false;
+  const coarse=matchMedia('(pointer:coarse)').matches;
+  const d3=Math.min(window.devicePixelRatio||1,(coarse?[1.25,1,.8,.6]:[1.75,1.25,1,.75])[QL]);R.dpr=d3;
+  const bw=Math.max(1,Math.round(W*d3)),bh=Math.max(1,Math.round(H*d3));
+  if(cv3.width!==bw||cv3.height!==bh){cv3.width=bw;cv3.height=bh}
+  if(worldKey!==map||lastTheme!==theme){lastTheme=theme;paintFloor();buildWorld();lastSplatN=-1}
+  {let n=0;for(const a of wallSplats.values())n+=a.length;if(n!==lastSplatN){lastSplatN=n;buildSplats()}}
+  flushFloor();
+  camera(o);ENV=env();pickLights(ENV);
+  ptN=0;ptAN=0;
+  // 그림자
+  useShadow=!!shadowFB&&QL<=1&&!DK&&theme===0;
+  if(useShadow){const s=ENV.sd,cx=P.x+Math.cos(P.a)*5,cz=P.y+Math.sin(P.a)*5,R0=14;
+    const V=M4.look(cx+s[0]*20,s[1]*20,cz+s[2]*20,cx,0,cz,0,1,0);shadowM=M4.mul(M4.ortho(-R0,R0,-R0,R0,1,45),V);
+    gl.bindFramebuffer(gl.FRAMEBUFFER,shadowFB);gl.viewport(0,0,SHS,SHS);gl.clearColor(1,1,1,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);gl.useProgram(PD.p);gl.uniformMatrix4fv(PD.u.uSM,false,shadowM);pass='shadow';
+    drawWorld();if(R.drawEntities)R.drawEntities(draw,true);
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null)}
+  pass='main';
+  gl.viewport(0,0,bw,bh);gl.clearColor(0,0,0,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  // 하늘
+  if(!DK){gl.disable(gl.DEPTH_TEST);gl.useProgram(PS.p);const u=PS.u,c=R.cam;
+    const r=c.rt,f=c.fw;gl.uniform3f(u.uF,f[0],0,f[2]);gl.uniform3f(u.uR,r[0],0,r[2]);gl.uniform3f(u.uU,0,1,0);
+    // NDC → (가로/깊이, 세로/깊이): ndcX = (2fx/W)*s + (2cxp/W-1)
+    gl.uniform4f(u.uPj,2*c.cxp/W-1,1-2*c.hy/H,2*c.fx/W,2*c.fy/H);
+    gl.uniform3fv(u.uZen,ENV.zen);gl.uniform3fv(u.uHor,ENV.hor);gl.uniform3fv(u.uSunC,ENV.sunC);gl.uniform3fv(u.uSunD,ENV.sd);gl.uniform3fv(u.uCloud,ENV.cloud);gl.uniform3fv(u.uFogCol,ENV.fog);
+    gl.uniform1f(u.uTime,time);gl.uniform1f(u.uCloudK,ENV.cloudK);gl.uniform1f(u.uStars,ENV.stars);gl.uniform1f(u.uExpo,1);
+    gl.bindBuffer(gl.ARRAY_BUFFER,quadVB);gl.enableVertexAttribArray(0);for(let i=1;i<4;i++)gl.disableVertexAttribArray(i);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);gl.drawArrays(gl.TRIANGLES,0,3)}
+  gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);
+  gl.useProgram(PM.p);const u=PM.u;curTex=null;
+  gl.uniformMatrix4fv(u.uP,false,VP);gl.uniformMatrix4fv(u.uV,false,VV);gl.uniform3fv(u.uCam,camPos);
+  gl.uniform3fv(u.uSunDir,ENV.sd);gl.uniform3fv(u.uSunCol,ENV.sunCol);gl.uniform3fv(u.uSkyCol,ENV.skyA);gl.uniform3fv(u.uGndCol,ENV.gndA);
+  gl.uniform3fv(u.uFogCol,ENV.fog);gl.uniform1f(u.uFogD,ENV.fogD);gl.uniform1f(u.uFogH,ENV.fogH);gl.uniform1f(u.uExpo,ENV.expo);gl.uniform1f(u.uTime,time);
+  gl.uniform3fv(u.uLP,LP);gl.uniform4fv(u.uLC,LC);gl.uniform1f(u.uTexOn,1);
+  gl.uniform1i(u.uTex,0);gl.uniform1i(u.uDet,1);gl.uniform1i(u.uShadow,2);
+  gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,TX.grass);gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,shadowTex);gl.activeTexture(gl.TEXTURE0);
+  gl.uniform1f(u.uShOn,useShadow?1:0);if(useShadow)gl.uniformMatrix4fv(u.uSM,false,shadowM);else gl.uniformMatrix4fv(u.uSM,false,I4);
+  drawWorld();
+  if(R.drawEntities)R.drawEntities(draw,false);
+  // 횃불 불꽃
+  if(!DK)for(const L of lights){const dd=Math.hypot(L.x-P.x,L.y-P.y);if(dd>16)continue;if(L.wall!==false&&R.torchFlame)R.torchFlame(L)}
+  flushPts(PTA,ptN,false);flushPts(ptAdd,ptAN,true);
+  if(R.drawView){gl.clear(gl.DEPTH_BUFFER_BIT);gl.useProgram(PM.p);curTex=null;R.drawView(draw)}
+  return true;
+};
+R.ENV=()=>ENV;R.setVP=(P_,V_,cp)=>{const u=PM.u;gl.uniformMatrix4fv(u.uP,false,P_);gl.uniformMatrix4fv(u.uV,false,V_);gl.uniform3fv(u.uCam,cp)};
+R.restoreVP=()=>{const u=PM.u;gl.uniformMatrix4fv(u.uP,false,VP);gl.uniformMatrix4fv(u.uV,false,VV);gl.uniform3fv(u.uCam,camPos)};
+R.gl=()=>gl;R.TX=TX;R.WH=WH;
+R.reset=()=>{worldKey=null};
+
+// ================= 엔티티 모델 =================
+const MC={};// 모델 캐시
+const mk=(key,fn)=>MC[key]||(MC[key]=fn());
+const PI=Math.PI;
+// 게임 좌표 → 모델 행렬. yaw는 게임 각도(라디안)
+function place(x,y,z,yaw,s){let M=M4.tr(x,z,y);if(yaw!==undefined&&yaw!==null)M=M4.mul(M,M4.ry(PI/2-yaw));if(s!==undefined&&s!==1)M=M4.mul(M,M4.sc(s,s,s));return M}
+const mm=(...ms)=>ms.reduce((a,b)=>M4.mul(a,b));
+const T3=M4.tr,RX=M4.rx,RY=M4.ry,RZ=M4.rz,SC=M4.sc;
+const HC=(h,s,l)=>hsl2rgb(h,s,l);
+
+// ---------- 사물 ----------
+function mBarrel(){const g=new GB();g.use(TX.plank).hsl(4,62,40);g.lathe([[0,0],[.2,0],[.235,.12],[.255,.31],[.235,.5],[.2,.62],[0,.62]],18,1);
+  g.use(TX.metal).hsl(30,10,32);for(const y of [.1,.52])g.save().t(0,y,0).torus(.236,.014,18,4).restore();
+  g.use(null).hsl(48,90,50).save().t(0,.31,.255).rx(PI/2).cyl(.07,.07,.01,3,true).restore();return g.build()}
+function mCrate(){const g=new GB();g.use(TX.crate).rbox(0,.275,0,.55,.55,.55,.025);return g.build()}
+function mPillar(){const g=new GB();g.use(TX.stone).hsl(35,8,72);
+  g.lathe([[.3,0],[.3,.08],[.25,.1],[.24,.14],[.2,.18]],16,1);
+  const fl=[];for(let i=0;i<=8;i++){const t=i/8;fl.push([.19-.012*Math.sin(t*PI),.18+t*.68])}g.lathe(fl,16,2);
+  g.lathe([[.2,.86],[.24,.9],[.28,.94],[.3,.96],[.3,1],[0,1]],16,1);return g.build()}
+function mBrazier(){const g=new GB();g.use(TX.metal).hsl(25,14,30);
+  for(let i=0;i<3;i++){const a=i/3*PI*2;g.rod(Math.cos(a)*.18,0,Math.sin(a)*.18,Math.cos(a)*.08,.46,Math.sin(a)*.08,.018,6)}
+  g.lathe([[.05,.42],[.16,.46],[.22,.56],[.24,.62],[.21,.62],[.14,.52],[0,.5]],14,1);
+  g.use(null).hsl(20,80,12).save().t(0,.58,0).s(1,.35,1).sph(.17,10,5).restore();return g.build()}
+function mLamp(){const g=new GB();g.use(TX.metal).hsl(210,8,24);g.lathe([[.12,0],[.12,.05],[.07,.08],[.035,.12],[.03,1.1],[.05,1.12],[0,1.13]],10,1);
+  g.save().t(0,1.12,0);g.rod(0,0,0,0,.02,0,.04,6);g.box(0,.04,0,.16,.02,.16).box(0,.26,0,.18,.03,.18);for(const ex of [-1,1])for(const ez of [-1,1])g.rod(ex*.075,.04,ez*.075,ex*.075,.25,ez*.075,.008,4);
+  g.lathe([[.09,.27],[.05,.32],[0,.34]],8,1);g.use(null).hsl(46,95,70,.95).box(0,.15,0,.12,.18,.12);g.restore();return g.build()}
+function mTree(seed){const g=new GB();const r=mulberry(seed);g.use(TX.bark).hsl(28,40,40);
+  const tr=[];for(let i=0;i<=7;i++){const t=i/7;tr.push([.11-.06*t+(i===0?.05:0),t*.95])}g.lathe(tr,10,2);
+  for(let i=0;i<3;i++){const a=r()*PI*2,h=.55+r()*.3;g.rod(0,h,0,Math.cos(a)*.3,h+.25,Math.sin(a)*.3,.03,6)}
+  g.use(TX.leaf);
+  const cl=[[0,1.2,0,.42],[.25,1.05,.12,.3],[-.22,1.08,-.1,.32],[.05,1.45,-.05,.32],[-.1,1.0,.25,.27],[.15,1.25,-.25,.28]];
+  for(const [x,y,z,s] of cl){g.hsl(100+r()*25,45+r()*10,28+r()*14);g.save().t(x,y,z).s(1,.82,1).sph(s,10,7,2).restore()}return g.build()}
+function mBones(){const g=new GB();g.use(null).hsl(45,15,72);const r=mulberry(7);
+  for(let i=0;i<5;i++){const a=r()*PI*2,l=.12+r()*.12,x=(r()-.5)*.4,z=(r()-.5)*.4;g.rod(x,.02,z,x+Math.cos(a)*l,.02,z+Math.sin(a)*l,.014,5);g.save().t(x,.02,z).sph(.022,6,4).restore()}
+  g.save().t(.05,.06,.02).s(1,.85,1.1).sph(.07,10,7).restore();g.hsl(0,0,8).save().t(.07,.07,.08).sph(.018,5,4).restore().save().t(.03,.07,.085).sph(.018,5,4).restore();return g.build()}
+const OBJM={B:mBarrel,C:mCrate,I:mPillar,T:mBrazier,L:mLamp,Z:mBones};
+// ---------- 아이템 ----------
+function mKey(){const g=new GB();g.use(null).hsl(46,90,52);g.save().t(-.08,0,0).rx(PI/2).torus(.05,.014,14,5).restore();g.rod(-.03,0,0,.12,0,0,.013,6);g.box(.1,-.025,0,.015,.04,.012).box(.065,-.022,0,.015,.032,.012);return g.build()}
+function mMed(){const g=new GB();g.use(null).hsl(0,0,92).rbox(0,0,0,.22,.16,.12,.02);g.hsl(0,80,45,.1).box(0,0,.062,.11,.035,.01).box(0,0,.062,.035,.11,.01);g.hsl(0,0,30).box(0,.09,0,.08,.02,.03);return g.build()}
+function mAmmo(){const g=new GB();g.use(TX.metal).hsl(80,30,30).rbox(0,0,0,.26,.12,.14,.01);g.use(null).hsl(46,80,45);for(let i=0;i<5;i++)g.save().t(-.08+i*.04,.09,0).cyl(.012,.012,.08,6).restore().save().t(-.08+i*.04,.135,0).cyl(.012,0,.025,6).restore();return g.build()}
+function mGold(){const g=new GB();g.use(null).hsl(46,95,50);const r=mulberry(3);for(let i=0;i<7;i++){const x=(r()-.5)*.14,z=(r()-.5)*.14,y=(i%3)*.018;g.save().t(x,y,z).rx((r()-.5)*.4).cyl(.04,.04,.012,12).restore()}return g.build()}
+function mArmor(){const g=new GB();g.use(TX.metal).hsl(212,40,50);g.save().s(1,1,.6).lathe([[.0,-.14],[.12,-.13],[.14,-.02],[.15,.08],[.1,.13],[0,.14]],12,1).restore();g.hsl(212,30,32).box(0,.1,.05,.06,.04,.04);return g.build()}
+function mGem(hue){const g=new GB();g.use(null).hsl(hue,90,58,.35);g.lathe([[0,-.13],[.08,0],[.06,.05],[0,.07]],6,1);return g.build()}
+function mSpears(){const g=new GB();g.use(null);for(let i=0;i<3;i++){const z=(i-1)*.04;g.hsl(80,40,48).rod(-.3,0,z,.26,0,z,.012,6);g.hsl(60,30,78).save().t(.3,0,z).rz(-PI/2).cyl(.02,0,.09,6).restore()}g.hsl(28,50,36).save().rz(PI/2).cyl(.03,.03,.06,8).restore();return g.build()}
+// ---------- 투사체 ----------
+function mArrow(){const g=new GB();g.use(null).hsl(30,42,52).rod(-.3,0,0,.28,0,0,.01,5);g.hsl(210,12,74).save().t(.31,0,0).rz(-PI/2).cyl(.022,0,.07,6).restore();
+  g.hsl(2,60,48);for(const a of [0,PI*2/3,PI*4/3])g.save().t(-.26,0,0).rx(a).ext([[0,0],[.1,0],[.02,.04]],.004).restore();return g.build()}
+function mSpearP(){const g=new GB();g.use(null).hsl(80,40,48).rod(-.45,0,0,.4,0,0,.015,6);g.hsl(70,35,30);for(const x of [-.2,.1])g.save().t(x,0,0).rz(PI/2).cyl(.019,.019,.02,8).restore();g.hsl(60,30,80).save().t(.46,0,0).rz(-PI/2).cyl(.022,0,.12,6).restore();return g.build()}
+function mRock(){const g=new GB();g.use(TX.stone).hsl(30,8,45);g.save().s(1,.8,.9).sph(.17,8,6).restore();return g.build()}
+function mNade(k){const g=new GB();g.use(null);if(k==='flash'){g.hsl(210,8,62).cyl(.035,.035,.1,10);g.hsl(210,10,30).save().t(0,.06,0).cyl(.02,.02,.02,8).restore()}else{g.hsl(100,30,30).save().s(1,1.2,1).sph(.045,10,7).restore();g.hsl(210,10,40).save().t(0,.06,0).cyl(.015,.015,.03,8).restore()}
+  g.hsl(210,8,50).rod(.015,.05,0,.04,0,0,.005,4);return g.build()}
+function mBrass(red){const g=new GB();g.use(null);if(red){g.hsl(4,62,42).save().rz(PI/2).cyl(.014,.014,.06,8).restore();g.hsl(44,75,50).save().t(-.03,0,0).rz(PI/2).cyl(.0145,.0145,.014,8).restore()}else{g.hsl(42,75,52).save().rz(PI/2).cyl(.008,.008,.035,8).restore()}return g.build()}
+function mBall(){const g=new GB();g.use(null).col(1,1,1).sph(.05,10,7);return g.build()}
+function mFoliage(){
+  const g=new GB();g.use(null);const r=mulberry(77);const DG=theme===1;
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){if(map[y][x]!=='.'||pathG[y*MW+x])continue;const n=QL===0?7:4;
+    for(let k=0;k<n;k++){const px=x+.1+r()*.8,pz=y+.1+r()*.8,m=vnoise(px*.35,pz*.35);if(m>.7)continue;const hh=.03+r()*.05;
+      const c=DG?HC(95,18,24+r()*8):HC(86+m*26+r()*10,44,44+r()*14);
+      for(let b=0;b<3;b++){const a=r()*PI,dx=Math.cos(a)*.014,dz=Math.sin(a)*.014,lean=(r()-.5)*.03;g.rgb(c);g.c[3]=1;
+        const i0=g.vert(px-dx,0,pz-dz,0,1,0,0,0),i1=g.vert(px+dx,0,pz+dz,0,1,0,1,0),i2=g.vert(px+lean,hh,pz+lean,0,1,0,.5,1);g.tri(i0,i1,i2)}
+      if(!DG&&r()<.06){g.hsl(r()<.5?330:52,70,62);g.rod(px,0,pz,px,.12,pz,.004,3);g.save().t(px,.13,pz).sph(.022,6,4).restore()}}}
+  return g.build()}
+let foliage=null,foliageKey=null;
+// ---------- 인체형 부품 ----------
+// opts: skin, body, legs, head:'helm'|'hood'|'bare'|'crown'|'skull', bulk, robe
+function humanoid(o){
+  const P_={};const sk=o.skin||[28,40,62];const g=()=>new GB();
+  // 몸통
+  let t=g();t.use(o.bodyTex||null).hsl(...o.body);
+  if(o.robe){t.lathe([[.0,.05],[.2*o.bulk,.05],[.17*o.bulk,.3],[.14*o.bulk,.5],[.16*o.bulk,.6],[.12,.66],[0,.68]],12,1)}
+  else if(o.skel){t.hsl(45,15,80);for(let i=0;i<4;i++)t.save().t(0,.42+i*.05,0).s(1,.5,.7).torus(.09-i*.008,.012,10,4).restore();t.rod(0,.36,-.04,0,.66,-.04,.02,6);t.save().t(0,.36,0).s(1,.5,.7).sph(.09,8,5).restore()}
+  else{t.save().t(0,.5,0).s(o.bulk,1,o.bulk*.75).lathe([[0,-.14],[.14,-.13],[.16,-.02],[.17,.1],[.15,.15],[.09,.18],[0,.18]],12,1).restore();
+    if(o.armor){t.hsl(...o.armor).save().t(0,.53,.02).s(o.bulk*1.04,1,o.bulk*.8).lathe([[.0,-.08],[.15,-.07],[.17,.06],[.13,.14],[0,.15]],12,1).restore()}
+    t.hsl(...(o.belt||[28,45,22])).save().t(0,.38,0).s(o.bulk,1,o.bulk*.75).cyl(.15,.15,.04,12).restore();t.hsl(46,70,45).box(0,.38,.11*o.bulk,.04,.035,.02)}
+  P_.torso=t.build();
+  // 머리
+  const h=g();h.use(TX.skin);
+  if(o.head==='skull'){h.hsl(45,15,82).save().s(1,1.05,1.1).sph(.1,12,9).restore();h.hsl(0,0,5).save().t(.035,.0,.09).sph(.025,6,5).restore().save().t(-.035,0,.09).sph(.025,6,5).restore();h.hsl(45,15,72).box(0,-.08,.05,.08,.04,.07)}
+  else{h.hsl(...sk).save().s(.95,1.08,1).sph(.1,14,10).restore();h.hsl(...sk).box(0,-.03,.095,.025,.03,.02);
+    const ec=o.eye||[0,0,8];h.hsl(...ec,o.eyeGlow?.8:0).save().t(.036,.02,.088).sph(.014,6,4).restore().save().t(-.036,.02,.088).sph(.014,6,4).restore();
+    if(o.beard){h.hsl(...o.beard).save().t(0,-.07,.05).s(1,1.3,.8).sph(.07,8,6).restore()}}
+  if(o.head==='helm'){h.use(TX.metal).hsl(...(o.helm||[210,10,50])).save().t(0,.03,0).s(1,.9,1.05).sph(.115,12,7).restore();h.box(0,-.02,.11,.02,.06,.015);h.save().t(0,.0,0).cyl(.12,.125,.02,12).restore()}
+  else if(o.head==='hood'){h.use(null).hsl(...o.hood).save().t(0,.03,-.015).s(1.05,1.1,1.1).lathe([[0,-.13],[.11,-.11],[.125,.0],[.11,.08],[.06,.13],[0,.15]],12,1).restore()}
+  else if(o.head==='cap'){h.use(null).hsl(...(o.hat||[28,40,30])).save().t(0,.05,0).s(1,.6,1).sph(.112,12,6).restore();h.box(0,.03,.1,.12,.012,.08)}
+  else if(o.head==='crown'){h.use(null).hsl(46,90,52,.1);h.save().t(0,.1,0).cyl(.1,.105,.06,12,false).restore();for(let i=0;i<5;i++){const a=i/5*PI*2;h.save().t(Math.cos(a)*.1,.15,Math.sin(a)*.1).cyl(.018,0,.06,4).restore()}
+    h.hsl(350,80,45,.4).save().t(0,.1,.105).sph(.016,6,4).restore()}
+  else if(o.head==='horn'){h.use(TX.metal).hsl(...(o.helm||[0,10,30])).save().t(0,.03,0).s(1,.9,1.05).sph(.115,12,7).restore();h.use(null).hsl(45,30,80);for(const sx of [-1,1])h.save().t(sx*.1,.06,0).rz(-sx*.9).cyl(.025,0,.14,6).restore()}
+  P_.head=h.build();
+  // 팔 (어깨 기준, 아래로)
+  const a=g();a.use(TX.skin);const sl=o.sleeve||o.body;
+  if(o.skel){a.hsl(45,15,80).rod(0,0,0,0,-.4,0,.018,6).save().t(0,-.42,0).sph(.03,6,4).restore()}
+  else{a.use(null).hsl(...sl).rod(0,0,0,0,-.2,0,.045*o.bulk,8);a.use(TX.skin).hsl(...(o.glove||sk)).rod(0,-.2,0,0,-.38,.02,.038*o.bulk,8);a.save().t(0,-.42,.02).s(1,1.1,.8).sph(.042*o.bulk,8,6).restore()}
+  P_.arm=a.build();
+  // 다리 (엉덩이 기준)
+  const l=g();l.use(null);
+  if(o.skel){l.hsl(45,15,80).rod(0,0,0,0,-.36,0,.02,6);l.save().t(0,-.38,.03).s(1,.6,1.6).sph(.035,6,4).restore()}
+  else if(!o.robe){l.hsl(...(o.legs||[220,14,26])).rod(0,0,0,0,-.34,0,.055*o.bulk,8);l.hsl(...(o.boot||[25,30,16])).save().t(0,-.36,.035).s(1,.7,1.5).sph(.05*o.bulk,8,6).restore()}
+  P_.leg=l.build();
+  return P_;
+}
+// 손에 드는 물건
+function propMesh(k){return mk('prop_'+k,()=>{const g=new GB();g.use(null);
+  if(k==='sword'){g.hsl(210,12,78).ext([[-.012,0],[.012,0],[.012,.42],[0,.47],[-.012,.42]],.01);g.hsl(46,70,42).box(0,-.005,0,.1,.018,.025);g.hsl(28,40,22).rod(0,-.01,0,0,-.11,0,.014,6);g.hsl(46,70,42).save().t(0,-.12,0).sph(.02,6,4).restore()}
+  else if(k==='axe'){g.hsl(28,40,30).rod(0,-.12,0,0,.5,0,.016,6);g.use(TX.metal).hsl(210,10,62).save().t(.06,.42,0).ext([[-.04,-.07],[.1,-.12],[.13,0],[.1,.12],[-.04,.07]],.02).restore()}
+  else if(k==='staff'){g.hsl(28,40,30).rod(0,-.3,0,0,.6,0,.016,6);g.hsl(28,40,30).save().t(0,.62,0).torus(.045,.012,10,4).restore()}
+  else if(k==='bow'){g.hsl(28,50,36);g.save().rz(PI/2).torus(.32,.012,16,5,PI*.8).restore();g.hsl(0,0,85).rod(.1,-.3,0,.1,.3,0,.003,3)}
+  else if(k==='spear'){g.hsl(28,40,32).rod(0,-.4,0,0,.6,0,.014,6);g.hsl(210,12,70).save().t(0,.66,0).cyl(.03,0,.12,6).restore()}
+  else if(k==='shield'){g.use(TX.wood).hsl(30,45,40).save().rx(PI/2).cyl(.2,.2,.04,16).restore();g.use(TX.metal).hsl(46,60,50).save().rx(PI/2).torus(.2,.015,18,4).restore().save().t(0,0,.03).sph(.04,8,5).restore()}
+  else if(k==='rifle'){g.hsl(210,8,18).box(0,0,0,.05,.07,.36).hsl(210,8,14).rod(0,.015,.18,0,.015,.42,.012,6);g.hsl(28,45,28).box(0,-.03,-.24,.045,.08,.16);g.hsl(210,8,14).box(0,.06,0,.025,.03,.12)}
+  else if(k==='longrifle'){g.hsl(100,15,22).box(0,0,0,.05,.07,.42).hsl(210,8,14).rod(0,.015,.2,0,.015,.58,.011,6);g.hsl(210,8,10).save().t(0,.07,0).rx(PI/2).cyl(.025,.025,.2,8).restore();g.hsl(100,15,22).box(0,-.03,-.28,.045,.08,.18)}
+  return g.build()})}
+// 인체형 그리기. pose: walk 위상, atk 0..1, dead 0..1
+function drawHuman(draw,H,M,o){
+  const w=o.walk||0,sw=Math.sin(w)*(o.moving?0.6:0),atk=o.atk||0;
+  const hip=.38;
+  for(const s of [-1,1]){const lg=mm(M,T3(s*.075,hip,0),RX(s*sw));draw(H.leg,lg,o.d)}
+  const bob=Math.abs(Math.sin(w))*.02*(o.moving?1:0);const tor=mm(M,T3(0,bob,0),RX(o.lean||0));draw(H.torso,tor,o.d);
+  draw(H.head,mm(tor,T3(0,.78,0),RY(o.look||0),RX(o.nod||0)),o.d);
+  for(const s of [-1,1]){let ra=-s*sw*.8,rz=s*.12;let extra=I4;
+    if(s===1&&atk>0){ra=-2.4*Math.sin(atk*PI)-.4;}
+    if(o.armPose){const ap=o.armPose(s);if(ap){ra=ap[0];rz=ap[1];}}
+    const am=mm(tor,T3(s*(.19*(o.bulk||1)),.66,0),RZ(rz),RX(ra));draw(H.arm,am,o.d);
+    const hand=mm(am,T3(0,-.42,.03));
+    if(s===1&&o.prop)draw(propMesh(o.prop),mm(hand,o.propM||RX(PI/2)),o.d);
+    if(s===-1&&o.propL)draw(propMesh(o.propL),mm(hand,o.propLM||I4),o.d)}
+}
+// ---------- 적 정의 ----------
+const EDEF={
+ E:{h:()=>humanoid({bulk:1,body:[4,70,40],armor:[8,45,32],legs:[25,30,22],head:'helm',helm:[24,40,34],sleeve:[4,60,34]}),prop:'sword'},
+ U:{h:()=>humanoid({bulk:.95,body:[140,32,28],legs:[140,20,20],head:'hood',hood:[140,35,24],sleeve:[140,30,24]}),prop:'bow',bow:1},
+ g:{h:()=>humanoid({bulk:1.15,body:[210,12,40],armor:[210,14,52],legs:[210,10,30],head:'helm',helm:[210,12,58],sleeve:[210,12,40]}),prop:'spear',propL:'shield'},
+ s:{h:()=>humanoid({skel:1,bulk:.9,head:'skull',body:[45,15,80],eye:[0,90,50],eyeGlow:1}),prop:'sword'},
+ N:{h:()=>humanoid({robe:1,bulk:1.1,body:[275,45,30],head:'hood',hood:[275,50,22],eye:[300,95,62],eyeGlow:1,sleeve:[275,45,28]}),prop:'staff',orb:[20,100,56]},
+ h:{h:()=>humanoid({robe:1,bulk:1.05,body:[120,20,82],head:'hood',hood:[120,35,70],eye:[140,90,40],sleeve:[120,20,80]}),prop:'staff',orb:[120,90,60],cross:1},
+ j:{h:()=>humanoid({bulk:1,body:[110,22,26],legs:[110,18,20],head:'cap',hat:[110,20,22],sleeve:[110,22,24]}),prop:'longrifle',gun:1},
+ k:{h:()=>humanoid({bulk:1.3,body:[0,62,40],armor:[355,40,24],legs:[0,30,22],head:'horn',helm:[0,10,28],skin:[10,45,45],eye:[50,100,60],eyeGlow:1,sleeve:[10,45,45],beard:[20,50,24]}),prop:'axe'},
+ Q:{h:()=>humanoid({robe:1,bulk:1.25,body:[352,62,32],head:'crown',skin:[28,40,60],beard:[0,0,85],sleeve:[352,55,26]}),prop:'sword',scale:1.6},
+ DEM:{h:()=>humanoid({robe:1,bulk:1.3,body:[280,55,20],head:'horn',helm:[280,40,24],skin:[280,30,40],eye:[0,100,55],eyeGlow:1,sleeve:[280,50,22]}),prop:'staff',orb:[290,90,62],scale:1.5},
+};
+// 비인체형 모델
+function mDog(){const g=new GB();g.use(TX.skin).hsl(30,55,44);g.save().t(0,.3,0).s(.55,.55,1).sph(.22,12,8).restore();
+  g.save().t(0,.42,.24).s(1,.95,1.15).sph(.1,10,7).restore();g.hsl(30,45,36).save().t(0,.39,.34).s(.7,.6,1).sph(.07,8,6).restore();
+  g.hsl(0,0,5).save().t(0,.4,.4).sph(.018,6,4).restore();g.hsl(50,100,60,.7).save().t(.04,.45,.33).sph(.012,5,4).restore().save().t(-.04,.45,.33).sph(.012,5,4).restore();
+  g.hsl(28,50,28);for(const s of [-1,1])g.save().t(s*.055,.52,.22).rz(-s*.3).cyl(.03,0,.08,4).restore();
+  g.hsl(30,50,40).rod(0,.36,-.22,0,.46,-.36,.02,5);return g.build()}
+function mDogLeg(){const g=new GB();g.use(TX.skin).hsl(30,45,36).rod(0,0,0,0,-.22,0,.03,6);g.hsl(30,30,26).save().t(0,-.23,.015).sph(.032,6,4).restore();return g.build()}
+function mSpider(){const g=new GB();g.use(TX.skin).hsl(280,30,26);g.save().t(0,.2,-.12).s(1,.8,1.2).sph(.17,12,8).restore();g.hsl(300,55,38).save().t(0,.2,-.12).s(.5,.4,1.25).sph(.172,10,6).restore();
+  g.hsl(280,25,20).save().t(0,.18,.1).sph(.1,10,7).restore();g.hsl(0,100,55,.9);for(const [x,y] of [[.04,.21],[-.04,.21],[.025,.24],[-.025,.24]])g.save().t(x,y,.19).sph(.016,5,4).restore();
+  g.hsl(0,0,10);for(const s of [-1,1])g.rod(s*.03,.15,.18,s*.02,.1,.22,.01,4);return g.build()}
+function mSpiderLeg(){const g=new GB();g.use(null).hsl(280,20,20).rod(0,0,0,.2,.12,0,.016,5).rod(.2,.12,0,.36,-.2,0,.013,5);return g.build()}
+function mBomber(){const g=new GB();g.use(TX.skin).hsl(0,5,16).save().t(0,.3,0).sph(.2,14,10).restore();g.hsl(0,5,28).save().t(0,.5,0).cyl(.05,.05,.04,10).restore();
+  g.hsl(30,40,50).rod(0,.52,0,.03,.6,.02,.008,4);g.hsl(50,100,62,.9).save().t(.035,.38,.17).sph(.025,6,4).restore().save().t(-.035,.38,.17).sph(.025,6,4).restore();
+  g.hsl(0,70,40).box(0,.18,.19,.1,.02,.01);g.hsl(30,30,30);for(const s of [-1,1])g.rod(s*.08,.14,0,s*.1,0,.03,.025,6);return g.build()}
+function mGhost(){const g=new GB();g.use(null).hsl(185,45,72);const pr=[];for(let i=0;i<=10;i++){const t=i/10;pr.push([t<.75?.22-.04*t:.22*Math.sqrt(Math.max(0,1-((t-.75)/.25)**2))*.82,.05+t*.75])}
+  g.lathe(pr,16,1);for(let i=0;i<8;i++){const a=i/8*PI*2;g.save().t(Math.cos(a)*.17,.03,Math.sin(a)*.17).cyl(0,.05,.08,6).restore()}
+  g.hsl(200,60,10).save().t(.06,.6,.17).s(1,1.4,1).sph(.03,6,4).restore().save().t(-.06,.6,.17).s(1,1.4,1).sph(.03,6,4).restore();g.save().t(0,.48,.19).s(1.3,.8,1).sph(.025,6,4).restore();return g.build()}
+function mBat(){const g=new GB();g.use(TX.skin).hsl(280,20,22).save().s(.8,1,1.1).sph(.09,10,7).restore();g.save().t(0,.08,.04).sph(.065,8,6).restore();
+  g.hsl(280,20,18);for(const s of [-1,1])g.save().t(s*.035,.15,.04).cyl(.02,0,.06,4).restore();g.hsl(0,100,60,.9).save().t(.025,.09,.1).sph(.011,4,3).restore().save().t(-.025,.09,.1).sph(.011,4,3).restore();return g.build()}
+function mWing(){const g=new GB();g.use(null).hsl(275,30,26);g.ext([[0,.02],[.18,.06],[.36,.02],[.32,-.06],[.24,-.03],[.18,-.08],[.1,-.04],[0,-.04]],.008);return g.build()}
+function mGolem(){const g=new GB();g.use(TX.stone).hsl(30,8,50);g.save().t(0,.75,0).s(1.15,1,.85).sph(.4,10,8).restore();g.save().t(0,1.22,.06).s(1,.9,1).sph(.2,9,7).restore();
+  g.hsl(190,100,60,.9).save().t(.07,1.24,.23).sph(.04,6,4).restore().save().t(-.07,1.24,.23).sph(.04,6,4).restore().box(0,.78,.33,.16,.06,.03);
+  for(const [x,y,z,s] of [[.25,.95,.15,.12],[-.28,.6,.2,.1],[.1,.45,.3,.09]])g.hsl(30,8,38).save().t(x,y,z).sph(s,7,5).restore();return g.build()}
+function mGolemArm(){const g=new GB();g.use(TX.stone).hsl(30,8,44);g.save().t(0,-.2,0).s(.8,1.3,.8).sph(.17,8,6).restore();g.save().t(0,-.52,.05).sph(.18,8,6).restore();return g.build()}
+function mGolemLeg(){const g=new GB();g.use(TX.stone).hsl(30,8,40);g.save().t(0,-.2,0).s(1,1.3,1).sph(.17,8,6).restore();return g.build()}
+function mDragon(){const g=new GB();g.use(TX.skin).hsl(350,62,40);g.save().t(0,.0,0).s(.7,.65,1.3).sph(.38,12,9).restore();
+  const nk=[];for(let i=0;i<6;i++){const t=i/5;g.save().t(0,.1+t*.35,.35+t*.25).sph(.17-.05*t,9,6).restore()}
+  g.hsl(356,70,50).save().t(0,.5,.68).s(.8,.7,1.3).sph(.17,10,8).restore();g.hsl(350,55,30).save().t(0,.44,.86).s(.6,.4,.7).sph(.1,8,6).restore();
+  g.hsl(50,100,62,.9).save().t(.08,.56,.78).sph(.03,6,4).restore().save().t(-.08,.56,.78).sph(.03,6,4).restore();
+  g.hsl(45,30,75);for(const s of [-1,1])g.save().t(s*.08,.66,.6).rx(-.8).cyl(.03,0,.16,6).restore();
+  g.hsl(350,62,36);for(let i=0;i<7;i++){const t=i/6;g.save().t(0,-.05-.1*t,-.4-t*.5).sph(.13-.1*t,8,6).restore()}
+  g.hsl(45,30,70);for(let i=0;i<6;i++)g.save().t(0,.22-i*.03,.3-i*.16).cyl(.03,0,.08,4).restore();return g.build()}
+function mDWing(){const g=new GB();g.use(null).hsl(10,50,30);g.ext([[0,.05],[.5,.25],[.95,.1],[.85,-.08],[.65,-.02],[.55,-.2],[.35,-.06],[.2,-.22],[0,-.08]],.01);g.hsl(10,40,22);g.rod(0,.02,0,.5,.25,0,.02,5).rod(.5,.25,0,.95,.1,0,.015,5);return g.build()}
+function mDLeg(){const g=new GB();g.use(TX.skin).hsl(350,55,30).rod(0,0,0,0,-.3,.05,.06,6);g.hsl(45,20,70);for(const x of [-.04,0,.04])g.rod(x,-.32,.08,x*1.5,-.36,.16,.012,4);return g.build()}
+
+// ---------- 그리기 도우미 ----------
+const tintHit=new Float32Array([1,1,1,.85]),tintZ=new Float32Array(4);
+function eTint(e){if(e.hit>0)return tintHit;if(e.paint){const c=hsl2rgb(e.paint.hue,80,55);return new Float32Array([c[0],c[1],c[2],.45])}return tintZ}
+function faceOf(e){
+  if(e._fx===undefined){e._fx=e.x;e._fy=e.y;e._yaw=Math.atan2(P.y-e.y,P.x-e.x)}
+  const dx=e.x-e._fx,dy=e.y-e._fy;let want=e._yaw;
+  if(e.alert||e.atkT>0||e.T&&e.T.ranged&&e.alertT>0)want=Math.atan2(P.y-e.y,P.x-e.x);else if(dx*dx+dy*dy>1e-6)want=Math.atan2(dy,dx);
+  const d=Math.atan2(Math.sin(want-e._yaw),Math.cos(want-e._yaw));e._yaw+=d*Math.min(1,frameDt*8);e._mv=dx*dx+dy*dy>1e-7;e._fx=e.x;e._fy=e.y;return e._yaw}
+function drawEnemy(draw,e,sp){
+  const T=e.T,key=Object.keys(ET).find(k=>ET[k]===T)||'E';e._k=e._k||key;const k=e._k;
+  if(e.dead&&T.ghost&&e.dieT>.35)return;
+  const yaw=faceOf(e);let z=T.float?(T.fz||.12)+Math.sin(time*2.5+e.ph)*.07:0;
+  let s=T.h/(T.boss?1:.95);const tint=eTint(e);let alpha=T.ghost?.55:1;
+  let dieK=0;if(e.dead){dieK=Math.min(1,e.dieT/.45)}
+  if(T.ghost&&e.dead)alpha*=1-dieK;
+  const d={tint,alpha,spec:.18};if(T.ghost){d.emis=.25}
+  let M=place(e.x,e.y,z,yaw,1);
+  if(e.dead&&!T.float){M=mm(M,RZ(0),RX(-dieK*PI/2*.98),T3(0,0,0))}
+  if(e.dead&&T.float){M=mm(T3(0,-z*dieK,0),M,RZ(dieK*1.2))}
+  const walk=e.anim*PI,moving=e._mv&&!e.dead,atk=e.atkT>0?clamp(1-e.atkT/.4,0,1):0;
+  const ED=EDEF[k];
+  if(ED){const H=mk('H_'+k,ED.h);const sc=T.h/.95;M=mm(M,SC(sc,sc,sc));
+    const o={walk,moving,atk:(ED.bow||ED.gun)?0:atk,d,prop:ED.prop,propL:ED.propL,bulk:1};
+    if(ED.bow){o.armPose=s=>s===-1?[-1.5,.1]:[-1.4+(e.atkT>0?.3:0),-.2];o.propL='bow';o.prop=null;o.propLM=mm(RX(PI/2),RY(PI/2))}
+    if(ED.gun){o.armPose=s=>s===1?[-1.35,-.15]:[-1.45,.35];o.propM=mm(RX(PI/2),T3(0,0,.1))}
+    if(ED.propL==='shield'){o.propLM=mm(RX(PI/2),T3(.05,0,.1));o.armPose=s=>s===-1?[-1.2,.5]:null}
+    if(k==='N'||k==='h'||k==='DEM'){o.armPose=s=>s===1?[-.5-(atk>0?Math.sin(atk*PI)*1.2:0),.1]:null}
+    if(e.stun>0){o.nod=.4;o.look=Math.sin(time*6)*.4}
+    if(e.wind>0||e.slamW>0){o.armPose=s=>[-2.6,s*.2]}
+    drawHuman(draw,H,M,o);
+    if(ED.orb&&!e.dead){const op=M4.pt(mm(M,T3(.19,.24,.55)),0,.65,0);const c=hsl2rgb(...ED.orb);draw(mk('orb',()=>{const g=new GB();g.use(null).col(1,1,1,1).sph(.06,10,7);return g.build()}),mm(M4.tr(op[0],op[1],op[2]),SC(1+.15*Math.sin(time*8))),{tint:new Float32Array([c[0],c[1],c[2],1]),emis:1.4,lit:false});
+      if(!R.shadowPass)for(let i=0;i<2;i++)pt(op[0]+(rand()-.5)*.06,op[2]+(rand()-.5)*.06,op[1]+rand()*.08,.08,c[0],c[1],c[2],.6,true)}
+    if(ED.cross&&!e.dead){draw(mk('cross',()=>{const g=new GB();g.use(null).hsl(120,80,62,.8).box(0,0,0,.03,.12,.02).box(0,.02,0,.09,.03,.02);return g.build()}),mm(M,T3(0,.56,.17)),{emis:.6})}
+  }else if(k==='R'){const sc=T.h/.5;M=mm(M,SC(sc));draw(mk('dog',mDog),M,d);const lg=mk('dogleg',mDogLeg);
+    for(const [x,zz,ph] of [[.08,.15,0],[-.08,.15,PI],[.08,-.15,PI],[-.08,-.15,0]])draw(lg,mm(M,T3(x,.24,zz),RX(moving?Math.sin(walk*1.5+ph)*.6:0)),d);
+    if(atk>0)M=mm(M,T3(0,0,.05*Math.sin(atk*PI)))}
+  else if(k==='v'){const sc=T.h/.42;M=mm(M,SC(sc*1.15));draw(mk('spider',mSpider),M,d);const lg=mk('spleg',mSpiderLeg);
+    for(let i=0;i<4;i++)for(const sd of [-1,1]){const ph=i*1.3+(sd>0?PI:0),zz=.08-i*.07;draw(lg,mm(M,T3(sd*.08,.2,zz),RY(sd>0?(-.2+i*.25):(PI+.2-i*.25)),RZ(moving?Math.sin(walk*2+ph)*.25:0)),d)}}
+  else if(k==='p'){const sc=T.h/.6;draw(mk('bomber',mBomber),mm(M,SC(sc),T3(0,Math.abs(Math.sin(walk))*.03,0)),d);
+    if(!e.dead&&!R.shadowPass){const fp=M4.pt(mm(M,SC(sc)),.03,.62,.02);pt(fp[0],fp[2],fp[1],.07,1,.7,.2,1,true);pt(fp[0]+(rand()-.5)*.04,fp[2]+(rand()-.5)*.04,fp[1]+rand()*.06,.04,1,.4,.1,.8,true)}}
+  else if(k==='F'){const sc=T.h/.8;draw(mk('ghost',mGhost),mm(M,SC(sc),RX(Math.sin(time*2+e.ph)*.06)),Object.assign({},d,{emis:.35,spec:.4}))}
+  else if(k==='x'){const sc=T.h/.4;const MB=mm(M,SC(sc),T3(0,.15,0));draw(mk('bat',mBat),MB,d);const wg=mk('batw',mWing),fl=Math.sin(time*16+e.ph)*.8;
+    for(const sd of [-1,1])draw(wg,mm(MB,T3(sd*.05,.04,0),SC(sd,1,1),RY(-PI/2*0),RZ(fl)),d)}
+  else if(k==='GOL'){const sc=T.h/1.4;const MB=mm(M,SC(sc));draw(mk('golem',mGolem),mm(MB,T3(0,Math.abs(Math.sin(walk))*.03,0)),d);
+    const ar=mk('golarm',mGolemArm),lg=mk('golleg',mGolemLeg),sw=moving?Math.sin(walk)*.4:0,up=(e.slamW>0||e.wind>0)?-2.5:atk>0?-2.2*Math.sin(atk*PI):0;
+    for(const sd of [-1,1]){draw(ar,mm(MB,T3(sd*.48,1.0,0),RZ(sd*.2),RX(-sd*sw+up)),d);draw(lg,mm(MB,T3(sd*.2,.42,0),RX(sd*sw)),d)}}
+  else if(k==='DRG'){const sc=T.h/1.1;const MB=mm(M,SC(sc),T3(0,.4,0),RX(Math.sin(time*2)*.05));draw(mk('dragon',mDragon),MB,d);const wg=mk('dwing',mDWing),fl=Math.sin(time*5+e.ph)*.5;
+    for(const sd of [-1,1])draw(wg,mm(MB,T3(sd*.18,.22,.05),SC(sd,1,1),RZ(fl+.2),RX(.1)),d);const lg=mk('dleg',mDLeg);for(const sd of [-1,1])draw(lg,mm(MB,T3(sd*.18,-.15,.15),RX(.3)),d);
+    if(e.breathT>0&&!R.shadowPass){const hp=M4.pt(MB,0,.45,.95);for(let i=0;i<3;i++)pt(hp[0]+(rand()-.5)*.1,hp[2]+(rand()-.5)*.1,hp[1],.18,1,.5+rand()*.3,.1,.9,true)}}
+  else{const H=mk('H_E',EDEF.E.h);drawHuman(draw,H,mm(M,SC(T.h/.95)),{walk,moving,atk,d,prop:'sword'})}
+  // 표시 (!, 기절 별)
+  if(!R.shadowPass&&!e.dead&&(e.alertT>0||e.wind>0||e.stun>0||e.slamW>0)){const top=(z+T.h*1.12);
+    if(e.stun>0){for(let i=0;i<3;i++){const a=time*4+i*2.1;pt(e.x+Math.cos(a)*.2,e.y+Math.sin(a)*.2,top,.07,1,.9,.3,1,true)}}
+    else{const red=e.wind>0||e.slamW>0||e.breathT>0;R.marks.push([e.x,e.y,top+.1,red])}}
+  if(T.boss)drawBossBar(e);
+}
+// 다른 플레이어
+const PLH={};
+function plHuman(tm,ar){const key=tm+'_'+ar.join('');return PLH[key]||(PLH[key]=humanoid({bulk:1,body:tm===1?[2,62,42]:[215,62,44],armor:ar[1]?(ar[1]===2?[tm===1?2:215,22,54]:[tm===1?2:215,40,36]):null,legs:[220,14,22],
+  head:ar[0]?'helm':'cap',helm:ar[0]===2?[210,10,62]:[210,10,45],hat:tm===1?[2,50,30]:[215,50,30],sleeve:tm===1?[2,55,36]:[215,55,38],glove:[24,42,52]}))}
+function drawRemote3(draw,r){
+  const tm=isFfa()?1:r.tm,H=plHuman(tm,r.ar||[0,0]);let alpha=r.iv?.18:1;const d={tint:eTint(r),alpha,spec:.2};
+  if(r.al&&r.trail&&r.trail.length&&!R.shadowPass){for(let i=0;i<r.trail.length;i++){const g=r.trail[i],age=time-g.t;if(age>.48)continue;const c=hsl2rgb(160+((r.trail.length-i)*34)+time*120,95,60);
+    drawHuman(draw,H,place(g.x,g.y,g.z||0,r.a,.86/.95),{d:{tint:new Float32Array([c[0],c[1],c[2],.7]),alpha:.35*(1-age/.48),emis:.6,lit:false},prop:'rifle',armPose:s=>s===1?[-1.35,-.15]:[-1.45,.35],propM:mm(RX(PI/2),T3(0,0,.1))})}}
+  let M=place(r.x,r.y,r.z||0,r.a,(r.cr?.7:1)*.86/.95);
+  if(!r.al){const k=Math.min(1,(time-(r.deadAt||0))/.4);M=mm(M,RX(-k*PI/2))}
+  r._wk=(r._wk||0)+(r.mv?frameDt*9:0);
+  const gk=r.gd&&((time*6|0)%2===0);if(gk)d.tint=new Float32Array([1,.9,.4,.6]);
+  drawHuman(draw,H,M,{walk:r._wk,moving:r.mv&&r.al,d,prop:'rifle',armPose:s=>s===1?[-1.35,-.15]:[-1.45,.35],propM:mm(RX(PI/2),T3(0,0,.1)),lean:r.cr?.25:0});
+  if(!R.shadowPass){const sp=R.toScreen(r.x,r.y,(r.z||0)+(r.cr?.62:.9));r.scr=sp?{x:sp.x,y:sp.y,d:sp.d}:null}
+}
+// ---------- 그리기 진입점 ----------
+R.marks=[];
+R.drawEntities=(draw,shadowPass)=>{
+  R.shadowPass=shadowPass;if(!shadowPass)R.marks=[];
+  const near=(x,y,r)=>{const dx=x-P.x,dy=y-P.y;return dx*dx+dy*dy<r*r};
+  // 풀
+  if(!shadowPass&&QL<=1){if(foliageKey!==map+theme+QL){freeMesh(foliage);foliage=mFoliage();foliageKey=map+theme+QL}draw(foliage,I4,{wind:1,spec:.05,noShadow:1})}
+  for(const o of objs){if(o.dead||!near(o.x,o.y,26))continue;const tint=o.hit>0?tintHit:tintZ;
+    if(o.k==='Y'){const m=mk('tree'+((o.x*7+o.y*3)|0)%3,()=>mTree(((o.x*7+o.y*3)|0)%3+1));draw(m,place(o.x,o.y,0,o.ph,O_S(o)),{tint,wind:.6,spec:.08});continue}
+    const f=OBJM[o.k];if(!f)continue;draw(mk('o_'+o.k,f),place(o.x,o.y,o.O.z||0,o.ph,1),{tint,spec:o.k==='L'||o.k==='T'?.35:.15});
+    if(!shadowPass&&o.k==='T'){fire(o.x,o.y,.62,1)}
+    if(!shadowPass&&o.k==='L'&&!DK){const g=.5+.5*Math.sin(time*3+o.ph);pt(o.x,o.y,1.27,.3,1,.8,.4,.25+g*.05,true)}}
+  for(const p of pickups){if(p.used||!near(p.x,p.y,22))continue;const D=PICK[p.k];const bob=Math.sin(time*3+p.ph)*.05,z=(D.z||0)+.12+bob,spin=time*1.5+p.ph;let m,o={spec:.5,shin:40};
+    if(p.k==='K')m=mk('key',mKey);else if(p.k==='H')m=mk('med',mMed);else if(p.k==='A')m=mk('ammo',mAmmo);else if(p.k==='G')m=mk('gold',mGold);else if(p.k==='V')m=mk('armor',mArmor);else if(p.k==='J')m=mk('spears',mSpears);
+    else if(D.item){const it=ITEMS[p.k];m=mk('gem'+p.k,()=>mGem(it.h));o.emis=.25;if(!shadowPass){const c=hsl2rgb(it.h,90,60);pt(p.x,p.y,z+.02,.35,c[0],c[1],c[2],.18,true)}}
+    if(m)draw(m,place(p.x,p.y,z+(p.k==='J'?.05:0),spin,p.k==='K'?1.4:1.2),o);
+    if(!shadowPass&&(p.k==='K'||p.k==='G'))pt(p.x,p.y,z,.25,1,.85,.3,.12,true)}
+  for(const e of enemies){if(!near(e.x,e.y,24))continue;if(e.dead&&e.dieT>8)continue;drawEnemy(draw,e)}
+  if(MODE==='pvp')for(const r of remotes.values())if(r.tx!==undefined&&r.rd===pv.round&&(r.al||time-r.deadAt<4))drawRemote3(draw,r);
+  for(const p of projs){const z=p.z===undefined?.55:p.z,yaw=Math.atan2(p.dy||0,p.dx||1);
+    if(p.kind==='rock')draw(mk('rock',mRock),mm(place(p.x,p.y,z,yaw,1),RX(time*8)));
+    else if(p.kind==='arrow')draw(mk('arrow',mArrow),mm(place(p.x,p.y,z,yaw,1),RY(-PI/2)));
+    else if(p.kind==='orb'){if(!shadowPass){const f=Math.sin(time*12+p.ph);pt(p.x,p.y,z,.5,.7,.3,1,.5,true);pt(p.x,p.y,z,.22+f*.03,1,.85,1,1,true);pt(p.x-(p.dx||0)*.2,p.y-(p.dy||0)*.2,z,.25,.6,.2,1,.4,true)}}
+    else if(p.kind==='breath'){if(!shadowPass){pt(p.x,p.y,z,.35+rand()*.15,1,.45+rand()*.3,.1,.7,true)}}
+    else if(!shadowPass)pt(p.x,p.y,z,.2,1,.6,.3,.8,true)}
+  for(const a of arrowsW){let yaw=a._yaw,pit=a._pit||0;if(!a.stuck&&(a.vx||a.vy)){yaw=a._yaw=Math.atan2(a.vy,a.vx);pit=a._pit=Math.atan2(a.vz||0,Math.hypot(a.vx,a.vy))}
+    draw(mk(a.kind==='spear'?'spearP':'arrow',a.kind==='spear'?mSpearP:mArrow),mm(place(a.x,a.y,a.z,yaw||0,1),RY(-PI/2),RZ(pit)))}
+  for(const b of paintballs){const c=hsl2rgb(b.hue,85,55);draw(mk('ball',mBall),place(b.x,b.y,b.z,0,1),{tint:new Float32Array([c[0],c[1],c[2],1]),spec:.6,shin:60})}
+  for(const n of nades)draw(mk('nade_'+n.k,()=>mNade(n.k)),mm(place(n.x,n.y,n.z,0,1),RX(time*9),RZ(time*5)),{spec:.4});
+  if(!shadowPass){for(const b of brass){const q=(b.x-P.x)**2+(b.y-P.y)**2;if(q>64)continue;draw(mk(b.red?'shell':'brass',()=>mBrass(b.red)),place(b.x,b.y,(b.z||0)+.01,b.a||((b.x*13+b.y*7)%6),1),{spec:.7,shin:60})}
+    for(const w of waves){const n=Math.max(12,Math.ceil(w.r*2*PI/.35));for(let i=0;i<n;i++){const a=i/n*PI*2,x=w.x+Math.cos(a)*w.r,y=w.y+Math.sin(a)*w.r;if(tileSolid(x,y))continue;pt(x,y,.06,.22,.9,.75,.5,.55,false)}}
+    for(const p of parts){const a=Math.min(1,p.life/p.max*2);const c=hsl2rgb(p.h,p.s,p.l);const sz=(p.size||.1)*1.1;pt(p.x,p.y,p.z,sz,c[0],c[1],c[2],a*(p.em?1:.95),!!p.em)}
+    if(!DK)for(const p of amb){const c=hsl2rgb(p.h,p.s,p.l);pt(p.x,p.y,p.z,p.size*.9,c[0],c[1],c[2],.85,!!p.em)}}
+  // 그림자 아래 원 (접지감)
+  R.shadowPass=false;
+};
+function O_S(o){return 1}
+function fire(x,y,z,s){const n=QL>=2?2:4;for(let i=0;i<n;i++){const t=rand();pt(x+(rand()-.5)*.12*s,y+(rand()-.5)*.12*s,z+t*.25*s,(.22-t*.12)*s,1,.45+.4*(1-t),.12,.85,true)}pt(x,y,z+.05,.4*s,1,.55,.2,.25,true)}
+R.torchFlame=(L)=>{for(const o of objs)if(Math.abs(o.x-L.x)<.05&&Math.abs(o.y-L.y)<.05)return;
+  // 벽 횃불: 빛 위치에서 벽 쪽으로 조금
+  const ix=Math.floor(L.x),iy=Math.floor(L.y);let wx=0,wy=0;for(const f of FNV){const nx=ix+f[0],ny=iy+f[1];if(nx>=0&&ny>=0&&nx<MW&&ny<MH&&isWallCh(map[ny][nx])){const cx=nx+.5-L.x,cy=ny+.5-L.y;if(Math.hypot(cx,cy)<.8){wx=f[0];wy=f[1];break}}}
+  fire(L.x+wx*.06,L.y+wy*.06,.9,.7)};
+
+// ================= 1인칭 무기 (3D) =================
+// 총 좌표: f = 앞(+), y = 위, x = 오른쪽. GL 로컬은 앞이 -Z.
+const VM={};
+const ROLE_BASE=[['총',215,8,38],['철',215,8,26],['목',28,48,38],['쇠',45,30,62]];
+const ROLE_K=['A','t','w','s'];
+function gunParts(){const parts={};const P_=(name,role)=>parts[name+'|'+role]||(parts[name+'|'+role]=new GB().use(role===2?TX.wood:role===4?null:TX.metal));return [parts,P_]}
+const BX=(g,f0,f1,y0,y1,w,bev,x)=>g.rbox(x||0,(y0+y1)/2,-(f0+f1)/2,w,y1-y0,f1-f0,bev===undefined?.004:bev,6);
+const CY=(g,f0,f1,y,r,seg,x)=>g.save().t(x||0,y,-(f0+f1)/2).rx(PI/2).cyl(r,r,f1-f0,seg||12).restore();
+const CN=(g,f0,f1,y,rBack,rFront,seg,x)=>g.save().t(x||0,y,-(f0+f1)/2).rx(PI/2).cyl(rFront,rBack,f1-f0,seg||12).restore();
+const PF=(g,pts,w,x)=>g.save().t(x||0,0,0).ry(PI/2).ext(pts,w,6).restore();
+const RAIL=(g,f0,f1,y,w)=>{BX(g,f0,f1,y,y+.006,w,.001);for(let f=f0+.006;f<f1-.004;f+=.012)BX(g,f,f+.006,y+.006,y+.011,w,.001)};
+function gripPoly(sl){sl=sl||.025;return [[.018,0],[.03,-.01],[.02-sl,-.11],[-.012-sl,-.118],[-.025-sl,-.105],[-.012,-.01],[-.012,0]]}
+function trigGuard(g,f0,f1,y){g.rod(f0>0?0:0,y,-f0,0,y-.035,-(f0+.005),.004,5);g.rod(0,y-.035,-(f0+.005),0,y-.035,-f1,.004,5);g.rod(0,y-.035,-f1,0,y,-(f1+.006),.004,5);BX(g,f0+.012,f0+.02,y-.03,y,.006,.001)}
+// ---- 소총 계열 ----
+function rifle(o){
+  const [parts,P_]=gunParts();const b=P_('body',0),d=P_('body',1),wd=P_('body',2),ac=P_('body',3),fx=P_('body',4);
+  const RY_=o.recY||0,rh=o.recH||.055,rw=o.recW||.04,f0=o.recF0===undefined?-.07:o.recF0,f1=o.recF1||.2,bl=o.barrel||.32,br=o.br||.009,by=RY_+rh*.62;
+  // 리시버 (아래·위)
+  BX(b,f0,f1,RY_,RY_+rh*.55,rw,.005);BX(b,f0+.01,f1-.005,RY_+rh*.55,RY_+rh,rw*.92,.006);
+  BX(d,f0+.06,f0+.12,RY_+rh*.58,RY_+rh*.88,.002,.0005,rw*.47);// 탄피 배출구 덮개
+  // 손잡이·방아쇠
+  PF(o.gripWood?wd:b,gripPoly(.02).map(([f,y])=>[f+.0,y+RY_+.005]),rw*.78);trigGuard(d,.035,.075,RY_);
+  // 총열 덮개
+  const hf0=f1,hf1=f1+(o.hg||.2);
+  if(o.hgType==='wood'){wd.save().t(0,by-.004,-(hf0+hf1)/2).rx(PI/2).s(1,1,1.15).cyl(.024,.022,hf1-hf0,14).restore()}
+  else if(o.hgType==='pump'){/* 펌프는 별도 */}
+  else if(o.hgType==='heat'){CY(d,hf0,hf1,by,.02,14);for(let f=hf0+.02;f<hf1-.01;f+=.03)CY(fx,f,f+.012,by,.0205,10)}
+  else{BX(b,hf0,hf1,by-.028,by+.022,rw*.95,.008);for(let f=hf0+.02;f<hf1-.02;f+=.028)for(const s of [-1,1])BX(d,f,f+.014,by-.012,by+.006,.002,.0005,s*rw*.48);RAIL(ac,hf0,hf1-.01,by+.022,.02)}
+  // 총열·소염기
+  CY(d,f1,f1+bl,by,br,12);const mf=f1+bl;
+  if(o.muzzle==='brake'){CY(d,mf,mf+.05,by,br*1.9,10);for(const s of [-1,1])BX(fx,mf+.012,mf+.038,by-.006,by+.006,.004,.0005,s*br*1.9)}
+  else if(o.muzzle==='flash'){CN(d,mf,mf+.045,by,br*1.4,br*1.7,10);for(let i=0;i<4;i++){const a=i/4*PI*2;BX(fx,mf+.03,mf+.046,by+Math.sin(a)*br*1.5-.002,by+Math.sin(a)*br*1.5+.002,.003,.0005,Math.cos(a)*br*1.5)}}
+  else if(o.muzzle==='can'){CY(d,mf,mf+.12,by,br*2.4,14)}
+  else if(o.muzzle==='bore'){CY(d,mf,mf+.02,by,br*1.3,12)}
+  // 개머리판
+  if(o.stock==='full'){PF(o.stockWood?wd:b,[[f0+.005,RY_+rh*.95],[f0+.005,RY_+.005],[f0-.2,RY_-.05],[f0-.27,RY_-.06],[f0-.27,RY_+rh*.85],[f0-.07,RY_+rh*.95]],rw*.85);BX(d,f0-.275,f0-.262,RY_-.06,RY_+rh*.85,rw*.9,.003)}
+  else if(o.stock==='wire'){for(const s of [-1,1])d.rod(s*.012,RY_+rh*.6,-f0,s*.012,RY_+.01,-(f0-.2),.004,5);d.rod(-.012,RY_,-(f0-.2),.012,RY_,-(f0-.2),.005,5);BX(d,f0-.21,f0-.195,RY_-.01,RY_+.05,.03,.003)}
+  else if(o.stock==='tube'){CY(d,f0-.12,f0,RY_+rh*.7,.012,10);PF(b,[[f0-.1,RY_+rh*.9],[f0-.1,RY_-.04],[f0-.23,RY_-.05],[f0-.23,RY_+rh*.9]],rw*.85)}
+  // 조준기
+  if(o.sight==='iron'){BX(ac,f1+bl-.03,f1+bl-.022,by+br,by+br+.026,.004,.0008);BX(ac,f0+.04,f0+.055,RY_+rh,RY_+rh+.022,.012,.002)}
+  else if(o.sight==='dot'){RAIL(ac,f0+.02,f1-.01,RY_+rh,.02);BX(d,f0+.07,f0+.11,RY_+rh,RY_+rh+.012,.018,.002);d.save().t(0,RY_+rh+.024,-(f0+.09)).rx(PI/2).lathe([[.0105,-.022],[.012,-.019],[.012,.019],[.0105,.022]],14).restore();fx.hsl(0,100,55,.9).save().t(0,RY_+rh+.024,-(f0+.075)).sph(.0018,6,4).restore();fx.hsl(200,40,20,0).save().t(0,RY_+rh+.024,-(f0+.09)).rx(PI/2).cyl(.0098,.0098,.038,12).restore()}
+  else if(o.sight==='scope'){RAIL(ac,f0+.0,f1-.01,RY_+rh,.02);const sy=RY_+rh+.04;d.save().t(0,sy,-(f0+.07)).rx(-PI/2).lathe([[.022,-.06],[.022,-.03],[.014,-.022],[.014,.03],[.018,.05],[.026,.07],[.026,.1],[0,.1]],16).restore();
+    for(const f of [f0+.04,f0+.11])BX(d,f,f+.012,RY_+rh,sy,.012,.002);BX(d,f0+.065,f0+.08,sy+.012,sy+.024,.008,.002);fx.hsl(205,40,14,0).save().t(0,sy,-(f0+.012)).rx(PI/2).cyl(.02,.02,.002,14).restore().save().t(0,sy,-(f0+.168)).rx(PI/2).cyl(.024,.024,.002,14).restore()}
+  // 탄창
+  const mp=P_('mag',o.magRole===undefined?1:o.magRole);const mf0=o.magF||.06;
+  if(o.mag==='curved'){PF(mp,[[mf0,RY_],[mf0+.035,RY_],[mf0+.06,RY_-.11],[mf0+.025,RY_-.12]],rw*.7);for(let i=0;i<3;i++)BX(fx,mf0+.004+i*.008,mf0+.03+i*.008,RY_-.02-i*.035,RY_-.016-i*.035,rw*.72,.001)}
+  else if(o.mag==='straight'){BX(mp,mf0,mf0+.03,RY_-(o.magL||.12),RY_,rw*.65,.003);BX(mp,mf0-.003,mf0+.033,RY_-(o.magL||.12)-.008,RY_-(o.magL||.12),rw*.75,.002)}
+  else if(o.mag==='box'){BX(mp,mf0-.02,mf0+.07,RY_-.11,RY_,rw*1.6,.008,-.01);fx.hsl(46,75,50);for(let i=0;i<5;i++)fx.save().t(-.05,RY_+.005,-(mf0-.01+i*.012)).rz(PI/2).cyl(.004,.004,.02,6).restore()}
+  else if(o.mag==='drum'){mp.save().t(0,RY_-.06,-(mf0+.02)).rz(PI/2).cyl(.06,.06,rw*1.3,18).restore();BX(mp,mf0,mf0+.04,RY_-.03,RY_,rw*.7,.003)}
+  else if(o.mag==='tube'){CY(d,f1,f1+bl*.85,by-.022,.009,10)}
+  else if(o.mag==='shell'){/* 유탄 */}
+  // 손잡이 앞부분 (수직 손잡이)
+  if(o.fgrip){d.save().t(0,by-.03,-(hf0+.07)).cyl(.011,.012,.06,10).restore()}
+  if(o.bipod){for(const s of [-1,1])d.rod(s*.006,by-.02,-(f1+bl*.7),s*.012,by-.03,-(f1+bl*.3),.004,5)}
+  if(o.carry){d.rod(0,RY_+rh,-(f0+.03),0,RY_+rh+.03,-(f0+.05),.004,5);d.rod(0,RY_+rh+.03,-(f0+.05),0,RY_+rh+.03,-(f0+.17),.004,5);d.rod(0,RY_+rh+.03,-(f0+.17),0,RY_+rh,-(f0+.19),.004,5)}
+  // 움직이는 부품
+  const bo=P_('bolt',1);BX(bo,f0+.015,f0+.055,RY_+rh*.6,RY_+rh*.8,.006,.001,rw*.5);// 장전 손잡이
+  if(o.boltHandle){bo.rod(rw*.5,RY_+rh*.75,-(f0+.03),rw*.5+.045,RY_+rh*.6,-(f0+.03),.005,6);bo.save().t(rw*.5+.048,RY_+rh*.58,-(f0+.03)).sph(.011,8,6).restore()}
+  if(o.hgType==='pump'){const pu=P_('pump',2);pu.save().t(0,by-.022,-(hf0+.1)).rx(PI/2).cyl(.022,.022,.13,14).restore();for(let i=0;i<6;i++)CY(P_('pump',1),hf0+.045+i*.018,hf0+.051+i*.018,by-.022,.0225,14)}
+  if(o.lever){const lv=P_('lever',1);lv.rod(0,RY_-.005,-.03,0,RY_-.045,-.03,.005,6);lv.rod(0,RY_-.045,-.03,0,RY_-.05,.04,.005,6);lv.rod(0,RY_-.05,.04,0,RY_-.012,.05,.005,6)}
+  const sightY=o.sight==='scope'?RY_+rh+.04:o.sight==='dot'?RY_+rh+.024:o.sight==='iron'?RY_+rh+.02:RY_+rh+.01;
+  return {parts,sightY,muzzle:[0,by,-(mf+(o.muzzle==='can'?.12:.05))],eject:[rw*.5,RY_+rh*.75,-(f0+.08)],grip2:[-.0,by-.035,-(hf0+(o.hg||.2)*.55)],magAt:[0,RY_-.05,-(mf0+.02)],len:mf-f0,f0,kind:'rifle'};
+}
+// ---- 권총 계열 ----
+function pistol(o){
+  const [parts,P_]=gunParts();const b=P_('body',0),d=P_('body',1),ac=P_('body',3),fx=P_('body',4);const L=o.len||.19,h=o.h||.034,w=o.w||.028;
+  PF(b,[[.06,.0],[.06,.012],[-.035,.012],[-.035,0]],w*.95);PF(o.gripWood?P_('body',2):b,gripPoly(.03),w*.92);trigGuard(d,.03,.065,0);
+  const sl=P_('slide',0);BX(sl,-.04,L-.04,.012,.012+h,w,.004);for(let f=-.032;f<.0;f+=.007)BX(fx,f,f+.003,.016,.012+h-.004,.0015,.0004,w*.5);
+  BX(P_('slide',1),.02,.06,.012+h*.4,.012+h*.85,.001,.0003,w*.5);BX(P_('slide',3),L-.055,L-.048,.012+h,.012+h+.008,.004,.001);BX(P_('slide',3),-.035,-.027,.012+h,.012+h+.007,.012,.001);
+  CY(d,L-.04,L-.035,.012+h*.55,.006,10);
+  const mp=P_('mag',1);BX(mp,-.03,.0,-.1-(o.ext||0),-.01,w*.8,.003,0);if(o.ext)BX(mp,-.034,.004,-.1-o.ext-.01,-.1-o.ext,w*.86,.002);
+  if(o.fgrip){d.save().t(0,-.03,-(.07)).cyl(.01,.011,.05,10).restore()}
+  if(o.comp){BX(P_('slide',1),L-.04,L-.01,.012,.012+h,w,.004);for(let i=0;i<3;i++)BX(fx,L-.036+i*.009,L-.031+i*.009,.012+h-.002,.012+h+.0005,w*.6,.0005)}
+  return {parts,sightY:.012+h+.008,muzzle:[0,.012+h*.55,-(L-.03+(o.comp?.03:0))],eject:[w*.5,.012+h*.7,-.04],grip2:[-.012,-.06,.01],magAt:[0,-.06,.015],len:L,f0:-.04,kind:'pistol',slideLen:L}}
+// ---- 리볼버 ----
+function revolver(o){const [parts,P_]=gunParts();const b=P_('body',0),d=P_('body',1),wd=P_('body',2),ac=P_('body',3),fx=P_('body',4);
+  PF(b,[[.085,.03],[.085,.055],[-.03,.055],[-.045,.04],[-.04,.0],[.02,-.005],[.04,.01],[.085,.01]],.022);
+  PF(wd,[[.0,-.0],[.012,-.01],[-.01,-.1],[-.035,-.105],[-.05,-.09],[-.04,.0]],.03);trigGuard(d,.02,.055,.0);
+  const bl=o.barrel||.16;d.save().t(0,.047,-(.085+bl/2)).rx(PI/2).cyl(.0085,.0085,bl,12).restore();BX(d,.085,.085+bl,.052,.06,.008,.002);BX(ac,.085+bl-.012,.085+bl-.004,.06,.07,.003,.0008);
+  CY(d,.09,.085+bl-.01,.03,.0045,8);
+  const cy_=P_('cyl',1);cy_.save().rx(PI/2).cyl(.026,.026,.055,18).restore();for(let i=0;i<6;i++){const a=i/6*PI*2;fx.hsl(0,0,4);cy_.save().t(Math.cos(a)*.0155,Math.sin(a)*.0155,-.028).rx(PI/2).cyl(.0055,.0055,.003,8).restore();
+    BX(P_('cyl',0),-.022,.022,-.0015+Math.sin(a+PI/6)*.0255,.0015+Math.sin(a+PI/6)*.0255,.003,.0008,Math.cos(a+PI/6)*.0255)}
+  const shells=P_('cylshell',4);shells.hsl(42,75,50);for(let i=0;i<6;i++){const a=i/6*PI*2;shells.save().t(Math.cos(a)*.0155,Math.sin(a)*.0155,.028).rx(PI/2).cyl(.0058,.0058,.002,8).restore()}
+  const hm=P_('hammer',1);hm.save().t(0,.0,0).ext([[0,0],[.006,0],[-.006,.022],[-.016,.024],[-.012,.016]],.007).restore();
+  return {parts,sightY:.07,muzzle:[0,.047,-(.085+bl+.01)],eject:[0,.03,-.03],grip2:[-.01,-.06,.02],magAt:[0,.03,-.04],cylAt:[0,.03,-.055],hammerAt:[0,.052,.032],len:bl+.13,f0:-.045,kind:'revolver'}}
+// ---- 활 ----
+function bowM(){const [parts,P_]=gunParts();const wd=P_('body',2),d=P_('body',1);
+  wd.save().t(0,0,0).cyl(.014,.014,.12,10).restore();BX(P_('body',3),-.008,.008,-.04,.04,.03,.004);
+  for(const s of [-1,1]){const lm=P_(s>0?'limbT':'limbB',2);const pts=[];for(let i=0;i<=10;i++){const t=i/10;pts.push([.02*t*t*0+Math.sin(t*1.2)*.05*-1,s*(.06+t*.36)])}
+    for(let i=0;i<10;i++){const [ax,ay]=pts[i],[bx2,by2]=pts[i+1];lm.rod(0,ay,-ax,0,by2,-bx2,.012-.006*i/10,6)}}
+  return {parts,sightY:.0,muzzle:[0,0,-.05],eject:[0,0,0],grip2:[0,0,0],len:.1,f0:0,kind:'bow'}}
+// ---- 근접 ----
+function melee(kind){const [parts,P_]=gunParts();const bl=P_('blade',1),h=P_('body',2),ac=P_('body',3),fx=P_('body',4);
+  // 칼날은 +y(위)로 뻗는다. 손잡이 원점.
+  if(kind==='sword'||kind==='katana'||kind==='dagger'){const L=kind==='dagger'?.22:kind==='katana'?.72:.62,W_=kind==='dagger'?.022:kind==='katana'?.02:.03,cur=kind==='katana'?.05:0;
+    const pts=[];const n=10;for(let i=0;i<=n;i++){const t=i/n;pts.push([W_/2+cur*t*t,.05+t*L*(t<1?1:1)])}pts.push([cur,.05+L+.05]);for(let i=n;i>=0;i--){const t=i/n;pts.push([-W_/2+cur*t*t,.05+t*L])}
+    bl.ext(pts,.006);bl.hsl(0,0,100);fx.hsl(210,15,88).save().t(0,0,.0035).ext(pts.map(([x,y])=>[x*.35,y]),.001).restore();
+    if(kind==='katana'){ac.save().t(0,.045,0).s(1,.25,1).cyl(.03,.03,.02,14).restore()}else{ac.box(0,.045,0,kind==='dagger'?.06:.13,.014,.024);ac.save().t((kind==='dagger'?.03:.065),.045,0).sph(.01,6,4).restore().save().t(-(kind==='dagger'?.03:.065),.045,0).sph(.01,6,4).restore()}
+    h.save().t(0,-.03,0).cyl(.014,.015,kind==='katana'?.2:.13,10).restore();if(kind==='katana'){for(let i=0;i<6;i++)fx.hsl(0,0,90).save().t(0,-.11+i*.03,0).rz(.5).box(0,0,0,.032,.006,.032).restore()}
+    ac.save().t(0,kind==='katana'?-.135:-.1,0).sph(.019,8,6).restore();return {parts,kind:'blade',len:L}}
+  if(kind==='axe'){h.rod(0,-.14,0,0,.42,0,.016,8);bl.save().t(0,.36,0).ext([[0,-.035],[.07,-.07],[.11,-.08],[.12,0],[.11,.08],[.07,.07],[0,.035]],.016).restore();fx.hsl(210,15,88).save().t(.115,.36,0).box(0,0,0,.008,.15,.018).restore();bl.box(-.02,.36,0,.05,.05,.03);return {parts,kind:'heavy',len:.42}}
+  if(kind==='hammer'){h.rod(0,-.14,0,0,.42,0,.017,8);bl.save().t(0,.42,0).rz(PI/2).cyl(.045,.045,.2,12).restore();bl.save().t(.1,.42,0).rz(PI/2).cyl(.05,.05,.02,12).restore().save().t(-.1,.42,0).rz(PI/2).cyl(.05,.05,.02,12).restore();return {parts,kind:'heavy',len:.45}}
+  if(kind==='club'){h.lathe([[.015,-.14],[.017,-.05],[.02,.1],[.032,.3],[.04,.45],[.035,.5],[0,.52]],10);for(let i=0;i<5;i++){const a=i*1.3,y=.3+i*.04;ac.save().t(Math.cos(a)*.035,y,Math.sin(a)*.035).rz(-Math.cos(a)*1.4).rx(Math.sin(a)*1.4).cyl(.006,0,.03,5).restore()}return {parts,kind:'heavy',len:.5}}
+  if(kind==='spear'){h.rod(0,-.5,0,0,.6,0,.014,8);for(const y of [-.2,.1,.35])CY(ac,0,0,0,0);for(const y of [-.25,.05,.35])ac.save().t(0,y,0).cyl(.0165,.0165,.02,10).restore();bl.save().t(0,.67,0).cyl(.026,0,.14,6).restore();return {parts,kind:'spear',len:1.1}}
+  return {parts,kind:'heavy',len:.5}}
+// ---- 무기별 정의 ----
+const WSPEC={
+ 0:()=>revolver({barrel:.15}),
+ 1:()=>rifle({barrel:.42,br:.011,hgType:'pump',hg:.18,stock:'full',stockWood:1,gripWood:1,mag:'tube',sight:'iron',muzzle:'bore',recH:.052}),
+ 3:()=>rifle({barrel:.48,br:.009,hg:.24,stock:'full',sight:'scope',muzzle:'brake',mag:'straight',magL:.06,bipod:1,boltHandle:1,recH:.05}),
+ 5:()=>rifle({barrel:.24,hg:.2,stock:'full',sight:'dot',muzzle:'flash',mag:'curved',stockWood:0}),
+ 6:()=>pistol({len:.19}),
+ 8:()=>{const g=pistol({len:.24,h:.04,w:.03});const hp=g.parts['hopper|4']=new GB().use(null);hp.col(1,1,1).save().t(0,.09,-.06).s(1,1.2,1.3).sph(.04,14,10).restore();hp.save().t(0,.055,-.06).cyl(.012,.012,.03,8).restore();
+   const tk=g.parts['tank|1']=new GB().use(TX.metal);tk.save().t(0,-.02,.12).rx(PI/2).cyl(.025,.025,.14,14).restore();g.sightY=.075;return g},
+ 9:()=>rifle({barrel:.11,hg:.12,stock:'wire',sight:'iron',muzzle:'can',mag:'straight',magL:.14,recH:.05,fgrip:1}),
+ 10:()=>rifle({barrel:.3,br:.011,hg:.18,hgType:'heat',stock:'full',sight:'iron',muzzle:'flash',mag:'box',bipod:1,carry:1,recH:.07,recW:.05}),
+ 11:()=>rifle({barrel:.36,hg:.24,hgType:'wood',stock:'full',stockWood:1,gripWood:1,sight:'scope',muzzle:'brake',mag:'straight',magL:.07}),
+ 12:()=>{const g=rifle({barrel:.22,br:.024,hg:.0,hgType:'none',stock:'full',stockWood:1,gripWood:1,sight:'iron',muzzle:'none',mag:'shell',recH:.06});
+   const br=g.parts['brl|1']=new GB().use(TX.metal);br.save().t(0,.045,-.2).rx(PI/2).cyl(.028,.028,.24,16).restore();g.parts['shell|4']=new GB().use(null).hsl(100,30,40).save().t(0,.045,-.08).rx(PI/2).cyl(.022,.022,.03,14).restore();g.muzzle=[0,.045,-.33];return g},
+ 13:()=>pistol({len:.24,h:.042,w:.034,comp:1}),
+ 14:()=>pistol({len:.2,ext:.07,fgrip:1}),
+ 15:()=>{const [parts,P_]=gunParts();const wd=P_('body',2),d=P_('body',1),ac=P_('body',3);PF(wd,gripPoly(.04).map(([f,y])=>[f,y+.01]),.03);PF(wd,[[.0,.0],[.06,.0],[.06,.035],[-.01,.035]],.034);trigGuard(d,.03,.065,.005);
+   const br=P_('brl',1);for(const s of [-1,1])br.save().t(s*.014,.045,-.17).rx(PI/2).cyl(.0135,.0135,.26,12).restore();BX(br,.06,.3,.022,.035,.02,.004);BX(P_('brl',3),.29,.3,.058,.064,.004,.001);
+   return {parts,sightY:.066,muzzle:[0,.045,-.31],eject:[0,.045,-.04],grip2:[-.0,.0,-.16],magAt:[0,.045,-.05],len:.33,f0:-.01,kind:'break'}},
+ 16:()=>rifle({barrel:.2,hg:.22,stock:'full',sight:'dot',muzzle:'brake',mag:'straight',magL:.1,recH:.06,carry:0,fgrip:1}),
+ 17:()=>rifle({barrel:.28,br:.013,hg:.18,stock:'full',sight:'iron',muzzle:'brake',mag:'drum',recH:.065,recW:.048}),
+ 18:()=>rifle({barrel:.4,br:.009,hgType:'wood',hg:.18,stock:'full',stockWood:1,gripWood:1,sight:'iron',muzzle:'bore',mag:'tube',lever:1,recH:.05}),
+ 4:()=>bowM(),
+ 2:()=>melee('sword'),19:()=>melee('dagger'),20:()=>melee('axe'),21:()=>melee('hammer'),22:()=>melee('katana'),23:()=>melee('club'),7:()=>melee('spear'),
+};
+function getVM(wi){if(VM[wi])return VM[wi];const w=WEAP[wi];let f=WSPEC[wi];
+  if(!f){if(w&&w.admin)f=()=>{const g=rifle({barrel:.3,hg:.22,stock:'full',sight:'scope',muzzle:'brake',mag:'drum',recH:.07,recW:.05});const c=g.parts['core|4']=new GB().use(null);c.hsl(46,100,70,.95);
+      for(let i=0;i<5;i++)c.save().t(0,.04,-(.22+i*.05)).rx(PI/2).torus(.024,.004,14,4).restore();c.save().t(-.026,.035,-.04).sph(.012,8,6).restore();g.admin=1;return g};
+    else if(w&&w.sword)f=()=>melee('sword');else if(w&&w.gen)f=()=>rifle({barrel:.24,hg:.2,stock:'full',sight:'iron',muzzle:'flash',mag:'straight'});else f=()=>pistol({})}
+  const m=f();const meshes={};for(const k in m.parts){const [name,role]=k.split('|');const mesh=m.parts[k].build();if(!mesh)continue;(meshes[name]||(meshes[name]=[])).push({mesh,role:+role})}
+  m.meshes=meshes;delete m.parts;VM[wi]=m;return m}
+// ---- 손·팔 ----
+function mHand(){const g=new GB().use(TX.skin);g.hsl(25,20,22);g.rbox(0,0,0,.05,.075,.03,.012);
+  for(let i=0;i<4;i++){const x=-.018+i*.012;g.rod(x,.035,.0,x,.06,.03,.0065,6);g.rod(x,.06,.03,x,.045,.05,.006,6)}
+  g.rod(.026,.0,.0,.035,.03,.035,.008,6);return g.build()}
+function mArm(){const g=new GB().use(TX.grain);g.hsl(100,14,20);g.save().t(0,-.18,0).cyl(.034,.03,.36,12).restore();g.hsl(100,10,14).save().t(0,-.005,0).cyl(.032,.034,.03,12).restore();return g.build()}
+function alignY(ax,ay,az,bx,by,bz){const dx=bx-ax,dy=by-ay,dz=bz-az,L=Math.hypot(dx,dy,dz)||1e-5;let yx=dx/L,yy=dy/L,yz=dz/L;
+  let rx=yy*0-yz*1,ry=yz*0-yx*0,rz=yx*1-yy*0;let rl=Math.hypot(rx,ry,rz);if(rl<1e-4){rx=1;ry=0;rz=0;rl=1}rx/=rl;ry/=rl;rz/=rl;
+  const zx=ry*yz-rz*yy,zy=rz*yx-rx*yz,zz=rx*yy-ry*yx;const m=new Float32Array(16);m[0]=rx;m[1]=ry;m[2]=rz;m[4]=yx;m[5]=yy;m[6]=yz;m[8]=zx;m[9]=zy;m[10]=zz;m[12]=ax;m[13]=ay;m[14]=az;m[15]=1;return m}
+// ---- 상태 → 자세 ----
+let vDeb=[],lastAtkT=9,lastPump=9,lastRelMo=0,muzzleW=null,lastGRel=null;
+function skinCols(wi){const w=WEAP[wi];const sk=SKIN_W(w)?skinOf(wi):SKINS[0];const out=[];
+  for(let r=0;r<4;r++){let e=ROLE_BASE[r];if(w&&w.admin)e=[[e[0],46,85,60,.25],[e[0],0,0,88,0],[e[0],46,80,52,.1],[e[0],46,90,70,.3]][r];
+    if(w&&w.paint&&r===0)e=[e[0],paintHue,60,46];
+    if(sk&&sk.f)e=sk.f(e,ROLE_K[r],r,r===3?3:0);const c=hsl2rgb(e[1],e[2],e[3]);out.push({c:new Float32Array(c),em:e[4]||0})}
+  out.push({c:new Float32Array([1,1,1]),em:0});return out}
+const v3=(m,p)=>M4.pt(m,p[0],p[1],p[2]);
+let swingTrail=[];
+R.drawView=(draw)=>{
+  if(state==='title'||!P)return;
+  const w=WEAP[cur];if(!w)return;
+  const wi=cur,vm=getVM(wi);
+  // 투영 (고정 시야)
+  const fov=.95,PV=M4.persp(fov,W/H,.01,30);R.setVP(PV,VV,camPos);
+  // 카메라 월드 행렬
+  const a=P.a,fwx=Math.cos(a),fwz=Math.sin(a),rx=-Math.sin(a),rz=Math.cos(a);let C=new Float32Array(16);C[0]=rx;C[2]=rz;C[5]=1;C[8]=-fwx;C[10]=-fwz;C[12]=P.x;C[13]=eyeZ;C[14]=P.y;C[15]=1;
+  if(roll&&!RM)C=M4.mul(C,M4.rz(roll));
+  // 공통 흔들림
+  const [bx,by]=gunBase();
+  let tx=0,ty=0,tr=0,mo=0,ko=0,hand=null,adsOK=!!w.ads||w.sniper||w.rifle||w.pistol||w.revolver||w.pump||w.gen||w.paint||w.admin;
+  if(w.gen&&gmRel){const rp=relPose(gmRel.t/gmRel.dur,gmRel.empty);tx=rp.tx;ty=rp.ty;tr=rp.tr;mo=rp.mo;ko=rp.ko;hand=rp.hand;adsOK=false}
+  else if(w.rifle&&arRel){const rp=relPose(arRel.t/(arRel.empty?1.35:1.1),arRel.empty);tx=rp.tx;ty=rp.ty;tr=rp.tr;mo=rp.mo;ko=rp.ko;hand=rp.hand;adsOK=false}
+  else if(w.sniper&&snpRel){const rp=relPose(snpRel.t/1.3,false);tx=rp.tx;ty=rp.ty;tr=rp.tr;mo=rp.mo;hand=rp.hand;adsOK=false}
+  else if((w.pistol||w.paint)&&gRel){const q=gRelPose();tx=q[0];ty=q[1];tr=q[2];const k=gRel.t/gRel.dur;mo=k>.12&&k<.3?(k-.12)/.18*6:k>=.3&&k<.55?99:k>=.55&&k<.75?(1-(k-.55)/.2)*6:0;adsOK=false}
+  else if(w.revolver&&reload){const q=revolverTarget();tx=q[0];ty=q[1];tr=q[2];adsOK=false}
+  else if(w.sniper&&snpBolt&&snpBolt.t>=0){tx=.35;ty=.55;tr=.16;adsOK=false}
+  if(w.pump){const po=pumpT<.12?0:pumpT<.22?easeIO((pumpT-.12)/.1):pumpT<.34?1-easeIO((pumpT-.22)/.12):0;tx+=po*.15;ty+=po*.35;tr+=po*.06}
+  let insp=null;if(inspT>=0){insp=inspT;adsOK=false}
+  springTo(tx,ty,tr,frameDt);
+  const want=adsOK&&aiming?1:0;adsK+=(want-adsK)*Math.min(1,frameDt*12);const k=easeIO(adsK),wob=1-k*.85;
+  if(w.sniper&&adsK>.55)return;
+  // 기본 위치 (총: 오른쪽 아래, 근접: 오른쪽)
+  const isGun=!(w.sword||w.spear||w.bow);
+  let hip=isGun?[.12,-.125,-.33]:w.spear?[.16,-.2,-.3]:[.2,-.25,-.44];
+  const ads=[0,-(vm.sightY||0),-.26-(vm.kind==='pistol'?.05:0)];
+  let pos=[hip[0]+(ads[0]-hip[0])*k,hip[1]+(ads[1]-hip[1])*k,hip[2]+(ads[2]-hip[2])*k];
+  pos[0]+=(GS.x+bx*wob)*.012;pos[1]-=(GS.y+by*wob)*.012;
+  let yaw=isGun?.05*(1-k):0,pit=0,rol=-GS.r*.6;
+  // 반동
+  const at=atkT,rk=at<.14?Math.pow(1-at/.14,2):0,kickK=(w.kick||(w.revolver?.03:w.pump?.05:w.sniper?.05:.012))*14;
+  pos[2]+=rk*.03*kickK*(1-k*.5);pit+=rk*.09*kickK;pos[1]+=rk*.008*kickK;
+  // 전환
+  if(switchT>0)pos[1]-=Math.sin(switchT/.32*PI)*.25;
+  // 자세히 보기
+  let spin=0;
+  if(insp!==null){const t=insp,e=easeIO;const up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;pos[0]-=.1*up;pos[1]+=.06*up;pos[2]+=.06*up;
+    let y2=.0,r2=.0;if(t>=.4&&t<1.0)y2=e((t-.4)/.6)*1.0;else if(t>=1.0&&t<1.5)y2=1.0-e((t-1.0)/.5)*2.4;else if(t>=1.5&&t<2.3){y2=-1.4;r2=Math.sin((t-1.5)/.8*PI)*.25}else if(t>=2.3&&t<2.9)y2=-1.4*(1-e((t-2.3)/.6));
+    yaw+=y2*up;rol+=r2;pit+=.25*up;const m2=inspSkinPose(t);pos[0]+=m2[0]*.01;pos[1]-=m2[1]*.01;spin=inspSpin(t)}
+  if(w.revolver&&typeof revSpinAngle==='function'){const s2=revSpinAngle();if(s2)spin+=s2}
+  // 근접 휘두르기
+  let melRot=null;
+  if(!isGun&&!w.bow){const kd=vm.kind;let rX=-.85,rY=.2,rZ=.55,px=0,py=0,pz=0;
+    if(w.spear){rX=-1.45;rY=0;rZ=0;px=-.02;py=.02;pz=.12;if(spCharging){const c=easeIO(spDraw);pz+=.12*c;py+=.03*c}if(spCd>0){py-=.5*Math.max(0,spCd/.5-.2)}
+      if(act){const kk=Math.min(1,act.t/act.dur),f=kk<.4?easeIO(kk/.4):1-easeIO((kk-.4)/.6);pz-=.35*f;px-=.05*f}}
+    else{if(charging&&!act&&time-chargeStart>.15){const c=Math.min(1,(time-chargeStart)/.6);rX-=.6*c;rZ+=.5*c;if(c>=1)px+=Math.sin(time*40)*.003}
+      if(blocking||(act&&act.type==='block')){rX=-.2;rY=1.3;rZ=1.45;px=-.12;py=.08}
+      if(act){const kk=Math.min(1,act.t/act.dur),e3=1-Math.pow(1-kk,3);
+        if(act.type==='slash'){const sd=act.side<0?-1:1;rY=.3;rX=-.6-.6*Math.sin(kk*PI);rZ=sd>0?(1.6-3.2*e3):(-1.6+3.2*e3);px=sd>0?(.05-.3*e3):(-.25+.3*e3);py=.05*Math.sin(kk*PI);pz=-.05*Math.sin(kk*PI)}
+        else if(act.type==='thrust'){const f=kk<.45?Math.sin(kk/.45*PI/2):1-(kk-.45)/.55;rX=-1.45;rY=0;rZ=0;px=-.08;pz=-.25*f;py=.05}
+        else if(act.type==='spin'){const e=easeIO(kk);rX=-1.2;rZ=0;rY=e*PI*2;px=-.1;py=.05}
+        else if(act.type==='dash'){rX=-1.3;rZ=0;px=-.08;pz=-.1}}}
+    if(kd==='heavy'){rX-=.1}
+    pos=[pos[0]+px,pos[1]+py,pos[2]+pz];melRot=[rX,rY,rZ]}
+  // 총 행렬 (카메라 공간)
+  let G=M4.tr(pos[0],pos[1],pos[2]);
+  if(melRot){G=mm(G,RY(melRot[1]),RZ(melRot[2]),RX(melRot[0]),SC(.8))}
+  else G=mm(G,RY(yaw),RX(pit),RZ(rol+tr*.5),RZ(spin));
+  if(!melRot&&tr)G=mm(G,RX(-ty*.0),T3(0,0,0));
+  const GW=mm(C,G);
+  const cols=skinCols(wi);const fl=flash>0?flash:0;
+  const dO=(role,extra)=>{const c=cols[role];return Object.assign({mul:c.c,emis:c.em*.8,spec:role===2?.25:.65,shin:role===2?18:48},extra||{})};
+  // 부품별 변형
+  const pm={};
+  if(vm.kind==='pistol'){const so=(slideT>0?Math.sin(slideT/.07*PI):0)+(((w.pistol&&pMag===0)||(w.gen&&gmSt(cur).mag===0))&&!gRel&&!gmRel?.85:0)+(w.gen&&rk>0?rk:0);pm.slide=T3(0,0,so*.035)}
+  if(vm.kind==='rifle'){pm.bolt=T3(0,0,(rk*.6+ko*.5)*.04)}
+  if(w.pump){const po=pumpT<.12?0:pumpT<.22?easeIO((pumpT-.12)/.1):pumpT<.34?1-easeIO((pumpT-.22)/.12):0;pm.pump=T3(0,0,po*.07)}
+  if(w.sniper&&snpBolt&&snpBolt.t>=0){const t=snpBolt.t;const up=t<.08?t/.08:t>.42?Math.max(0,1-(t-.42)/.08):1,back=t<.08?0:t<.22?(t-.08)/.14:t<.36?1-(t-.22)/.14:0;
+    const hy=vm.eject[1],hz=-(vm.f0+.03);pm.bolt=mm(T3(0,0,back*.07),T3(0,hy,hz),RZ(up*1.2),T3(0,-hy,-hz))}
+  if(w.gen&&w.name==='레버액션 소총'){const t=at,lv=t>.08&&t<.45?Math.sin((t-.08)/.37*PI):0;pm.lever=mm(T3(0,0,-.03),RX(lv*.9),T3(0,0,.03));pm.bolt=T3(0,0,lv*.05)}
+  if(vm.kind==='break'||w.launcher){let o2=0;if(gmRel){const kk=gmRel.t/gmRel.dur;o2=kk<.15?kk/.15:kk>.85?(1-kk)/.15:1}pm.brl=mm(T3(0,.02,-.06),RX(-o2*.55),T3(0,-.02,.06))}
+  let magM=null,magHide=mo>50;
+  if(mo)magM=T3(0,-Math.min(mo,8)*.012,0);
+  if(vm.kind==='revolver'){const q=reload?revolverTarget():[0,0,0,0],open=q[3]||0;let disp=cyl;if(reload&&reload.ph===2)disp=cyl-1+ease3(reload.t/.12);
+    const ang=disp/6*PI*2+(at<.08?0:0);const c0=vm.cylAt;pm.cyl=mm(T3(c0[0]-open*.045,c0[1]-open*.012,c0[2]),RZ(open*0),T3(0,0,0),RZ(ang));pm.cylshell=pm.cyl;
+    const hc=at<.05?0:Math.min(1,(at-.05)/.2);pm.hammer=mm(T3(...vm.hammerAt),RX(-(1-hc)*.0+hc*.0),RX(at<.03?-.0:.35*(1-Math.min(1,at/.3))))}
+  // 탄창 · 손 위치
+  const drawParts=(GWm,shadow)=>{for(const name in vm.meshes){if(name==='mag'&&magHide)continue;if(name==='cylshell'&&reload&&reload.ph<=1&&vm.kind==='revolver')continue;
+      let M=GWm;if(pm[name])M=mm(GWm,pm[name]);else if(name==='mag'&&magM)M=mm(GWm,magM);
+      if(name==='limbT'||name==='limbB'){const d=bowVis||0;M=mm(GWm,RX((name==='limbT'?1:-1)*d*.25))}
+      for(const p of vm.meshes[name]){let o=dO(p.role);if(name==='hopper'){const c=hsl2rgb(paintHue,80,55);o=Object.assign({},o,{mul:new Float32Array(c),alpha:.8,spec:.9,shin:80})}
+        if(name==='core'){o={emis:1.2+.4*Math.sin(time*8),lit:false}}
+        if(name==='blade'){const ch=charging&&time-chargeStart>=.6||act&&act.type==='spin';if(ch)o=Object.assign({},o,{emis:.6,mul:new Float32Array([1,.8,.35])});else o=Object.assign({},o,{spec:1.2,shin:90})}
+        draw(p.mesh,M,o)}}};
+  // 활
+  if(w.bow){bowVis+=((drawing?bowDraw:0)-bowVis)*Math.min(1,frameDt*(drawing?14:34));const d=bowVis;
+    let BM=mm(C,T3(-.04+.03*d,-.08+.03*d,-.36+.04*d),RZ(.12),RY(0));let sh=0;if(drawing&&bowDraw>=1){const over=time-bowFull;if(over>2)sh=Math.min(1,(over-2)*.5)*.004}BM=mm(BM,T3((rand()-.5)*sh,(rand()-.5)*sh,0));
+    drawParts(BM);const top=v3(mm(BM,RX(d*.25)),[0,.42,.05]),bot=v3(mm(BM,RX(-d*.25)),[0,-.42,.05]),nock=v3(BM,[0,0,.05+.28*d]);
+    const str=mk('string',()=>{const g=new GB().use(null);g.hsl(40,20,80).cyl(.0018,.0018,1,4,false);return g.build()});
+    for(const [A,B2] of [[top,nock],[nock,bot]]){draw(str,mm(alignY(A[0],A[1],A[2],B2[0],B2[1],B2[2]),T3(0,.5*Math.hypot(B2[0]-A[0],B2[1]-A[1],B2[2]-A[2]),0),SC(1,Math.hypot(B2[0]-A[0],B2[1]-A[1],B2[2]-A[2]),1)),{spec:.1})}
+    if(arrows>0&&bowCd<=.15){const am=mm(BM,T3(0,.0,-.32+.28*d),RY(-PI/2));draw(mk('arrowV',()=>{const g=new GB();g.use(null).hsl(30,42,52).rod(-.33,0,0,.3,0,0,.004,5);g.hsl(210,12,74).save().t(.32,0,0).rz(-PI/2).cyl(.009,0,.035,6).restore();g.hsl(2,60,48);for(const a2 of [0,PI*2/3,PI*4/3])g.save().t(-.28,0,0).rx(a2).ext([[0,0],[.06,0],[.012,.018]],.002).restore();return g.build()}),am,{spec:.3})}
+    // 손
+    const hm=mk('hand',mHand),arm=mk('arm',mArm);const gp=v3(BM,[0,0,0]);draw(hm,mm(BM,RX(-PI/2),RY(PI/2)));armTo(draw,arm,gp,v3(C,[-.25,-.45,.15]));
+    const hp=nock;draw(hm,mm(M4.tr(hp[0],hp[1],hp[2]),RY(PI/2-a),RZ(-.4)));armTo(draw,arm,hp,v3(C,[.28,-.55,-.05]));R.restoreVP();return}
+  drawParts(GW);
+  // 탄피·탄창 낙하
+  if(at<lastAtkT&&isGun&&!w.bow&&vm.kind!=='revolver'&&!w.paint&&!w.launcher&&vm.kind!=='break'){const ep=v3(GW,vm.eject);const right=[C[0],C[1],C[2]];vDeb.push({p:ep,v:[right[0]*1.6+(rand()-.5)*.3,1.2+rand()*.5,right[2]*1.6+(rand()-.5)*.3],r:rand()*6,vr:(rand()-.5)*30,life:.7,red:w.pump||vm.kind==='break'})}
+  lastAtkT=at;
+  if(magHide&&lastRelMo<=50){const mp=v3(GW,vm.magAt||[0,-.05,0]);vDeb.push({p:mp,v:[0,-.5,0],r:0,vr:(rand()-.5)*4,life:1,mag:1,wi})}lastRelMo=mo;
+  if(vm.kind==='revolver'&&reload&&reload.ph===1&&!R._revEj){R._revEj=1;const cp=v3(GW,vm.cylAt);for(let i=0;i<6;i++)vDeb.push({p:[cp[0]+(rand()-.5)*.03,cp[1],cp[2]+(rand()-.5)*.03],v:[(rand()-.5)*.4,-.4-rand()*.4,(rand()-.5)*.4],r:rand()*6,vr:(rand()-.5)*20,life:.9})}
+  if(!reload)R._revEj=0;
+  for(let i=vDeb.length-1;i>=0;i--){const q=vDeb[i];q.life-=frameDt;if(q.life<=0){vDeb.splice(i,1);continue}q.v[1]-=9*frameDt;for(let j=0;j<3;j++)q.p[j]+=q.v[j]*frameDt;q.r+=q.vr*frameDt;
+    if(q.mag){const mv=VM[q.wi];if(mv&&mv.meshes.mag)for(const p of mv.meshes.mag)draw(p.mesh,mm(M4.tr(q.p[0],q.p[1],q.p[2]),RY(PI/2-a),RZ(q.r*.2)),dO(p.role))}
+    else draw(mk(q.red?'shellV':'brassV',()=>mBrass(q.red)),mm(M4.tr(q.p[0],q.p[1],q.p[2]),RY(q.r),RZ(q.r*.7)),{spec:.8,shin:60})}
+  // 총구 섬광
+  if(fl>0&&isGun&&!w.bow&&!(w.pistol&&gRel)){const mz=v3(GW,vm.muzzle);const s=.6+rand()*.5;
+    const fm=mk('flashM',()=>{const g=new GB().use(null);g.col(1,.85,.5,1);for(let i=0;i<3;i++)g.save().rz(i*PI/3).ext([[0,-.012],[.09,0],[0,.012],[-.09,0]],.001).restore();g.save().rx(PI/2).ext([[0,-.02],[.035,0],[0,.02],[-.035,0]],.001).restore();for(let i=0;i<5;i++){const a2=i/5*PI*2;g.save().ry(PI/2).rz(a2).ext([[0,0],[.12,-.008],[.13,0],[.12,.008]],.001).restore()}return g.build()});
+    draw(fm,mm(M4.tr(mz[0],mz[1],mz[2]),RY(PI/2-a+PI/2),RZ(rand()*6),SC(s*(w.admin?1.8:1))),{emis:2.2,lit:false,add:1,alpha:.95,mul:w.admin?new Float32Array([1,.95,.6]):undefined});
+    if(!R.shadowPass){pt(mz[0],mz[2],mz[1],.25,1,.7,.3,.6,true)}}
+  // 손과 팔
+  const hm=mk('hand',mHand),arm=mk('arm',mArm);
+  if(isGun){const g0=v3(GW,[0,-.03,.0]);draw(hm,mm(GW,T3(0,-.03,.012),RX(-.25)));armTo(draw,arm,g0,v3(C,[.26,-.42,.25]));
+    let lp=vm.grip2;if(hand){lp=[vm.magAt[0]+hand[0]*.008,vm.magAt[1]-hand[1]*.012,vm.magAt[2]]}
+    else if(vm.kind==='pistol'||vm.kind==='revolver'){lp=[-.015,-.055,.005]}
+    if(w.pump){const po=pumpT<.12?0:pumpT<.22?easeIO((pumpT-.12)/.1):pumpT<.34?1-easeIO((pumpT-.22)/.12):0;lp=[lp[0],lp[1],lp[2]+po*.07]}
+    if(vm.kind==='pistol'&&gRel){const kk=gRel.t/gRel.dur;if(kk>.25&&kk<.8){const e=Math.sin((kk-.25)/.55*PI);lp=[-.03,-.09+e*.04,.03]}}
+    const l0=v3(GW,lp);draw(hm,mm(M4.tr(l0[0],l0[1],l0[2]),RY(PI/2-a-.3),RX(-.4),RZ(.8)));armTo(draw,arm,l0,v3(C,[-.24,-.46,.22]))}
+  else{const g0=v3(GW,[0,0,0]);draw(hm,mm(GW,RX(-PI/2),RY(PI/2),T3(0,0,0)));armTo(draw,arm,g0,v3(C,[.3,-.48,.25]))}
+  // 수류탄 던지기
+  if(throwT<.4){const kk=throwT/.4,hp=v3(C,[-.15+.2*kk,-.2+.25*Math.sin(kk*PI),-.35-.2*kk]);if(kk<.5)draw(mk('nade_'+throwKind,()=>mNade(throwKind)),M4.tr(hp[0],hp[1],hp[2]),{spec:.4});draw(hm,mm(M4.tr(hp[0],hp[1]-.02,hp[2]),RY(PI/2-a)));armTo(draw,arm,[hp[0],hp[1]-.02,hp[2]],v3(C,[-.3,-.5,.2]))}
+  // 2D 효과 위치 (자세히 보기 입자)
+  const cp=R.toScreenV?R.toScreenV(v3(GW,[0,0,-.1]),PV):null;if(cp)revLast={x:cp[0],y:cp[1]};
+  R.restoreVP();
+};
+function armTo(draw,arm,hp,sp){const M=alignY(hp[0],hp[1],hp[2],2*hp[0]-sp[0],2*hp[1]-sp[1],2*hp[2]-sp[2]);draw(arm,mm(M,RY(0)),{spec:.1})}
+R.toScreenV=(p,PV)=>{const v=M4.mul(PV,VV);const x=v[0]*p[0]+v[4]*p[1]+v[8]*p[2]+v[12],y=v[1]*p[0]+v[5]*p[1]+v[9]*p[2]+v[13],ww=v[3]*p[0]+v[7]*p[1]+v[11]*p[2]+v[15];if(ww<=0)return null;return [(x/ww*.5+.5)*W,(1-(y/ww*.5+.5))*H]};
+
+R.onFail=msg=>{if(GMODE>=4){GMODE=0;try{localStorage.setItem('gd-gmode2',0)}catch(e){}if(window.__gmSync)window.__gmSync();say('3D를 켤 수 없어 글자 그래픽으로 돌아갔어요',2.4)}};
+R.drawMarks=()=>{for(const [x,y,z,red] of R.marks){const p=R.toScreen(x,y,z);if(!p)continue;const sx=p.x-R.cam.cxp+COLS*CELL/2,sy=p.y;
+  ctx.save();ctx.font=`bold ${clamp(Math.round(260/p.d),12,34)}px ${DFONT}`;ctx.textAlign='center';ctx.textBaseline='bottom';ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.75)';ctx.strokeText('!',sx,sy);ctx.fillStyle=red?'#ff4a3a':'#ffd24a';ctx.fillText('!',sx,sy);ctx.restore()}};
+return R;
+})();
+
+/*R3-END*/
 function render(){
   {const zt=aiming?(cur===3?4.2:cur===0?1.35:cur===5?1.45:WEAP[cur].zoom||1.18):(cur===4&&drawing?1+.3*bowDraw:1);zoomCur+=(zt-zoomCur)*Math.min(1,frameDt*(zt>zoomCur?10:14));if(state!=='play')zoomCur=1;proj=(COLS/2)/(Math.tan(FOV/2)/(zoomCur/(fxOn(4)||(fxOn(1)&&MODE==='pvp')?1.1:1)))}
   ctx.setTransform(DPR,0,0,DPR,0,0);
-  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  const R3ON=GMODE>=4&&!R3.failed&&R3.init();R3.show(R3ON);if(R3ON)R3.setTheme(GMODE-4);
+  if(R3ON)ctx.clearRect(0,0,W,H);else{ctx.fillStyle='#000';ctx.fillRect(0,0,W,H)}
   if(!P||!lm)return;
   buildLight(time);
   DK=isDark();if(DK){if(CW.length!==COLS*ROWS*2)CW=new Float32Array(COLS*ROWS*2);CW.fill(NaN)}
@@ -2321,6 +3455,7 @@ function render(){
     zbuf[c]=pr;
     FLC[c]=flashOn?FLASH_I*(comfort?.85:1)*Math.exp(-(camX*camX)/(comfort?.11:.075)):0;
   }
+  if(!R3ON){
   // 2차: 그리기
   for(let c=0;c<COLS;c++){
     const ra=RC.ra[c],cosd=Math.cos(ra-P.a),rdx=Math.cos(ra)/cosd,rdy=Math.sin(ra)/cosd;
@@ -2424,6 +3559,7 @@ function render(){
   }
   GK=0;drawGlows(dirX,dirY,hor);
   if(DK){darkMask();drawGhosts(dirX,dirY,hor)}
+  }else{R3.frame({hor,ox,oy,roll});R3.drawMarks();if(DK)drawGhosts(dirX,dirY,hor)}
   // 이름표
   if(MODE==='pvp')for(const r of remotes.values()){if(!r.al||!r.inRound||!r.scr)continue;const ally=!isFfa()&&r.tm===team;if(r.iv&&!ally)continue;if(DK&&!ally&&echoAt(r.x,r.y)<.3)continue;const ci=clamp(Math.floor(r.scr.x/CELL),0,COLS-1);if(!ally&&zbuf[ci]<r.scr.d)continue;
     ctx.save();ctx.textAlign='center';ctx.textBaseline='bottom';ctx.font=`bold 12px ${FONT}`;ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.7)';ctx.strokeText(r.n,r.scr.x,r.scr.y-4);
@@ -2456,7 +3592,8 @@ function render(){
   ctx.textBaseline='middle';
   if(onTarget&&!onTarget.T.boss&&!(DK&&onTarget.remote)){const e=onTarget,bw=70,yy=H/2+CELL+14;ctx.font=`13px ${DFONT}`;ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(W/2-bw/2-6,yy-12,bw+12,26);ctx.fillStyle='#ffd0c8';ctx.fillText(e.T.name,W/2,yy-2);ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(W/2-bw/2,yy+7,bw,4);ctx.fillStyle='#ff5a4d';ctx.fillRect(W/2-bw/2,yy+7,bw*Math.max(0,e.hp)/e.max,4)}
   drawHitDirs();
-  {const st=fxOn(7);if(st)ctx.globalAlpha=.4;drawWeapon();ctx.globalAlpha=1}
+  if(R3ON){if(state!=='title'){const w=WEAP[cur];if(w&&w.sniper&&adsK>.55)drawScope();inspSkinFx(frameDt);drawInspectLabel();if(adsK<.5)drawReloadRing()}}
+  else{const st=fxOn(7);if(st)ctx.globalAlpha=.4;drawWeapon();ctx.globalAlpha=1}
   // 후처리
   ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
   if(scanPat&&!comfort&&QL===0){ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=scanPat;ctx.fillRect(0,0,cv.width,cv.height);ctx.restore()}
