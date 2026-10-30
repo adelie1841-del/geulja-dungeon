@@ -1344,11 +1344,10 @@ addEventListener('keydown',e=>{
   if(e.code==='KeyN')cycleBright();
   if(e.code==='KeyB'){openShop(false);return}
   if(e.code==='KeyX'&&cur===8){const hs=[330,190,55,110,270];paintHue=hs[(hs.indexOf(paintHue)+1)%hs.length];say('물감 색 바꿈',.6)}
-  if(e.code==='KeyG')throwNade('frag');
-  if(e.code==='KeyH')throwNade('flash');
+  if((e.code==='KeyG'||e.code==='KeyH')&&!e.repeat){const k=e.code==='KeyG'?'frag':'flash';if(k==='frag'?nadeN<=0:flashN<=0){sfx('dry');say(k==='frag'?'수류탄이 없다':'섬광탄이 없다',1)}else nadeAim={k,t:time}}
   if(e.code==='BracketLeft'||e.code==='BracketRight'){sens=clamp(sens+(e.code==='BracketRight'?.15:-.15),.4,2.5);say('마우스 감도 '+sens.toFixed(2),.8)}
 });
-addEventListener('keyup',e=>{keys[e.code]=false;if(e.code==='Enter')attackUp()});
+addEventListener('keyup',e=>{if(nadeAim&&((e.code==='KeyG'&&nadeAim.k==='frag')||(e.code==='KeyH'&&nadeAim.k==='flash'))){const k=nadeAim.k;nadeAim=null;throwNade(k)}keys[e.code]=false;if(e.code==='Enter')attackUp()});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;atkHeld=false});
 let mouseDown=false,lastTouchT=-1e9;
 // 터치 뒤에 브라우저가 흉내 내는 마우스 이벤트는 무시 (포인터 잠금이 걸리면 터치 좌표가 0으로 고정돼 조작이 멈춤)
@@ -1889,7 +1888,7 @@ function handleNet(r,e){
     case 'sd':netSound(r,'sande');burst(r.x,r.y,.6,14,'산',165,90,62,1,2.5,.4,.08,0,false);break;
     case 'hit':if(e.to===myPeer&&MODE==='pvp'&&pv.alive&&pv.inv<=0&&state!=='title'&&(e.rd===undefined||(e.rd|0)===pv.round)){const d=clamp(+e.d||0,0,30)*10;lastAtk={peer:r.peer,w:e.w|0,hd:e.hd?1:0};hurtPlayer(d,r.x,r.y,null,r.peer,e.z==='h'?'head':e.z==='l'?'legs':'body')}break;
     case 'kill':{const by=String(e.by||'');killFeed.push({a:nameOf(by),ta:teamOf(by),v:r.n,tv:r.tm,w:e.w|0,hd:!!e.hd,at:time,self:by===r.peer});if(killFeed.length>6)killFeed.shift();
-      if(by===myPeer&&by!==r.peer){slashText=.8;slashMsg=e.hd?'헤드샷 처치!':'처치!';sfx('headshot');if(GM==='aug')perkOnKill(null,e.hd?'head':'body')}
+      if(by===myPeer&&by!==r.peer){slashText=.8;slashMsg=e.hd?'헤드샷 처치!':'처치!';sfx('headshot');if(GM==='aug')perkOnKill({pvpV:1,x:r.x,y:r.y,peer:r.peer},e.hd?'head':'body')}
       r.deadAt=time;break}
     case 'proj':{const a=+e.a||0,sp=+e.sp||10,sl=+e.sl||0,hs=sp/Math.sqrt(1+sl*sl),x=+e.x||r.x,y=+e.y||r.y;
       if(e.k==='paint')paintballs.push({remote:true,x:x+Math.cos(a)*.3,y:y+Math.sin(a)*.3,z:(+e.ez||.5)-.03,vx:Math.cos(a)*hs,vy:Math.sin(a)*hs,vz:sl*hs,hue:(e.h|0)%360,life:3});
@@ -1990,12 +1989,15 @@ function netTick(dt){
   }
   netSend();
 }
+let nadeAim=null;addEventListener('blur',()=>{nadeAim=null});
+function nadeArc(){const sl=aimSlope(),sp=10,hs=sp/Math.sqrt(1+sl*sl),a=P.a;let x=P.x+Math.cos(a)*.3,y=P.y+Math.sin(a)*.3,z=eyeZ+.1,vx=Math.cos(a)*hs,vy=Math.sin(a)*hs,vz=sl*hs+1.8;const pts=[];let t=0;
+  for(let i=0;i<120&&t<2.2;i++){const h=.02;t+=h;vz-=9*h;const nx=x+vx*h,ny=y+vy*h;if(tileSolid(nx,y))vx=-vx*.5;else x=nx;if(tileSolid(x,ny))vy=-vy*.5;else y=ny;z+=vz*h;if(z<=0){z=0;if(vz<-1.2){vz=-vz*.35;vx*=.6;vy*=.6}else{vz=0;vx*=.9;vy*=.9}}if(i%3===0)pts.push([x,y,z])}pts.push([x,y,z]);return pts}
 function throwNade(k){
   if(state!=='play'||throwT<.45||(MODE==='pvp'&&!pv.alive))return;
   if(k==='frag'?nadeN<=0:flashN<=0){sfx('dry');say(k==='frag'?'수류탄이 없다':'섬광탄이 없다',1);return}
   if(k==='frag')nadeN--;else flashN--;throwT=0;throwKind=k;GS.vy+=10;sfx('nade');
-  setTimeout(()=>{if(state!=='play')return;const sl=aimSlope(),sp=8.5,hs=sp/Math.sqrt(1+sl*sl),a=P.a;
-    spawnNade(k,P.x+Math.cos(a)*.3,P.y+Math.sin(a)*.3,eyeZ+.1,Math.cos(a)*hs,Math.sin(a)*hs,sl*hs+1.8,null);
+  setTimeout(()=>{if(state!=='play')return;const sl=aimSlope(),sp=10,hs=sp/Math.sqrt(1+sl*sl),a=P.a;
+    spawnNade(k,P.x+Math.cos(a)*.3,P.y+Math.sin(a)*.3,eyeZ+.1,Math.cos(a)*hs,Math.sin(a)*hs,sl*hs+1.8,null);nades[nades.length-1].fuse=k==='frag'?2.2:1.6;
     netEmit({t:'nade',k,x:+P.x.toFixed(2),y:+P.y.toFixed(2),a:+a.toFixed(3),sl:+sl.toFixed(3)})},120);
 }
 function spawnNade(k,x,y,z,vx,vy,vz,owner){nades.push({k,x,y,z,vx,vy,vz,fuse:k==='frag'?2.2:1.6,owner})}
@@ -2023,9 +2025,10 @@ function flashBoom(x,y,owner){addEcho(x,y,12,1.2);
   sfx('flashbang');dyn.push({x,y,r:9,i:4,life:.3,max:.3});burst(x,y,.4,10,'섬',50,30,90,1,3,.3,.1,0,false);
   const d=Math.hypot(P.x-x,P.y-y);
   if(d<14&&los(x,y,P.x,P.y)){let an=Math.atan2(y-P.y,x-P.x)-P.a;an=Math.atan2(Math.sin(an),Math.cos(an));const face=(Math.cos(an)+1)/2;
-    const amt=(1-d/14)*(.3+.7*face);blindT=Math.max(blindT,amt*3.6);if(amt>.15)say('눈이 부시다!',.8)}
+    const amt=(1-d/14)*(.3+.7*face)*(MODE!=='pvp'&&!owner?.35:1);blindT=Math.max(blindT,amt*3.6);if(amt>.15)say('눈이 부시다!',.8)}
   if(owner)return;
-  for(const e of enemies){if(e.dead)continue;const de=Math.hypot(e.x-x,e.y-y);if(de<9&&los(x,y,e.x,e.y)){e.stun=Math.max(e.stun||0,3*(1-de/9)+.5);e.alert=true}}
+  for(const e of enemies){if(e.dead)continue;const de=Math.hypot(e.x-x,e.y-y);if(de<9&&los(x,y,e.x,e.y)){e.stun=Math.max(e.stun||0,1.6*(1-de/9)+.6);e.blind=Math.max(e.blind||0,4.5*(1-de/9)+1.5);e.alert=true;burst(e.x,e.y,e.T.h,4,'?',50,40,90,1,1.2,.6,.07,-1,false)}}
+  if(MODE!=='pvp'){let n=0;for(const e of enemies)if(!e.dead&&e.blind>0)n++;if(n)say(`적 ${n}명이 눈이 멀었다!`,1.4)}
 }
 function updateArrows(dt){
   for(let i=arrowsW.length-1;i>=0;i--){const a=arrowsW[i];
@@ -2252,7 +2255,8 @@ function update(dt){
     if(e.slow>0)e.slow-=dt;
     if(e.stun>0){e.stun-=dt;e.wind=0;e.alert=true;continue}
     const dx=P.x-e.x,dy=P.y-e.y,d=Math.hypot(dx,dy)||.001;
-    const hid=fxOn(7)&&d>2.2+2*HL('sight');const see=!hid&&d<14*(ROUL.quiet?.5:1)*(PS('ambush')?.6:1)*(1+.1*HL('aim'))&&los(e.x,e.y,P.x,P.y);
+    if(e.blind>0){e.blind-=dt;e.cd=Math.max(e.cd,.25);if(rand()<dt*2)burst(e.x,e.y,e.T.h*1.05,1,'?',50,30,85,1,.6,.5,.06,-1,false)}
+    const hid=(fxOn(7)&&d>2.2+2*HL('sight'))||e.blind>0;const see=!hid&&d<14*(ROUL.quiet?.5:1)*(PS('ambush')?.6:1)*(1+.1*HL('aim'))&&los(e.x,e.y,P.x,P.y);
     e.alertT=Math.max(0,(e.alertT||0)-dt);
     if(see&&!e.alert){e.alert=true;e.alertT=1.3;if(d<10)sfx('alert');if(T.boss){say(`${T.name} 등장!`,2);sfx('boom')}}
     if(!e.alert)continue;
@@ -3657,6 +3661,13 @@ function render(){
     ctx.save();ctx.textAlign='center';ctx.textBaseline='bottom';ctx.font=`bold 12px ${FONT}`;ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.7)';const tagN=r.n+(r.ag&&r.ag.length?' · 증강 '+r.ag.length:'');ctx.strokeText(tagN,r.scr.x,r.scr.y-4);
     ctx.fillStyle=ally?(team===1?'#ff8a80':'#8ab8ff'):'#ffd0c8';ctx.fillText(tagN,r.scr.x,r.scr.y-4);
     if(ally){ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(r.scr.x-18,r.scr.y-2,36,4);ctx.fillStyle='#7ee6a0';ctx.fillRect(r.scr.x-18,r.scr.y-2,36*clamp(r.hp/100,0,1),4)}ctx.restore()}
+  // 투척 궤적
+  if(nadeAim&&state==='play'){const pts=nadeArc(),col=nadeAim.k==='frag'?'126,230,160':'230,240,255';let last=null;
+    for(let i=0;i<pts.length;i++){const [x,y,z]=pts[i],dx=x-P.x,dy=y-P.y,depth=dx*dirX+dy*dirY;if(depth<.2)continue;const side=dy*dirX-dx*dirY,sx=(COLS/2+side/depth*proj)*CELL,sy=(hor+2*K*proj*(eyeZ-z)/depth)*CELL;
+      ctx.fillStyle=`rgba(${col},${.35+.6*i/pts.length})`;ctx.beginPath();ctx.arc(sx,sy,Math.max(1.5,4/Math.max(.6,depth*.4)),0,Math.PI*2);ctx.fill();last=[x,y,sx,sy,depth]}
+    if(last){const [lx,ly]=last;const R=nadeAim.k==='frag'?2.2:3;ctx.strokeStyle=`rgba(${col},.85)`;ctx.lineWidth=2;ctx.beginPath();
+      for(let j=0;j<=24;j++){const an=j/24*Math.PI*2,x=lx+Math.cos(an)*R,y=ly+Math.sin(an)*R,dx=x-P.x,dy=y-P.y,depth=dx*dirX+dy*dirY;if(depth<.2)continue;const side=dy*dirX-dx*dirY,sx=(COLS/2+side/depth*proj)*CELL,sy=(hor+2*K*proj*eyeZ/depth)*CELL;j?ctx.lineTo(sx,sy):ctx.moveTo(sx,sy)}ctx.stroke()}
+    ctx.font=`12px ${FONT}`;ctx.textAlign='center';ctx.fillStyle=`rgba(${col},.9)`;ctx.fillText(`${nadeAim.k==='frag'?'수류탄':'섬광탄'} — 떼면 던져요 · 위아래로 거리 조절`,W/2,H*.62)}
   // 피해 숫자
   for(const n of dmgNums){const dx=n.x-P.x,dy=n.y-P.y,depth=dx*dirX+dy*dirY;if(depth<.25)continue;
     const side=dy*dirX-dx*dirY,col=COLS/2+side/depth*proj,ci=Math.floor(col);if(ci<0||ci>=COLS||zbuf[ci]<depth-.3)continue;
@@ -4278,7 +4289,7 @@ const PERKS=[
  {id:'shake',n:'떨리는 손',g:'떨',r:2,d:'화면이 흔들릴수록 피해 증가 (최대 +60%)',s:{shakeDmg:.6}},
  {id:'backward',n:'뒷걸음 장인',g:'뒤',r:2,d:'뒤로 걸을 때 속도 2배',s:{back:1}},
  {id:'crouchInv',n:'그림자 웅크림',g:'숨',r:2,d:'앉아 있으면 투명해짐',s:{crouchInv:1}},
- {id:'blink',n:'차원 불안정',g:'차',r:2,d:'8초마다 근처로 순간이동, 피해 +20%',s:{blinkT:1,dmg:.2}},
+ {id:'blink',n:'차원 도약',g:'차',r:2,d:'공중에서 한 번 더 점프, 공중 피해 +25%, 피해 +15%',s:{djump:1,air:.25,dmg:.15}},
  {id:'curse',n:'저주받은 힘',g:'저',r:2,d:'피해 +60%, 최대 체력 −30',s:{dmg:.6,hp:-30}},
  {id:'gamble',n:'도박사',g:'박',r:2,d:'치명타 +20%, 치명타가 아니면 피해 −20%',s:{crit:.2,gamble:1}},
  {id:'bleed',n:'피의 계약',g:'혈',r:2,d:'초당 체력 −1, 피해 +70%',s:{dmg:.7,bleed:1}},
@@ -4557,7 +4568,7 @@ PERKS.push(
  {id:'calm',n:'침착',g:'침',r:0,d:'탄 퍼짐 −10%, 반동 −10%',s:{acc:.1,recoil:.1}},
  {id:'nimble',n:'날쌘 몸',g:'날',r:0,d:'돌진 대기 −10%, 이동 +4%',s:{dash:.1,spd:.04}},
  {id:'dice',n:'주사위',g:'주',r:0,d:'증강 리롤 +1회',s:{reroll:1}},
- {id:'mark',n:'사신의 표식',g:'표',r:1,d:'처형 +25%, 치명타 +3%',s:{exec:.25,crit:.03}},
+ {id:'mark',n:'사신의 표식',g:'표',r:1,d:'체력 30% 이하 적에게 피해 +25%, 치명타 +3%',s:{exec:.25,crit:.03}},
  {id:'apround',n:'철갑탄',g:'철',r:1,d:'피해 +10%, 방패 관통',s:{dmg:.1,pierce:1}},
  {id:'hedgehog',n:'고슴도치',g:'슴',r:1,d:'가시 반사, 받는 피해 −5%',s:{thorns:1,tough:.05}},
  {id:'alchemy',n:'연금술사',g:'연',r:1,d:'회복약 +60%, 초당 체력 +0.4',s:{med:.6,regen:.4}},
@@ -4565,7 +4576,7 @@ PERKS.push(
  {id:'vest',n:'방탄 조끼',g:'조',r:1,d:'12초마다 방어막 +15, 받는 피해 −4%',s:{shieldGen:15,tough:.04}},
  {id:'hound',n:'사냥개',g:'개',r:1,d:'이동 +10%, 움직일 때 피해 +8%',s:{spd:.1,moving:.08}},
  {id:'fate',n:'운명 거부',g:'운',r:2,d:'리롤 +3회, 리롤할 때마다 체력 +5',s:{reroll:3,rerollHeal:5,dmg:.1}},
- {id:'headsman',n:'처형자의 도끼',g:'형',r:2,d:'처형 +50%, 근접 +25%',s:{exec:.5,melee:.25}},
+ {id:'headsman',n:'처형자의 도끼',g:'형',r:2,d:'체력 30% 이하 적에게 피해 +50%, 근접 +25%',s:{exec:.5,melee:.25}},
  {id:'undying',n:'불사신',g:'사',r:2,d:'초당 체력 +2, 받는 피해 −8%',s:{regen:2,tough:.08}},
  {id:'bstorm',n:'탄환 폭풍',g:'탄',r:2,d:'쌍발 20%, 연사 +12%',s:{twin:.2,rof:.12}},
  {id:'hydra',n:'독룡',g:'룡',r:2,d:'화염·독 탄, 번개 10%',s:{burn:1,poison:1,chainHit:.1}},
@@ -4690,7 +4701,7 @@ PERKS.push(
  {id:'bulwark',n:'성벽',g:'벽',r:2,d:'받는 피해 −15%, 최대 체력 +20, 이동 −5%',s:{tough:.15,hp:20,spd:-.05}},
  {id:'sniperseye',n:'명사수의 눈',g:'눈',r:2,d:'머리 피해 +35%, 멈춰 있을 때 피해 +20%',s:{head:.35,still:.2}},
  {id:'berserkp',n:'광전사',g:'광',r:2,d:'체력이 낮을수록 피해 (최대 +40%), 근접 +20%',s:{bloodrage:.4,melee:.2}},
- {id:'phase',n:'위상 이동',g:'위',r:2,d:'8초마다 순간이동, 회피 +8%',s:{blinkT:1,dodge:.08}},
+ {id:'phase',n:'위상 회피',g:'위',r:2,d:'회피 +12%, 돌진 대기 −15%',s:{dodge:.12,dash:.15}},
  {id:'vampblade',n:'흡혈 칼날',g:'칼',r:2,d:'준 피해 3% 흡수, 근접 +15%',s:{leech:.03,melee:.15}},
  {id:'gunsmith',n:'총기 장인',g:'장',r:2,d:'연사 +10%, 장전 +15%, 반동 −20%',s:{rof:.1,rld:.15,recoil:.2}},
  // 전설 8
@@ -4736,6 +4747,8 @@ function perkExtraMul(t,zone,w,o){if(!AUGON()||!t.T)return 1;let m=1;const mx=t.
   if(PS('collector'))m*=1+.02*perkCount()*PS('collector');if(PS('dashDmg')&&act&&act.type==='dash')m*=1+2*PS('dashDmg');return m}
 function perkKillExtra(e,zone){if(!AUGON())return;const ks=PS('killShield');if(ks)armor=Math.min(100,armor+ks);
   if(PS('momentum')){RUN.mom=Math.min(8,(RUN.mom|0)+1);RUN.momT=4}
+  if(e&&e.pvpV){if(PS('killBolt')){const ex=e.x,ey=e.y,near=targets().filter(o=>o.remote&&o.al&&o.peer!==e.peer&&Math.hypot(o.x-ex,o.y-ey)<7).sort((a,b)=>Math.hypot(a.x-ex,a.y-ey)-Math.hypot(b.x-ex,b.y-ey)).slice(0,2);
+    for(const o of near){burst(o.x,o.y,1.2,10,'벼',55,100,75,1,3,.35,.08,0,false);lastZone='body';damage(o,2.2*PS('killBolt'),0,0,true)}if(near.length){sfx('boom');flashW=Math.max(flashW,.15);slashText=.8;slashMsg='천벌! 벼락 '+near.length+'명'}}return}
   if(!e||!e.T)return;const ex=e.x,ey=e.y;
   if(PS('hsBoom')&&zone==='head')setTimeout(()=>boomAt(ex,ey,1.8,1.4,'머'),60);
   if(PS('overkill')&&e.hp<0){const ov=-e.hp*PS('overkill');let best=null,bd=2.8;for(const o of enemies){if(o.dead||o===e)continue;const d=Math.hypot(o.x-ex,o.y-ey);if(d<bd){bd=d;best=o}}if(best){burst(ex,ey,.6,6,'과',0,80,60,1,2,.3,.06,0,false);damage(best,ov,(best.x-ex)/(bd||1),(best.y-ey)/(bd||1),false)}}
@@ -4757,9 +4770,9 @@ const ATOMS=[
  ['rld',.06,'재빠른','탄띠','장전',1],['tough',.035,'굳센','방패','받는 피해 감소',1],['regen',.3,'살아나는','샘','초당 체력',0],['vamp',2,'굶주린','송곳니','처치 회복',0],
  ['head',.08,'정밀한','조준경','머리 피해',1],['crit',.025,'행운의','네잎클로버','치명타',1],['dodge',.025,'흐릿한','안개','회피',1],['melee',.08,'무거운','도끼날','근접 피해',1],
  ['acc',.06,'고요한','눈동자','탄 퍼짐 감소',1],['recoil',.06,'든든한','어깨','반동 감소',1],['legs',.12,'낮은','올가미','다리 피해',1],['air',.12,'나는','깃털','공중 피해',1],
- ['still',.08,'멈춘','바위','정지 피해',1],['moving',.06,'달리는','발굽','이동 중 피해',1],['exec',.12,'잔혹한','단두대','처형 피해',1],['blast',.12,'터지는','화약','폭발 피해',1],
- ['boss',.1,'용맹한','왕관','보스 피해',1],['med',.2,'치유의','약초','회복약',1],['shieldGen',6,'빛나는','갑주','방어막',0],['bigHit',.1,'맹렬한','망치','거물 피해',1],
- ['firstHit',.1,'성급한','선봉','첫 타격',1],['reach',.05,'기다란','장창','근접 사거리',1],['dash',.06,'번개 같은','돌풍','돌진 대기 감소',1],['ammoKill',.06,'알뜰한','주머니','처치 탄약',1],
+ ['still',.08,'멈춘','바위','정지 피해',1],['moving',.06,'달리는','발굽','이동 중 피해',1],['exec',.12,'잔혹한','단두대','약한 적(체력 30%↓) 피해',1],['blast',.12,'터지는','화약','폭발 피해',1],
+ ['boss',.1,'용맹한','왕관','보스 피해',1],['med',.2,'치유의','약초','회복약',1],['shieldGen',6,'빛나는','갑주','방어막',0],['bigHit',.1,'맹렬한','망치','멀쩡한 적(체력 80%↑) 피해',1],
+ ['firstHit',.1,'성급한','선봉','안 다친 적 첫 피해',1],['reach',.05,'기다란','장창','근접 사거리',1],['dash',.06,'번개 같은','돌풍','돌진 대기 감소',1],['ammoKill',.06,'알뜰한','주머니','처치 탄약',1],
  ['chainHit',.05,'찌릿한','벼락','번개 확률',1],['critHeal',1.2,'붉은','핏방울','치명 회복',0],['killShield',2.5,'약탈하는','전리품','처치 방어막',0],['momentum',.25,'불타는','기세','기세',2]];
 const TIER_BUDGET=[3,5,8,12];
 const ALBL={};for(const a of ATOMS)ALBL[a[0]]=a;
@@ -4785,22 +4798,27 @@ let AUG_SEEN={};try{AUG_SEEN=JSON.parse(localStorage.getItem('gd-aug-seen')||'{}
 const codexEl=document.createElement('div');codexEl.id='codex';codexEl.hidden=true;let cxTab='aug',cxTier=-1,cxQ='',cxPage=0;
 function markSeen(id){if(AUG_SEEN[id])return;AUG_SEEN[id]=1;try{localStorage.setItem('gd-aug-seen',JSON.stringify(AUG_SEEN))}catch(e){}}
 function openCodex(){codexEl.hidden=false;cxPage=0;renderCodex()}
-function renderCodex(){const PER=60;
-  let body='';
-  if(cxTab==='aug'){let list=PERKS.filter(p=>cxTier<0||p.r===cxTier);if(cxQ)list=list.filter(p=>(p.n+p.d).includes(cxQ));
-    const pages=Math.max(1,Math.ceil(list.length/PER));cxPage=Math.min(cxPage,pages-1);const seen=list.filter(p=>AUG_SEEN[p.id]||HID_FOUND[p.id]).length;
-    body=`<div class="cx-bar"><input id="cxQ" placeholder="이름·효과 검색" value="${esc2(cxQ)}"><span>${list.length}종 · 얻어 본 것 ${seen}</span></div>
-    <div class="cx-grid">${list.slice(cxPage*PER,cxPage*PER+PER).map(p=>{const known=AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5);return known?`<div class="cx-c${AUG_SEEN[p.id]?' got':''}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}</b><small>${RAR[p.r].n}${p.gen?' · 조합':''} · ${p.d}</small></div></div>`:`<div class="cx-c" style="--rc:${RAR[p.r].c}"><span>?</span><div><b>???</b><small>${RAR[p.r].n} · ${p.hint||'아주 드물게 나와요'}</small></div></div>`}).join('')}</div>
-    ${pages>1?`<div class="cx-pg"><button type="button" data-pg="-1" ${cxPage?'':'disabled'}>이전</button><span>${cxPage+1} / ${pages}</span><button type="button" data-pg="1" ${cxPage<pages-1?'':'disabled'}>다음</button></div>`:''}`}
-  else{let list=HARDS;if(cxQ)list=list.filter(h=>(h.n+h.d(1)).includes(cxQ));
-    body=`<div class="cx-bar"><input id="cxQ" placeholder="고난 검색" value="${esc2(cxQ)}"><span>${list.length}종 — 내 증강과 플레이에 맞춰 적이 적응해요 (1~3단계)</span></div>
-    <div class="cx-grid">${list.map(h=>`<div class="cx-c" style="--rc:#ff8a80"><span>${h.g}</span><div><b>${h.n}</b><small>${h.d(1)} → ${h.d(3)}</small></div></div>`).join('')}</div>`}
+function cxNorm(t){return String(t).toLowerCase().replace(/\s+/g,'')}
+function cxMatch(text){if(!cxQ)return true;const t=cxNorm(text);return cxNorm(cxQ).split(/[,·]/).filter(Boolean).every(w=>t.includes(w))}
+function renderCodex(){
   codexEl.innerHTML=`<div class="sk-box"><div class="sk-head"><h2>도감</h2><button type="button" class="btn sm" data-x>닫기</button></div>
   <div class="sk-tabs"><button type="button" data-tab="aug" aria-pressed="${cxTab==='aug'}">증강 ${PERKS.length}</button><button type="button" data-tab="hard" aria-pressed="${cxTab==='hard'}">고난 ${HARDS.length}</button>
-  ${cxTab==='aug'?`<span class="cx-sep"></span><button type="button" data-t="-1" aria-pressed="${cxTier<0}">전체</button>${RAR.map((r,i)=>`<button type="button" data-t="${i}" aria-pressed="${cxTier===i}" style="color:${r.c}">${r.n} ${PERKS.filter(p=>p.r===i).length}</button>`).join('')}`:''}</div>${body}</div>`;
-  const q=codexEl.querySelector('#cxQ');if(q){q.addEventListener('input',()=>{cxQ=q.value.trim();cxPage=0;const pos=q.selectionStart;renderCodex();const q2=codexEl.querySelector('#cxQ');q2.focus();try{q2.setSelectionRange(pos,pos)}catch(e){}})}}
+  ${cxTab==='aug'?`<span class="cx-sep"></span><button type="button" data-t="-1" aria-pressed="${cxTier<0}">전체</button>${RAR.map((r,i)=>`<button type="button" data-t="${i}" aria-pressed="${cxTier===i}" style="color:${r.c}">${r.n} ${PERKS.filter(p=>p.r===i).length}</button>`).join('')}<span class="cx-sep"></span><button type="button" data-own aria-pressed="${!!cxOwn}">얻어 본 것만</button>`:''}</div>
+  <div class="cx-bar"><input id="cxQ" type="search" autocomplete="off" placeholder="${cxTab==='aug'?'이름·효과 검색 (예: 치명타, 이동)':'고난 검색 (예: 들개, 방패)'}" value="${esc2(cxQ)}"><span id="cxCount"></span></div><div id="cxBody"></div></div>`;
+  const q=codexEl.querySelector('#cxQ');q.addEventListener('input',()=>{cxQ=q.value.trim();cxPage=0;renderCxList()});renderCxList()}
+let cxOwn=false;
+function renderCxList(){const PER=60,body=codexEl.querySelector('#cxBody'),cnt=codexEl.querySelector('#cxCount');if(!body)return;
+  if(cxTab==='aug'){let list=PERKS.filter(p=>(cxTier<0||p.r===cxTier)&&(!cxOwn||AUG_SEEN[p.id]||HID_FOUND[p.id]));
+    list=list.filter(p=>{const known=AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5);return cxMatch(known?p.n+p.d+RAR[p.r].n:RAR[p.r].n+(p.hint||''))});
+    const pages=Math.max(1,Math.ceil(list.length/PER));cxPage=Math.min(cxPage,pages-1);
+    cnt.textContent=`${list.length}종${cxQ?` 찾음`:''} · 얻어 본 것 ${list.filter(p=>AUG_SEEN[p.id]||HID_FOUND[p.id]).length}`;
+    body.innerHTML=list.length?`<div class="cx-grid">${list.slice(cxPage*PER,cxPage*PER+PER).map(p=>{const known=AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5);return known?`<div class="cx-c${AUG_SEEN[p.id]?' got':''}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}</b><small>${RAR[p.r].n}${p.gen?' · 조합':''} · ${p.d}</small></div></div>`:`<div class="cx-c" style="--rc:${RAR[p.r].c}"><span>?</span><div><b>???</b><small>${RAR[p.r].n} · ${p.hint||'아주 드물게 나와요'}</small></div></div>`}).join('')}</div>
+    ${pages>1?`<div class="cx-pg"><button type="button" data-pg="-1" ${cxPage?'':'disabled'}>이전</button><span>${cxPage+1} / ${pages}</span><button type="button" data-pg="1" ${cxPage<pages-1?'':'disabled'}>다음</button></div>`:''}`:'<p class="pk-tip">찾는 증강이 없어요. 다른 낱말로 검색해 보세요.</p>'}
+  else{const list=HARDS.filter(h=>cxMatch(h.n+h.d(1)+h.d(3)));cnt.textContent=`${list.length}종 — 내 증강과 플레이에 맞춰 적이 적응해요 (1~3단계)`;
+    body.innerHTML=list.length?`<div class="cx-grid">${list.map(h=>`<div class="cx-c" style="--rc:#ff8a80"><span>${h.g}</span><div><b>${h.n}</b><small>${h.d(1)} → ${h.d(3)}</small></div></div>`).join('')}</div>`:'<p class="pk-tip">찾는 고난이 없어요.</p>'}}
 codexEl.addEventListener('click',e=>{const b=e.target.closest('button');if(e.target===codexEl||(b&&b.dataset.x!==undefined)){codexEl.hidden=true;return}if(!b)return;
-  if(b.dataset.tab){cxTab=b.dataset.tab;cxQ='';cxPage=0;renderCodex();return}if(b.dataset.t!==undefined){cxTier=+b.dataset.t;cxPage=0;renderCodex();return}if(b.dataset.pg){cxPage+=+b.dataset.pg;renderCodex();codexEl.querySelector('.sk-box').scrollTop=0}});
+  if(b.dataset.tab){cxTab=b.dataset.tab;cxQ='';cxPage=0;renderCodex();return}if(b.dataset.t!==undefined){cxTier=+b.dataset.t;cxPage=0;codexEl.querySelectorAll('[data-t]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.t===cxTier)));renderCxList();return}
+  if(b.dataset.own!==undefined){cxOwn=!cxOwn;b.setAttribute('aria-pressed',String(cxOwn));cxPage=0;renderCxList();return}if(b.dataset.pg){cxPage+=+b.dataset.pg;renderCxList();codexEl.querySelector('.sk-box').scrollTop=0}});
 addEventListener('keydown',e=>{if(!codexEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();codexEl.hidden=true}},true);
 
 let relWas=false;
