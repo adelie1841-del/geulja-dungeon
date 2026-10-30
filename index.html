@@ -395,6 +395,7 @@ canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 .ht-t{display:grid;line-height:1.35}.ht-t b{font-size:13.5px}.ht-t b i{font-style:normal;font-size:11px;color:#ffc864;margin-left:4px}.ht-t small{font-size:12px;opacity:.8}.hbar{display:block;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:3px 0 1px;overflow:hidden}.hbar i{display:block;height:100%;background:var(--rc)}
 .ht-more{font-size:11px;opacity:.65;margin-top:5px;text-align:center}
 @media (max-height:460px){#hardToast{top:50px;padding:5px 8px;width:min(360px,calc(100% - 24px))}.ht-h{font-size:12.5px;margin-bottom:3px}.ht-c{padding:3px 6px}.ht-t small{font-size:11px}}
+.pk-card.dim{opacity:.55;filter:saturate(.6)}.pk-card.on{outline:3px solid var(--rc,#ffb347);outline-offset:2px;transform:translateY(-4px)}
 #savePick{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(0,0,0,.6);padding:16px}#savePick[hidden]{display:none}
 .savepick{background:#11161a;border:1px solid rgba(255,200,100,.45);border-radius:14px;padding:20px 22px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);display:grid;gap:12px;justify-items:center;text-align:center;padding:6px 0}.savepick .sp-h{font-size:18px;font-weight:700;color:#ffc864}.savepick .sp-s{line-height:1.6}.savepick .sp-s small{opacity:.7}
 .savepick .sp-b{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
@@ -1613,7 +1614,7 @@ let rcN=0,rcT=-9,burstLeft=0,burstT=0,BURSTING=false;
 function applyRecoil(w){if(time-rcT>.3)rcN=0;rcT=time;rcN++;const rv=w.rv||0,rh=w.rh||0;if(!rv&&!rh)return;
   const k=(aiming?.65:1)*(crK>.5?.75:1),pr=Math.min(rcN,14);
   kick+=rv*(1+pr*.07)*k*(SOLO()?Math.max(.4,1-PS('recoil')):1);P.a+=(Math.sin(pr*.9)*.7+(rand()-.5)*.6)*rh*k*(pr>4?1.5:1)}
-function startInspect(){const w=WEAP[cur];if(state!=='play'||reload||arRel||snpRel||gRel||gmRel||aiming||atkHeld||!SKIN_W(w)||w.sword)return;if(inspT>=0){inspT=-1;return}inspT=0;sfx('inspect')}
+function startInspect(){const w=WEAP[cur];if(state!=='play'||reload||arRel||snpRel||gRel||gmRel||aiming||atkHeld||charging||act||!(SKIN_W(w)||w.sword)||w.spear)return;if(inspT>=0){inspT=-1;return}inspT=0;sfx('inspect')}
 function inspectPose(t){const e=easeIO;let tx=0,ty=0,tr=0,fl=1,mo=0;
   const up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;tx=-2.3*up;ty=-2.9*up;tr=.55*up;
   if(t>=.4&&t<1.0){const f=e((t-.4)/.6);tr-=1.25*f}
@@ -3502,19 +3503,46 @@ function bowM(){const [parts,P_]=gunParts();const wd=P_('body',2),d=P_('body',1)
 // ---- 근접 ----
 function melee(kind){const [parts,P_]=gunParts();const bl=P_('blade',1),h=P_('body',2),ac=P_('body',3),fx=P_('body',4);
   // 칼날은 +y(위)로 뻗는다. 손잡이 원점.
-  if(kind==='sword'||kind==='katana'||kind==='dagger'){const L=kind==='dagger'?.22:kind==='katana'?.72:.62,W_=kind==='dagger'?.022:kind==='katana'?.02:.03,cur=kind==='katana'?.05:0;
-    const pts=[];const n=10;for(let i=0;i<=n;i++){const t=i/n;pts.push([W_/2+cur*t*t,.05+t*L*(t<1?1:1)])}pts.push([cur,.05+L+.05]);for(let i=n;i>=0;i--){const t=i/n;pts.push([-W_/2+cur*t*t,.05+t*L])}
-    bl.ext(pts,.006);bl.hsl(0,0,100);fx.hsl(210,15,88).save().t(0,0,.0035).ext(pts.map(([x,y])=>[x*.35,y]),.001).restore();
-    if(kind==='katana'){ac.save().t(0,.045,0).s(1,.25,1).cyl(.03,.03,.02,14).restore()}else{ac.box(0,.045,0,kind==='dagger'?.06:.13,.014,.024);ac.save().t((kind==='dagger'?.03:.065),.045,0).sph(.01,6,4).restore().save().t(-(kind==='dagger'?.03:.065),.045,0).sph(.01,6,4).restore()}
-    h.save().t(0,-.03,0).cyl(.014,.015,kind==='katana'?.2:.13,10).restore();if(kind==='katana'){for(let i=0;i<6;i++)fx.hsl(0,0,90).save().t(0,-.11+i*.03,0).rz(.5).box(0,0,0,.032,.006,.032).restore()}
-    ac.save().t(0,kind==='katana'?-.135:-.1,0).sph(.019,8,6).restore();return {parts,kind:'blade',len:L}}
-  if(kind==='great'){const L=.86,W_=.07,pts=[[W_/2,.05],[W_/2,.05+L],[0,.05+L+.09],[-W_/2,.05+L],[-W_/2,.05]];bl.ext(pts,.01);fx.hsl(210,15,88).save().t(0,0,.0055).ext([[.008,.09],[.008,.05+L],[-.008,.05+L],[-.008,.09]],.001).restore();
-    ac.box(0,.045,0,.22,.024,.032);for(const sx of [-1,1])ac.save().t(sx*.11,.045,0).sph(.016,6,4).restore();h.save().t(0,-.08,0).cyl(.017,.018,.24,10).restore();ac.save().t(0,-.21,0).sph(.026,8,6).restore();return {parts,kind:'heavy',len:L}}
-  if(kind==='scythe'){h.rod(0,-.32,0,0,.62,0,.015,8);bl.ext([[.0,.57],[-.08,.65],[-.22,.68],[-.36,.63],[-.46,.52],[-.33,.58],[-.18,.6],[-.05,.56]],.008);fx.hsl(210,15,88).save().t(0,0,.0045).ext([[-.06,.62],[-.22,.665],[-.36,.62],[-.44,.535],[-.34,.6],[-.2,.635]],.001).restore();ac.save().t(0,.58,0).cyl(.022,.022,.05,8).restore();return {parts,kind:'heavy',len:.65}}
-  if(kind==='rapier'){const L=.74,pts=[[.007,.05],[.004,.05+L],[0,.05+L+.03],[-.004,.05+L],[-.007,.05]];bl.ext(pts,.006);ac.save().t(0,.05,0).rx(PI/2).torus(.048,.006,16,5).restore();ac.save().t(0,.0,0).rz(PI/2).torus(.035,.005,12,4,PI).restore();
-    h.save().t(0,-.04,0).cyl(.013,.014,.12,10).restore();ac.save().t(0,-.11,0).sph(.02,8,6).restore();return {parts,kind:'blade',len:L}}
-  if(kind==='saber'){h.use(TX.metal);h.save().t(0,-.04,0).cyl(.02,.02,.22,12).restore();ac.save().t(0,.07,0).cyl(.024,.022,.03,12).restore();for(let i=0;i<4;i++)ac.save().t(0,-.12+i*.04,0).cyl(.0215,.0215,.008,12).restore();
-    const bm=parts['beam|4']=new GB().use(null);bm.col(1,1,1).save().t(0,.47,0).cyl(.016,.012,.78,10).restore().save().t(0,.86,0).sph(.012,8,6).restore();return {parts,kind:'blade',len:.82,saber:1}}
+  // 칼날 단면을 층층이 쌓아 날(얇게)→가운데(두껍게)로 깎인 느낌을 낸다
+  // 진짜 단면(날→어깨→가운데)으로 칼날을 만든다: 면마다 빛이 달라 각이 살아 보인다
+  const ringOf=(y,w,t,cf,xo,one)=>{const o=xo||0;return one?[[o+w,y,0],[o+w*.25,y,t],[o-w*.85,y,t*.9],[o-w,y,0],[o-w*.85,y,-t*.9],[o+w*.25,y,-t]]:[[o+w,y,0],[o+w*.45,y,t],[o,y,t*cf],[o-w*.45,y,t],[o-w,y,0],[o-w*.45,y,-t],[o,y,-t*cf],[o+w*.45,y,-t]]};
+  const blade3=(g,S,one)=>{const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],cr=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+    const R=S.map(q=>ringOf(q[0],q[1],q[2],q[3]||1,q[4],one)),m=R[0].length;
+    for(let i=0;i<R.length-1;i++)for(let j=0;j<m;j++){const k=(j+1)%m,p0=R[i][j],p1=R[i][k],p2=R[i+1][k],p3=R[i+1][j];
+      const c1=cr(sub(p1,p0),sub(p2,p0)),c2=cr(sub(p2,p0),sub(p3,p0));let n=[c1[0]+c2[0],c1[1]+c2[1],c1[2]+c2[2]];
+      const mx=(p0[0]+p1[0]+p2[0]+p3[0])/4,mz=(p0[2]+p1[2]+p2[2]+p3[2])/4,ax=S[i][4]||0,out=[mx-ax,0,mz];
+      if(n[0]*out[0]+n[2]*out[2]<0){n=n.map(v=>-v);const l=Math.hypot(...n)||1;g.quad(p0,p3,p2,p1,n.map(v=>v/l),[0,0,1,1])}else{const l=Math.hypot(...n)||1;g.quad(p0,p1,p2,p3,n.map(v=>v/l),[0,0,1,1])}}
+    const b0=R[0];for(let j=1;j<m-1;j++){const a=g.vert(...b0[0],0,-1,0,0,0),b=g.vert(...b0[j],0,-1,0,0,0),c=g.vert(...b0[j+1],0,-1,0,0,0);g.tri(a,b,c);g.tri(a,c,b)}};
+  const straight=(L,W0,W1,tip,t,cf,fl)=>{const S=[],n=8;for(let i=0;i<=n;i++){const u=i/n;S.push([.05+L*u,(W0+(W1-W0)*u)/2,t*(1-.35*u),u<(fl||0)?cf:1.12])}S.push([.05+L+tip*.55,W1*.32,t*.5,1.1]);S.push([.05+L+tip,.0006,.0006,1]);return S};
+  const groove=(y0,y1,w,d)=>{fx.hsl(215,14,34).ext([[w/2,y0],[w/2,y1],[0,y1+w*1.6],[-w/2,y1],[-w/2,y0]],d)};
+  const wrap=(y0,y1,r,n,role)=>{const g=role||fx;for(let i=0;i<n;i++){const y=y0+(y1-y0)*(i+.5)/n;g.save().t(0,y,0).rz(i%2?.35:-.35).torus(r,.0032,12,4).restore()}};
+  const curvedGuard=(hw,dip,r,sc)=>{const N=8,P=[];for(let i=-N;i<=N;i++){const u=i/N;P.push([u*hw,.045-dip*u*u*(sc||1)])}for(let i=0;i<P.length-1;i++)ac.rod(P[i][0],P[i][1],0,P[i+1][0],P[i+1][1],0,r*(1-.25*Math.abs(i/N-1)),8);for(const e of [P[0],P[P.length-1]])ac.save().t(e[0],e[1],0).sph(r*1.45,8,6).restore()};
+  if(kind==='sword'||kind==='dagger'){const D=kind==='dagger',L=D?.22:.62,W0=D?.03:.04,W1=D?.012:.026,tip=D?.06:.075;
+    blade3(bl,straight(L,W0,W1,tip,D?.0042:.0046,D?1.3:.55,D?0:.62));if(!D)groove(.075,.05+L*.6,.0075,.0052);
+    ac.box(0,.045,0,D?.034:.03,.03,D?.022:.026);if(D){curvedGuard(.04,-.008,.006)}else{curvedGuard(.085,-.016,.0075);ac.save().t(0,.062,0).ext([[.012,0],[0,.022],[-.012,0]],.024).restore()}
+    h.save().t(0,-.035,0).cyl(.0135,.0155,D?.1:.13,10).restore();wrap(-.095,.025,.0148,D?5:7);
+    ac.save().t(0,D?-.095:-.112,0).rx(PI/2).cyl(D?.018:.024,D?.018:.024,D?.016:.02,14).restore();ac.save().t(0,D?-.112:-.132,0).sph(.009,8,6).restore();
+    fx.hsl(355,70,45).save().t(0,D?-.095:-.112,0).rx(PI/2).cyl(.008,.008,(D?.016:.02)+.003,10).restore();return {parts,kind:'blade',len:L}}
+  if(kind==='katana'){const L=.72,W_=.026,cur=.05,n=14,pts=[];for(let i=0;i<=n;i++){const t=i/n;pts.push([W_/2+cur*t*t,.05+t*L])}pts.push([cur-.004,.05+L+.055]);for(let i=n;i>=0;i--){const t=i/n;pts.push([-W_/2*.9+cur*t*t,.05+t*L])}
+    {const S=[];for(let i=0;i<=n;i++){const t=i/n;S.push([.05+t*L,W_/2*(1-.12*t),.0048*(1-.3*t),1,cur*t*t])}S.push([.05+L+.03,W_*.3,.0028,1,cur+.002]);S.push([.05+L+.055,.0006,.0006,1,cur-.004]);blade3(bl,S,1)}
+    {const ham=[];for(let i=0;i<=n;i++){const t=i/n;ham.push([W_/2*.93*(1-.12*t)+cur*t*t,.06+t*L*.98])}for(let i=n;i>=0;i--){const t=i/n;ham.push([W_*.1+cur*t*t+Math.sin(t*38)*.003,.06+t*L*.98])}fx.hsl(40,10,97).ext(ham,.0058)}
+    ac.box(0,.06,0,.032,.03,.014);ac.save().t(0,.042,0).s(1,.22,.72).cyl(.04,.04,.02,18).restore();ac.save().t(0,.042,0).s(1,.6,.72).torus(.04,.004,18,4).restore();
+    h.save().t(0,-.07,0).s(1,1,.78).cyl(.0155,.0165,.2,10).restore();for(let i=0;i<7;i++)fx.hsl(0,0,12).save().t(0,-.155+i*.027,0).rz(.6).box(0,0,0,.035,.006,.026).restore();
+    fx.hsl(45,60,55).save().t(0,-.06,.0135).ext([[-.012,-.006],[.012,-.006],[.008,.006],[-.008,.006]],.003).restore();ac.save().t(0,-.175,0).s(1,1,.78).cyl(.018,.016,.022,12).restore();return {parts,kind:'blade',len:L}}
+  if(kind==='great'){const L=.86,W0=.075,W1=.05,_n=0;blade3(bl,[[.05,.022,.006,1.1],[.168,.022,.006,1.1],[.172,W0/2,.007,.6],[.05+L*.45,(W0+W1)/4,.0065,.6],[.05+L*.75,W1/2*1.02,.006,1.1],[.05+L,W1/2,.005,1.15],[.05+L+.055,W1*.3,.003,1.1],[.05+L+.1,.0006,.0006,1]]);groove(.2,.05+L*.68,.012,.0094);
+    for(const sx of [-1,1])ac.save().t(sx*.04,.155,0).rz(-sx*.5).ext([[0,0],[.025,.012],[.02,.02],[0,.01]],.012).restore();wrap(.065,.15,.0225,5,fx);
+    ac.box(0,.04,0,.05,.034,.034);curvedGuard(.15,.035,.011,1);ac.save().t(0,.04,0).torus(.03,.006,14,5).restore();
+    h.save().t(0,-.09,0).cyl(.017,.019,.24,10).restore();wrap(-.2,.015,.0182,10);ac.save().t(0,-.235,0).lathe([[0,-.04],[.018,-.034],[.028,-.015],[.026,.0],[.016,.012],[.012,.02]],12).restore();return {parts,kind:'heavy',len:L}}
+  if(kind==='scythe'){h.rod(0,-.32,0,0,.62,0,.015,8);bl.ext([[.0,.57],[-.08,.65],[-.22,.68],[-.36,.63],[-.46,.52],[-.33,.58],[-.18,.6],[-.05,.56]],.008);fx.hsl(210,15,88).save().t(0,0,.0045).ext([[-.06,.62],[-.22,.665],[-.36,.62],[-.44,.535],[-.34,.6],[-.2,.635]],.001).restore();ac.save().t(0,.58,0).cyl(.022,.022,.05,8).restore();
+    for(const y of [-.2,.12])ac.save().t(0,y,0).cyl(.02,.02,.03,8).restore();ac.rod(0,.12,0,.07,.16,0,.009,6);ac.save().t(0,-.325,0).sph(.022,8,6).restore();return {parts,kind:'heavy',len:.65}}
+  if(kind==='rapier'){const L=.74,_n=0;blade3(bl,straight(L,.016,.009,.035,.0038,1.35,0));
+    ac.save().t(0,.05,0).torus(.04,.0045,18,5).restore();ac.save().t(0,.03,0).s(1,.35,1).sph(.036,14,8).restore();curvedGuard(.075,-.02,.005);
+    const bow=[[.075,.065],[.07,.03],[.055,-.03],[.032,-.08],[.008,-.112]];for(let i=0;i<bow.length-1;i++)ac.rod(bow[i][0],bow[i][1],0,bow[i+1][0],bow[i+1][1],0,.0042,6);
+    for(const sz of [-1,1]){const sw=[[.035,.03],[.05,0,.02],[.04,-.04,.028],[.02,-.08,.018],[.005,-.105,.005]];for(let i=0;i<sw.length-1;i++)ac.rod(sw[i][0],sw[i][1],(sw[i][2]||0)*sz,sw[i+1][0],sw[i+1][1],(sw[i+1][2]||0)*sz,.0035,6)}
+    h.save().t(0,-.045,0).cyl(.012,.014,.12,10).restore();wrap(-.1,.01,.0132,8);ac.save().t(0,-.12,0).lathe([[0,-.022],[.012,-.018],[.019,-.004],[.016,.008],[.009,.014]],12).restore();return {parts,kind:'blade',len:L}}
+  if(kind==='saber'){h.use(TX.metal);h.save().t(0,-.04,0).cyl(.02,.02,.22,12).restore();ac.save().t(0,.075,0).cyl(.026,.021,.04,14).restore();ac.save().t(0,.098,0).torus(.019,.004,14,4).restore();for(let i=0;i<6;i++)fx.hsl(0,0,14).save().t(0,-.13+i*.03,0).cyl(.0215,.0215,.012,12).restore();
+    ac.box(.022,.0,0,.012,.05,.012);fx.hsl(0,80,50).save().t(.028,.0,0).box(0,0,0,.004,.012,.008).restore();ac.save().t(0,-.155,0).cyl(.017,.022,.02,12).restore();
+    const bm=parts['beam|4']=new GB().use(null);bm.col(1,1,1).save().t(0,.48,0).cyl(.018,.013,.78,12).restore().save().t(0,.87,0).sph(.013,10,6).restore();return {parts,kind:'blade',len:.82,saber:1}}
   if(kind==='axe'){h.rod(0,-.14,0,0,.42,0,.016,8);bl.save().t(0,.36,0).ext([[0,-.035],[.07,-.07],[.11,-.08],[.12,0],[.11,.08],[.07,.07],[0,.035]],.016).restore();fx.hsl(210,15,88).save().t(.115,.36,0).box(0,0,0,.008,.15,.018).restore();bl.box(-.02,.36,0,.05,.05,.03);return {parts,kind:'heavy',len:.42}}
   if(kind==='hammer'){h.rod(0,-.14,0,0,.42,0,.017,8);bl.save().t(0,.42,0).rz(PI/2).cyl(.045,.045,.2,12).restore();bl.save().t(.1,.42,0).rz(PI/2).cyl(.05,.05,.02,12).restore().save().t(-.1,.42,0).rz(PI/2).cyl(.05,.05,.02,12).restore();return {parts,kind:'heavy',len:.45}}
   if(kind==='club'){h.lathe([[.015,-.14],[.017,-.05],[.02,.1],[.032,.3],[.04,.45],[.035,.5],[0,.52]],10);for(let i=0;i<5;i++){const a=i*1.3,y=.3+i*.04;ac.save().t(Math.cos(a)*.035,y,Math.sin(a)*.035).rz(-Math.cos(a)*1.4).rx(Math.sin(a)*1.4).cyl(.006,0,.03,5).restore()}return {parts,kind:'heavy',len:.5}}
@@ -3605,7 +3633,7 @@ R.drawView=(draw)=>{
   if(switchT>0)pos[1]-=Math.sin(switchT/.32*PI)*.25;
   // 자세히 보기
   let spin=0;
-  if(insp!==null){const t=insp,e=easeIO;const up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;pos[0]-=.1*up;pos[1]+=.06*up;pos[2]+=.06*up;
+  if(insp!==null&&(isGun||w.bow)){const t=insp,e=easeIO;const up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;pos[0]-=.1*up;pos[1]+=.06*up;pos[2]+=.06*up;
     let y2=.0,r2=.0;if(t>=.4&&t<1.0)y2=e((t-.4)/.6)*1.0;else if(t>=1.0&&t<1.5)y2=1.0-e((t-1.0)/.5)*2.4;else if(t>=1.5&&t<2.3){y2=-1.4;r2=Math.sin((t-1.5)/.8*PI)*.25}else if(t>=2.3&&t<2.9)y2=-1.4*(1-e((t-2.3)/.6));
     yaw+=y2*up;rol+=r2;pit+=.25*up;const m2=inspSkinPose(t);pos[0]+=m2[0]*.01;pos[1]-=m2[1]*.01;spin=inspSpin(t)}
   if(w.revolver&&typeof revSpinAngle==='function'){const s2=revSpinAngle();if(s2)spin+=s2}
@@ -3621,11 +3649,21 @@ R.drawView=(draw)=>{
         else if(act.type==='thrust'){const f=kk<.45?Math.sin(kk/.45*PI/2):1-(kk-.45)/.55;rX=-1.45;rY=0;rZ=0;px=-.08;pz=-.25*f;py=.05}
         else if(act.type==='spin'){const e=easeIO(kk);rX=-1.2;rZ=0;rY=e*PI*2;px=-.1;py=.05}
         else if(act.type==='dash'){rX=-1.3;rZ=0;px=-.08;pz=-.1}}}
+    if(w.dual&&!act&&!charging&&!blocking){rZ=.16;rX=-1.0;px+=.03}
+    let bsp=0;
+    if(insp!==null&&!w.spear&&!act&&!blocking&&!charging){const t=insp,e=easeIO,up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;
+      const dl=w.dual;let tX=dl?-.35:-.08,tY=dl?.15:.3,tZ=dl?.55:1.35,tx=dl?-.04:-.1,ty=dl?.1:.21,tz=dl?.02:.05;
+      if(t>.4&&t<1.1){const k=(t-.4)/.7;tX+=.22*Math.sin(k*PI);tx+=.03*Math.sin(k*PI)}
+      if(t>=1.1&&t<1.7)bsp=PI*e((t-1.1)/.6);else if(t>=1.7)bsp=PI;
+      if(t>=1.7&&t<2.3){const k=(t-1.7)/.6;tY+=1.0*Math.sin(k*PI);ty+=.02*Math.sin(k*PI)}
+      if(t>=2.3&&t<2.9)tZ-=PI*2*e((t-2.3)/.6);
+      if(t>=2.9)bsp=PI*(1-up)+PI*up;
+      rX+=(tX-rX)*up;rY+=(tY-rY)*up;rZ+=(tZ-rZ)*up;px+=tx*up;py+=ty*up;pz+=tz*up;bsp*=up}
     if(kd==='heavy'){rX-=.1}
-    pos=[pos[0]+px,pos[1]+py,pos[2]+pz];melRot=[rX,rY,rZ]}
+    pos=[pos[0]+px,pos[1]+py,pos[2]+pz];melRot=[rX,rY,rZ,bsp]}
   // 총 행렬 (카메라 공간)
   let G=M4.tr(pos[0],pos[1],pos[2]);
-  if(melRot){G=mm(G,RY(melRot[1]),RZ(melRot[2]),RX(melRot[0]),SC(.8))}
+  if(melRot){G=mm(G,RY(melRot[1]),RZ(melRot[2]),RX(melRot[0]),RY(melRot[3]||0),SC(.8))}
   else G=mm(G,RY(yaw),RX(pit),RZ(rol+tr*.5),RZ(spin));
   if(!melRot&&tr)G=mm(G,RX(-ty*.0),T3(0,0,0));
   const GW=mm(C,G);
@@ -3652,7 +3690,7 @@ R.drawView=(draw)=>{
       for(const p of vm.meshes[name]){let o=dO(p.role);if(name==='hopper'){const c=hsl2rgb(paintHue,80,55);o=Object.assign({},o,{mul:new Float32Array(c),alpha:.8,spec:.9,shin:80})}
         if(name==='core'){o={emis:1.2+.4*Math.sin(time*8),lit:false}}
         if(name==='beam'){const c=cols[3].c;o={emis:1.6+.3*Math.sin(time*30),lit:false,mul:new Float32Array([Math.min(1,c[0]*1.4+.25),Math.min(1,c[1]*1.4+.25),Math.min(1,c[2]*1.4+.25)])}}
-        if(name==='blade'){const ch=charging&&time-chargeStart>=.6||act&&act.type==='spin';if(ch)o=Object.assign({},o,{emis:.6,mul:new Float32Array([1,.8,.35])});else o=Object.assign({},o,{spec:1.2,shin:90})}
+        if(name==='blade'){const ch=charging&&time-chargeStart>=.6||act&&act.type==='spin';if(ch)o=Object.assign({},o,{emis:.6,mul:new Float32Array([1,.8,.35])});else{o=Object.assign({},o,{spec:1.35,shin:110,emis:(o.emis||0)+.12});if(insp!==null&&!isGun){const sh=Math.max(0,Math.sin((insp-.45)*4.2))*(insp<1.2?1:0);if(sh>0)o.emis=(o.emis||0)+.45*sh}}}
         draw(p.mesh,M,o)}}};
   // 활
   if(w.bow){bowVis+=((drawing?bowDraw:0)-bowVis)*Math.min(1,frameDt*(drawing?14:34));const d=bowVis;
@@ -3665,7 +3703,7 @@ R.drawView=(draw)=>{
     const hm=mk('hand',mHand),arm=mk('arm',mArm);const gp=v3(BM,[0,0,0]);draw(hm,mm(BM,RX(-PI/2),RY(PI/2)));armTo(draw,arm,gp,v3(C,[-.25,-.45,.15]));
     const hp=nock;draw(hm,mm(M4.tr(hp[0],hp[1],hp[2]),RY(PI/2-a),RZ(-.4)));armTo(draw,arm,hp,v3(C,[.28,-.55,-.05]));R.restoreVP();return}
   drawParts(GW);
-  if(w.dual&&melRot){const G2=mm(C,M4.tr(-pos[0]+.02,pos[1]+.01,pos[2]+.03),RY(-melRot[1]),RZ(-melRot[2]),RX(melRot[0]),SC(.8));drawParts(G2);
+  if(w.dual&&melRot){const G2=mm(C,M4.tr(-pos[0]+.02,pos[1]+.01,pos[2]+.03),RY(-melRot[1]),RZ(-melRot[2]),RX(melRot[0]),RY(-(melRot[3]||0)),SC(.8));drawParts(G2);
     const hm2=mk('hand',mHand),arm2=mk('arm',mArm),g2=v3(G2,[0,0,0]);draw(hm2,mm(G2,RX(-PI/2),RY(PI/2)));armTo(draw,arm2,g2,v3(C,[-.3,-.48,.25]))}
   // 탄피·탄창 낙하
   if(at<lastAtkT&&isGun&&!w.bow&&vm.kind!=='revolver'&&!w.paint&&!w.launcher&&vm.kind!=='break'){const ep=v3(GW,vm.eject);const right=[C[0],C[1],C[2]];vDeb.push({p:ep,v:[right[0]*1.6+(rand()-.5)*.3,1.2+rand()*.5,right[2]*1.6+(rand()-.5)*.3],r:rand()*6,vr:(rand()-.5)*30,life:.7,red:w.pump||vm.kind==='break'})}
@@ -3959,7 +3997,13 @@ function swordPose(){
         case 'block':rot=-2.0;px=W*.7;py=H*.84;break;
       }}
     return {px,py,rot,sc}}
-  let px=W*.72,py=H*1.03,rot=.12,sc=1;
+  let px=W*.72,py=H*1.03,rot=.12,sc=1,fx=1;
+  if(inspT>=0&&!act&&!charging){const t=inspT,e=easeIO,up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;const dl=WEAP[cur].dual;let tr=dl?-.7:-1.45,tpx=W*(dl?.7:.62),tpy=H*(dl?.92:.86);
+    if(t>.4&&t<1.1)tr+=.12*Math.sin((t-.4)/.7*Math.PI);
+    if(t>=1.1&&t<1.7)fx=Math.max(.12,Math.abs(Math.cos(e((t-1.1)/.6)*Math.PI)));
+    if(t>=1.7&&t<2.3){const k=(t-1.7)/.6;tr-=.35*Math.sin(k*Math.PI);tpy-=H*.04*Math.sin(k*Math.PI)}
+    if(t>=2.3&&t<2.9)tr-=Math.PI*2*e((t-2.3)/.6);
+    rot+=(tr-rot)*up;px+=(tpx-px)*up;py+=(tpy-py)*up;sc=1+.08*up}
   if(charging&&!act&&time-chargeStart>.15){const c=Math.min(1,(time-chargeStart)/.6);rot=.12-c*.55;px=W*(.74+c*.03);py=H*(1.03-c*.07)+(c>=1?Math.sin(time*40)*2:0)}
   if(act){const k=Math.min(1,act.t/act.dur),e=1-Math.pow(1-k,3);
     switch(act.type){
@@ -3969,7 +4013,7 @@ function swordPose(){
       case 'dash':rot=-.78;px=W*.6;py=H*.86;sc=.82;break;
       case 'block':rot=-2.0;px=W*.7;py=H*.84;break;
     }}
-  return {px,py,rot,sc};
+  return {px,py,rot,sc,fx};
 }
 function drawSpear(){
   const w=WEAP[7],gc=clamp(Math.floor(H/19),16,40),step=gc*.6,rowH=gc*.88,art=w.art;
@@ -3996,11 +4040,12 @@ function drawSword(){
   const toS=(cx,cy)=>{const lx=(cx-w.pivot[0])*step*pose.sc,ly=(cy-w.pivot[1])*rowH*pose.sc;return [pose.px+lx*cs-ly*sn,pose.py+lx*sn+ly*cs]};
   const charged=charging&&time-chargeStart>=.6;
   const lit=clamp(lightAt(P.x,P.y)*1.15,.45,1.35);
-  ctx.save();ctx.translate(pose.px,pose.py);ctx.rotate(pose.rot);ctx.scale(pose.sc,pose.sc);
+  for(const mir of (w.dual?[-1,1]:[1])){
+  ctx.save();ctx.translate(mir<0?W-pose.px+gc*1.5:pose.px,pose.py);ctx.rotate(pose.rot*mir);ctx.scale(pose.sc*(pose.fx||1)*(w.dual?.88:1),pose.sc*(w.dual?.88:1));
   ctx.font=`bold ${gc}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
   const occM=(i,r)=>!!(art[r]&&art[r][i]&&art[r][i]!==' '&&w.leg[art[r][i]]);const DET=QL<=1;
   for(let pass=0;pass<2;pass++)for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k===' ')continue;const e=w.leg[k];
-    const x=(i-w.pivot[0])*step,y=(r-w.pivot[1])*rowH;
+    const x=(i-w.pivot[0])*step*mir,y=(r-w.pivot[1])*rowH;
     if(DET&&e[0]!=='손'){const bl=k==='K'||k==='k',L0=bl?e[3]:e[3]*lit;ctx.font=`bold ${Math.round(gc*.52)}px ${FONT}`;
       for(const dy of [-1,1])for(const dx of [-1,1]){const hx=occM(i+dx,r),vy=occM(i,r+dy);let g=e[0],lm=1;
         if(bl){g=dx===dy?e[0]:'/';lm=dx===dy?1:1.18}else if(!hx&&!vy){g=dx===dy?'/':'\\';lm=.7}else if(!vy){g=dy<0?'¯':'_';lm=dy<0?1.2:.7}else if(!hx){g='|';lm=.8}else if(!(dx<0&&dy<0))g=bl?(dx>0&&dy>0?'=':'-'):'#';
@@ -4014,8 +4059,9 @@ function drawSword(){
     if(blade&&blocking){L=Math.min(95,L+6)}
     ctx.fillStyle=`hsl(${hue},${sat}%,${clamp(L,4,95)}%)`;ctx.fillText(e[0],x,y)}
   if(charged){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(255,190,80,${.35+.25*Math.sin(time*20)})`;
-    for(let r=0;r<8;r++){const x=(w.art[r].search(/[Kj]/)-w.pivot[0])*step,y=(r-w.pivot[1])*rowH;ctx.fillText('기',x+(rand()-.5)*gc*.8,y+(rand()-.5)*gc*.8)}}
-  ctx.restore();
+    for(let r=0;r<8;r++){const x=(w.art[r].search(/[Kj]/)-w.pivot[0])*step*mir,y=(r-w.pivot[1])*rowH;ctx.fillText('기',x+(rand()-.5)*gc*.8,y+(rand()-.5)*gc*.8)}}
+  if(inspT>=0&&!act){const sh=Math.max(0,Math.sin((inspT-.45)*4.2))*(inspT<1.2?1:0);if(sh>0){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(255,255,255,${.35*sh})`;for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k==='K'||k==='k')ctx.fillText(w.leg[k][0],(i-w.pivot[0])*step*mir,(r-w.pivot[1])*rowH)}ctx.globalCompositeOperation='source-over'}}
+  ctx.restore()}
 }
 // ===== 총 모션: 스프링 =====
 const GS={x:0,y:0,r:0,vx:0,vy:0,vr:0};
@@ -4508,7 +4554,7 @@ const PERKS=[
  {id:'void',n:'공허의 눈',g:'공',r:4,d:'적이 나를 늦게 발견하고, 첫 공격 피해 3배',s:{ambush:2},hint:'그림자 웅크림으로 오래 숨으면…',cond:()=>RUN.hiddenT>=60}];
 const RAR=[{n:'실버',c:'#c9d1cc'},{n:'골드',c:'#ffc857'},{n:'프리즘',c:'#7fe6ff'},{n:'전설',c:'#ff8a5c'},{n:'히든',c:'#ff6ad5'}];
 const TIERW=[1,2,3,4,5];
-let PK={},RUN={kills:0,hsKills:0,meleeKills:0,gold:0,dashes:0,bosses:0,floorHurt:0,hiddenT:0,shots:0,streak:[],rerolls:3,rerollUsed:0,hard:{},fastFloors:0,blastKills:0,pity:0},perkOffer=null,perkPicked=false,warpCd=0,frenzyT=0,shadowT=0,reviveUsed=false,shieldT=0,blinkT=0,infT=0,predatorN=0;
+let PK={},RUN={kills:0,hsKills:0,meleeKills:0,gold:0,dashes:0,bosses:0,floorHurt:0,hiddenT:0,shots:0,streak:[],rerolls:3,rerollUsed:0,hard:{},fastFloors:0,blastKills:0,pity:0},perkOffer=null,perkPicked=false,perkSel=-1,warpCd=0,frenzyT=0,shadowT=0,reviveUsed=false,shieldT=0,blinkT=0,infT=0,predatorN=0;
 let HID_FOUND={};try{HID_FOUND=JSON.parse(localStorage.getItem('gd-hidden')||'{}')}catch(e){}
 let OPT={inf:false,roul:false,rush:false};try{Object.assign(OPT,JSON.parse(localStorage.getItem('gd-opt')||'{}'))}catch(e){}
 const saveOpt=()=>{try{localStorage.setItem('gd-opt',JSON.stringify(OPT))}catch(e){}};
@@ -4539,8 +4585,8 @@ function rollPerks(n,boost){
 function cardHtml(p,i,cls){return `<button type="button" class="pk-card${p.r===4?' hid':''}${p.r===5?' myth':''}${cls||''}" data-pk="${i}" style="--rc:${RAR[p.r].c}"><span class="pk-k">${i+1}</span><span class="pk-g">${p.g}</span><b>${p.n}</b><small>${RAR[p.r].n}${PK[p.id]?` · 보유 ${PK[p.id]}`:''}</small><span class="pk-d">${p.d}</span><span class="tq" data-term="${p.id}" title="자세히 보기">?</span></button>`}
 function perkCardsHtml(){
   if(!perkOffer)return '';
-  return `<div class="pk-row">${perkOffer.map((p,i)=>cardHtml(p,i)).join('')}</div>
-  ${perkPicked?'':`<button type="button" class="btn ghost sm pk-rr" id="pkReroll" ${rerollLeft()?'':'disabled'}>리롤 (R) · 남은 ${rerollLeft()}회</button>`}<p class="pk-tip">${perkPicked?'고른 증강이 적용됐어요. 다음 층으로 가세요.':'증강을 하나 고르세요 (키보드 1~'+perkOffer.length+')'} · 히든 발견 ${Object.keys(HID_FOUND).length}/${PERKS.filter(p=>p.r===4).length}</p>${perkCount()?`<details class="own-fold"><summary>보유 증강 ${perkCount()}개 보기</summary>${ownedHtml()}</details>`:''}`}
+  return `<div class="pk-row">${perkOffer.map((p,i)=>cardHtml(p,i,!perkPicked&&perkSel>=0?(i===perkSel?' on':' dim'):'')).join('')}</div>
+  ${perkPicked?'':`<button type="button" class="btn ghost sm pk-rr" id="pkReroll" ${rerollLeft()?'':'disabled'}>리롤 (R) · 남은 ${rerollLeft()}회</button>`}<p class="pk-tip">${perkPicked?'고른 증강이 적용됐어요. 다음 층으로 가세요.':perkSel>=0?`<b style="color:${RAR[perkOffer[perkSel].r].c}">${perkOffer[perkSel].n}</b> 선택됨 — 다른 카드를 누르면 바꿀 수 있고, <b>다음 층</b>을 누르면 확정돼요`:'증강을 하나 고르세요 (키보드 1~'+perkOffer.length+')'} · 히든 발견 ${Object.keys(HID_FOUND).length}/${PERKS.filter(p=>p.r===4).length}</p>${perkCount()?`<details class="own-fold"><summary>보유 증강 ${perkCount()}개 보기</summary>${ownedHtml()}</details>`:''}`}
 function perkListHtml(){const ids=Object.keys(PK);if(!ids.length)return '';
   return `<div class="pk-list">${ids.map(id=>{const p=PMAP[id];return `<span style="color:${RAR[p.r].c}" title="${p.d}">${p.g} ${p.n}${PK[id]>1?' ×'+PK[id]:''}</span>`}).join('')}</div>`}
 function grantPerk(p,quiet){PK[p.id]=(PK[p.id]|0)+1;markSeen(p.id);if(p.s.reroll)RUN.rerolls=(RUN.rerolls|0)+p.s.reroll;if(p.s.hp&&p.s.hp>0)hp=Math.min(MAXHP(),hp+p.s.hp);hp=Math.min(hp,MAXHP());
@@ -4548,9 +4594,8 @@ function grantPerk(p,quiet){PK[p.id]=(PK[p.id]|0)+1;markSeen(p.id);if(p.s.reroll
   if(!quiet){sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}}
 function pickPerk(i){
   if(state!=='clear'||!perkOffer||perkPicked)return;const p=perkOffer[i];if(!p)return;
-  grantPerk(p,true);perkPicked=true;sfx(p.r>=2?'exit':'pick');
+  perkSel=i;sfx('pick');
   btn.disabled=false;document.getElementById('pkBox').innerHTML=perkCardsHtml();bindPerkCards();
-  document.querySelectorAll('#pkBox .pk-card').forEach(b=>{if(+b.dataset.pk===i)b.classList.add('on');else b.classList.add('off')});
   setTimeout(()=>{try{btn.focus({preventScroll:true})}catch(e){}},30)}
 function bindPerkCards(){document.querySelectorAll('#pkBox .pk-card').forEach(b=>b.addEventListener('click',()=>pickPerk(+b.dataset.pk)));const rr=document.getElementById('pkReroll');if(rr)rr.addEventListener('click',rerollFloor)}
 addEventListener('keydown',e=>{if(state==='clear'&&perkOffer&&!perkPicked&&/^Digit[1-4]$/.test(e.code)){e.preventDefault();pickPerk(+e.code.slice(5)-1)}else if(state==='clear'&&perkOffer&&!perkPicked&&e.code==='KeyR'){e.preventDefault();rerollFloor()}});
@@ -4792,7 +4837,7 @@ function rerollLeft(){return RUN.rerolls|0}
 function useReroll(){if(rerollLeft()<=0){sfx('dry');say('리롤이 없어요',1);return false}
   if(!(PS('rerollSave')&&rand()<PS('rerollSave')))RUN.rerolls--;RUN.rerollUsed=(RUN.rerollUsed|0)+1;
   const hl=PS('rerollHeal');if(hl)hp=Math.min(MAXHP(),hp+hl*healMul());sfx('pick');return true}
-function rerollFloor(){if(state!=='clear'||!perkOffer||perkPicked||!useReroll())return;perkOffer=rollPerks(null,PS('rerollUp')?.6:0);document.getElementById('pkBox').innerHTML=perkCardsHtml();bindPerkCards()}
+function rerollFloor(){if(state!=='clear'||!perkOffer||perkPicked||!useReroll())return;perkOffer=rollPerks(null,PS('rerollUp')?.6:0);perkSel=-1;btn.disabled=true;document.getElementById('pkBox').innerHTML=perkCardsHtml();bindPerkCards()}
 function rerollQuick(){if(!quickOffer||!useReroll())return;augQ++;quickOffer=null;quickEl.hidden=true;const was=state;if(state==='aug')state='play';openQuick()}
 // ================= 고난 (적의 적응) =================
 const HARDS=[
@@ -5318,7 +5363,7 @@ function start(){
   initAudio();if(AC&&AC.state==='suspended')AC.resume();
   if(state==='title'&&!freshStart){const d=soloLoadData();if(d){spEl.innerHTML=savePickHtml(d);spEl.hidden=false;return}}
   if(state==='over'){score=0;resetPerks();clearRoul();hp=100;armor=0;resetAmmo();loadLevel(0);adaptFloor();if(OPT.inf)augQ=1}
-  else if(state==='clear'){if(perkOffer&&!perkPicked)return;loadLevel(level+1);clearRoul();perkFloorStart();if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor()}
+  else if(state==='clear'){if(perkOffer&&!perkPicked){const p=perkOffer[perkSel];if(!p)return;grantPerk(p,true);perkPicked=true;perkSel=-1;sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}loadLevel(level+1);clearRoul();perkFloorStart();if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor()}
   else if(state==='title'){resetPerks();clearRoul();hp=100;resetAmmo();cur=primary>=0?primary:secondary;loadLevel(0);adaptFloor();if(OPT.inf)augQ=1}
   act=null;charging=false;trail=[];
   ov.hidden=true;state='play';atkCd=.2;
@@ -5341,7 +5386,7 @@ function levelClear(){
   const nb=(level+1)%2===1;
   showOverlay(`${level+1}층 돌파`,levelName,
     `처치 ${kills}/${totalEnemies} · 시간 ${m}:${String(s).padStart(2,'0')} · 보너스 +${bonus}<br>다음: ${level+2}층${nb?' — 보스가 기다린다':''} · 지도는 매번 새로 만들어져요<br>다음 층 시작 전에 무기를 고를 수 있어요.<div id="pkBox"></div>`,'다음 층',false,true);
-  if(SOLO()){perkOffer=rollPerks();perkPicked=false;btn.disabled=true;const bx=document.getElementById('pkBox');if(bx){bx.innerHTML=perkCardsHtml();bindPerkCards()}}
+  if(SOLO()){perkOffer=rollPerks();perkPicked=false;perkSel=-1;btn.disabled=true;const bx=document.getElementById('pkBox');if(bx){bx.innerHTML=perkCardsHtml();bindPerkCards()}}
 }
 
 ovP.dataset.home=ovP.innerHTML;
