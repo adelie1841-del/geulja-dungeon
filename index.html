@@ -441,6 +441,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
 @media (pointer:coarse) and (max-height:420px){.hud .solo{display:none}.pad .flashb{right:calc(232px + var(--sr));bottom:calc(128px + var(--sb))}.pad .ws{width:66px;height:40px}.pad .is{width:40px;height:40px}}
 @media (pointer:coarse) and (max-height:520px){.overlay .legend{display:none}.overlay{gap:8px}}
 @media (max-width:700px) and (pointer:fine){#menuBtn{display:inline-block}.tools{display:none;position:absolute;right:0;top:calc(100% + 6px);z-index:9;flex-direction:column;gap:6px;background:rgba(10,13,12,.96);border:1px solid var(--line);padding:10px}.hud.open .tools{display:flex}}
+.set-sec{margin:14px 0 4px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);font-weight:700;color:#ffb347;font-size:13px}.set-sec small{display:block;font-weight:400;color:#9a9a9a;font-size:11px;margin-top:2px}
 </style>
 
 <div class="wrap">
@@ -555,13 +556,13 @@ const GMODE_NAME=['글자','혼합 1','혼합 2','블록','3D 세미 리얼','3D
 function G(g,h,s,l,x,y,bg,hzA){
   if(GMODE===3||(GMODE===1&&GK===1)||(GMODE===2&&GK>=1&&GK<=3)){
     if(hzA>0){l=l*(1-hzA)+HZL*hzA;s=s*(1-hzA*.8);h=h*(1-hzA)+HZH*hzA}
-    if(comfort){s*=.82;if(l>86)l=86}
+    if(GK){if(CX.sat){if(s>38)s=38+(s-38)*.4;s*=.9;if(l>80)l=80}else if(comfort){s*=.82;if(l>86)l=86}}else if(comfort){s*=.95;if(l>90)l=90}
     l=(l*.5|0)*2;if(l<3)return;if(l>97)l=97;
     ctx.fillStyle=`hsl(${((h/3)|0)*3},${((s/4)|0)*4}%,${l}%)`;ctx.fillRect(x,y,CELL,CELL);
     if(bg&&CELL>=9){ctx.fillStyle='rgba(0,0,0,.14)';ctx.fillRect(x,y+CELL-1,CELL,1);ctx.fillRect(x+CELL-1,y,1,CELL)}
     return}
   if(hzA>0){l=l*(1-hzA)+HZL*hzA;s=s*(1-hzA*.8);h=h*(1-hzA)+HZH*hzA}
-  if(comfort){s*=.82;if(l>86)l=86}
+  if(GK){if(CX.sat){if(s>38)s=38+(s-38)*.4;s*=.9;if(l>80)l=80}else if(comfort){s*=.82;if(l>86)l=86}}else if(comfort){s*=.95;if(l>90)l=90}
   l=(l*.5|0)*2;if(l<3)return;if(l>97)l=97;h=((h/3)|0)*3;s=((s/4)|0)*4;
   const bq=bg?Math.round(bg*10):0;
   let id=GID[g];if(id===undefined)id=GID[g]=gidN++;
@@ -949,6 +950,9 @@ let cur=6,owned=[true,true,true,true,true],shells=12,atkCd=0,atkT=9,switchT=0,re
 let hitDirs=[],sizeIdx=1;const SIZES=[.75,1,1.35],SIZE_NAME=['작게','보통','크게'];
 let primary=5,arMag=30,arRes=120,arRel=null,arHeat=0,atkHeld=false,dmgNums=[],comfort=true,bgS=.55;
 try{if(localStorage.getItem('gd-comfort')==='0')comfort=false}catch(e){}
+const CX={wall:comfort,floor:comfort,lod:comfort,sat:comfort};try{const o=JSON.parse(localStorage.getItem('gd-cfx')||'null');if(o)for(const k in CX)if(k in o)CX[k]=!!o[k]}catch(e){}
+function saveCX(){try{localStorage.setItem('gd-cfx',JSON.stringify(CX))}catch(e){}}
+function presetCX(on){for(const k in CX)CX[k]=on;saveCX()}
 let snpMag=5,snpRes=15,snpBolt=null,snpRel=null,arrows=14,arrowsW=[],drawing=false,bowDraw=0,bowFull=0,bowCd=0,aiming=false,zoomCur=1,breath=4,swA=0,swP=0;
 let cyl=6,reload=null,scr=[],brass=[],pitch=0,kick=0,roll=0,rollV=0,turnRate=0,pitchRate=0,lastA=0,frameDt=.016,pumpT=9,pumpEj=true,hitMark=0,hitHead=false,crossK=0,crossHead=false,lastClink=0;
 let act=null,combo=0,lastSlash=-9,chargeStart=0,charging=false,dashCd=0,blockHeld=0,blocking=false,hitstop=0,trail=[],slashText=0,slashMsg='',dashHit=null,inv=0,flashW=0;
@@ -1043,7 +1047,7 @@ function cycleBright(){brightIdx=(brightIdx+1)%3;AMB=BRIGHT[brightIdx];brBtn.tex
 try{const b=+localStorage.getItem('gd-bright');if(b>=0&&b<3&&localStorage.getItem('gd-bright')!==null){brightIdx=b;AMB=BRIGHT[b];brBtn.textContent='밝기 '+BRIGHT_NAME[b]}}catch(e){}
 const gzBtn=document.getElementById('gz'),cfBtn=document.getElementById('cf');
 function syncComfort(){cfBtn.textContent=comfort?'눈 편하게 켬':'눈 편하게 끔'}
-cfBtn.addEventListener('click',e=>{comfort=!comfort;syncComfort();try{localStorage.setItem('gd-comfort',comfort?'1':'0')}catch(_){}resize();e.currentTarget.blur()});
+cfBtn.addEventListener('click',e=>{comfort=!comfort;presetCX(comfort);syncComfort();try{localStorage.setItem('gd-comfort',comfort?'1':'0')}catch(_){}resize();e.currentTarget.blur()});
 syncComfort();
 function cycleSize(){sizeIdx=(sizeIdx+1)%3;gzBtn.textContent='글자 '+SIZE_NAME[sizeIdx];try{localStorage.setItem('gd-size',sizeIdx)}catch(e){}resize()}
 try{const v=localStorage.getItem('gd-size');if(v!==null&&+v>=0&&+v<3){sizeIdx=+v;gzBtn.textContent='글자 '+SIZE_NAME[sizeIdx]}}catch(e){}
@@ -1057,11 +1061,17 @@ function setRows(){const qOrder=['auto','0','1','2','3'];return [
   {k:'br',n:'밝기',opts:BRIGHT_NAME.map((x,i)=>[i,x]),cur:brightIdx},
   {k:'gz',n:'글자 크기',opts:SIZE_NAME.map((x,i)=>[i,x]),cur:sizeIdx},
   {k:'ts',n:'시점 감도',opts:TSENS.map((t,i)=>[i,t[1]]),cur:(()=>{let b=0;TSENS.forEach((t,i)=>{if(Math.abs(t[0]-lookSens)<Math.abs(TSENS[b][0]-lookSens))b=i});return b})(),tip:'화면을 밀어서 돌아보는 속도'},
-  {k:'cf',n:'눈 편하게',opts:[[1,'켬'],[0,'끔']],cur:comfort?1:0},
+  {k:'cf',n:'눈 편하게',opts:[[1,'켬'],[0,'끔']],cur:comfort?1:0,tip:'켜고 끄면 아래 글자 화면 설정도 한꺼번에 바뀌어요'},
+  {sec:'글자 화면',tip:'글자·혼합·블록 그래픽에만 적용돼요'},
+  {k:'cx_wall',n:'벽 글자',opts:[[1,'은은하게'],[0,'선명하게']],cur:CX.wall?1:0,tip:'은은하게: 멀리선 색 면, 가까이 가면 글자'},
+  {k:'cx_floor',n:'바닥 글자',opts:[[1,'발밑만'],[0,'전부']],cur:CX.floor?1:0},
+  {k:'cx_lod',n:'먼 벽',opts:[[1,'색 블록'],[0,'글자']],cur:CX.lod?1:0},
+  {k:'cx_sat',n:'배경 색',opts:[[1,'차분하게'],[0,'원색']],cur:CX.sat?1:0,tip:'적·아이템·무기 색은 그대로'},
+  {sec:'기타'},
   {k:'fl',n:'손전등',opts:[[1,'켬'],[0,'끔']],cur:flashOn?1:0},
   {k:'snd',n:'소리',opts:[[1,'켬'],[0,'끔']],cur:muted?0:1}]}
 function renderSettings(){setEl.innerHTML=`<div class="set-box"><div class="sk-head"><h2>설정</h2><button type="button" class="btn sm" data-setx>닫기</button></div>
-  ${setRows().map(r=>`<div class="set-row"><div class="set-n">${r.n}${r.tip?`<small>${r.tip}</small>`:''}</div><div class="set-seg">${r.opts.map(([v,t])=>`<button type="button" data-sk="${r.k}" data-sv="${v}" aria-pressed="${String(v)===String(r.cur)}">${t}</button>`).join('')}</div></div>`).join('')}
+  ${setRows().map(r=>r.sec?`<div class="set-sec">${r.sec}${r.tip?`<small>${r.tip}</small>`:''}</div>`:`<div class="set-row"><div class="set-n">${r.n}${r.tip?`<small>${r.tip}</small>`:''}</div><div class="set-seg">${r.opts.map(([v,t])=>`<button type="button" data-sk="${r.k}" data-sv="${v}" aria-pressed="${String(v)===String(r.cur)}">${t}</button>`).join('')}</div></div>`).join('')}
   <p class="sk-tip">누르면 바로 적용돼요. 단계를 거치지 않고 원하는 값을 바로 고를 수 있어요.</p></div>`}
 function openSettings(){const hudEl=document.querySelector('.hud');hudEl.classList.remove('open');document.getElementById('menuBtn').setAttribute('aria-expanded','false');
   if(state==='play'&&MODE!=='pvp')pause();renderSettings();setEl.hidden=false;try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
@@ -1071,7 +1081,8 @@ function applySetting(k,v){
   else if(k==='br'){brightIdx=+v;AMB=BRIGHT[brightIdx];brBtn.textContent='밝기 '+BRIGHT_NAME[brightIdx];try{localStorage.setItem('gd-bright',brightIdx)}catch(e){}}
   else if(k==='gz'){sizeIdx=+v;gzBtn.textContent='글자 '+SIZE_NAME[sizeIdx];try{localStorage.setItem('gd-size',sizeIdx)}catch(e){}resize()}
   else if(k==='ts'){lookSens=TSENS[+v][0];try{localStorage.setItem('gd-tsens',lookSens)}catch(e){}syncTs()}
-  else if(k==='cf'){comfort=v==='1';syncComfort();try{localStorage.setItem('gd-comfort',comfort?'1':'0')}catch(e){}resize()}
+  else if(k==='cf'){comfort=v==='1';presetCX(comfort);syncComfort();try{localStorage.setItem('gd-comfort',comfort?'1':'0')}catch(e){}resize()}
+  else if(k.startsWith('cx_')){CX[k.slice(3)]=v==='1';saveCX()}
   else if(k==='fl'){if((v==='1')!==flashOn)toggleFlash()}
   else if(k==='snd'){muted=v==='0';sndBtn.textContent=muted?'소리 끔':'소리 켬';initAudio()}
   renderSettings()}
@@ -3789,7 +3800,7 @@ function render(){
     const lwF=fl*flFall(perp)*(SIDE?.85:1);
     const x=c*CELL;
     const rTop=Math.max(0,Math.floor(top)),rBot=Math.min(ROWS,Math.ceil(bot));
-    const lod=comfort&&perp>5.5,spl=wallSplats.size?wallSplats.get(MX+','+MY+','+FACE):null;
+    const lod=CX.lod&&perp>4,spl=wallSplats.size?wallSplats.get(MX+','+MY+','+FACE):null;
     // 천장
     for(let r=0;r<rTop;r++){
       if(DK)continue;GK=1;skyCell(ra,(hor-(r+.5))/ROWS);G(tg,th,ts,tl,x,r*CELL,1);
@@ -3803,7 +3814,7 @@ function render(){
       let L=tl*Math.max(lw+lwF*Math.exp(-vy*vy),te);
       if(r===rTop||r===rBot-1)L*=.5;
       if(edge)L*=.42;
-      GK=2;G(tg,th,ts,L,x,r*CELL,bgW,te>.5?0:hzW);
+      GK=2;G(tg,th,ts,L,x,r*CELL,CX.wall&&te<=.5?(perp>2.5?.88:.82):bgW,te>.5?0:hzW);
       if(DK){const ii=(r*COLS+c)*2;CW[ii]=P.x+Math.cos(ra)*(hd-.06);CW[ii+1]=P.y+Math.sin(ra)*(hd-.06)}
     }
     // 바닥
@@ -3812,14 +3823,14 @@ function render(){
       const fx=P.x+rdx*rd,fy=P.y+rdy*rd,ix=fx|0,iy=fy|0;
       if(ix<0||iy<0||ix>=MW||iy>=MH)continue;
       const ti=iy*MW+ix;seen[ti]=1;
-      floorTex(fx,fy,ix,iy,comfort&&rd>5);
+      floorTex(fx,fy,ix,iy,CX.floor&&rd>3.2);
       const dl=decalGrid[ti];
       if(dl){for(const d of dl){if((fx-d.x)**2+(fy-d.y)**2<d.r*d.r){if(d.g==='검'){tg='검';th=20;ts=10;tl=8}else if(d.g==='칠'){th=d.hue;ts=72;tl=40}else{tg='피';th=0;ts=72;tl=26}break}}}
       const vy=(r+.5-ROWS/2)/VS;
       let L=lightAt(fx,fy)*fogF(rd)+fl*flFall(rd)*Math.exp(-vy*vy)*.75;
       {const cs=r-rBot;if(cs<3)L*=.42+.58*(cs/3)}
       if(QL===0&&!DK&&rd<22){const cl=vnoise(fx*.11+time*.025,fy*.11+time*.012);L*=.76+.24*clamp((.62-cl)*4,0,1)}
-      GK=1;G(tg,th,ts,tl*L,x,r*CELL,bgF,hz(rd));
+      GK=1;G(tg,th,ts,tl*L,x,r*CELL,CX.floor?(rd>2?.88:.82):bgF,hz(rd));
       if(DK){const ii=(r*COLS+c)*2;CW[ii]=fx;CW[ii+1]=fy}
     }
   }
