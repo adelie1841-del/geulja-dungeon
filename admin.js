@@ -22,7 +22,7 @@ function hookFb(){
 function loadCfg(){if(cfgLoaded||!isAdm())return;cfgLoaded=true;
   firebase.database().ref('db/data/users/'+me+'/admin').once('value').then(s=>{const v=s.val();if(v&&typeof v==='object'){Object.assign(cfg,v);sdOn=!!cfg.sd;try{localStorage.setItem('gd-admin',JSON.stringify(cfg))}catch(e){}if(menuOpen)renderMenu()}}).catch(()=>{})}
 function hello(){loadCfg();topBtn.hidden=false;try{say('👑 운영자 모드 — ` 운영자 메뉴 · F 산데비스탄 · O 신의 심판',3.2)}catch(e){}}
-const ranked=()=>MODE==='pvp'&&matchMode==='rank';
+const ranked=()=>false; // 운영자 능력은 랭크전에서도 켜짐
 const live=()=>isAdm()&&state==='play'&&!ranked()&&!(MODE==='pvp'&&!pv.alive);
 function canUse(){if(!isAdm()||state!=='play')return false;if(ranked()){say('랭크전에서는 운영자 능력이 꺼져요',1.6);return false}return !(MODE==='pvp'&&!pv.alive)}
 function cool(k,s){if(CD[k]>0){say(`재사용까지 ${Math.ceil(CD[k])}초`,.7);return false}CD[k]=s;return true}
