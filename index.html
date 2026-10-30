@@ -4043,8 +4043,8 @@ function drawSword(){
   for(const mir of (w.dual?[-1,1]:[1])){
   ctx.save();ctx.translate(mir<0?W-pose.px+gc*1.5:pose.px,pose.py);ctx.rotate(pose.rot*mir);ctx.scale(pose.sc*(pose.fx||1)*(w.dual?.88:1),pose.sc*(w.dual?.88:1));
   ctx.font=`bold ${gc}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
-  const occM=(i,r)=>!!(art[r]&&art[r][i]&&art[r][i]!==' '&&w.leg[art[r][i]]);const DET=QL<=1;
-  for(let pass=0;pass<2;pass++)for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k===' ')continue;const e=w.leg[k];
+  const occM=(i,r)=>!!(art[r]&&art[r][i]&&art[r][i]!==' '&&w.leg[art[r][i]]);const DET=QL<=1;const skf=skinOf(cur).f;
+  for(let pass=0;pass<2;pass++)for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k===' ')continue;let e=w.leg[k];if(skf&&e[0]!=='손')e=skf(e,k,i,r);
     const x=(i-w.pivot[0])*step*mir,y=(r-w.pivot[1])*rowH;
     if(DET&&e[0]!=='손'){const bl=k==='K'||k==='k',L0=bl?e[3]:e[3]*lit;ctx.font=`bold ${Math.round(gc*.52)}px ${FONT}`;
       for(const dy of [-1,1])for(const dx of [-1,1]){const hx=occM(i+dx,r),vy=occM(i,r+dy);let g=e[0],lm=1;
