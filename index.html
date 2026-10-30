@@ -368,6 +368,14 @@ canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 .set-seg button[aria-pressed="true"]{background:#ffb347;color:#1a1206;border-color:#ffb347;font-weight:700}
 @media (max-width:560px){.set-row{grid-template-columns:1fr}.set-seg button{flex:1 1 auto}}
 .tools .set-main{border-color:#ffb347;color:#ffc864}
+#hardToast{position:absolute;left:50%;top:56px;transform:translate(-50%,-12px);z-index:20;width:min(420px,calc(100% - 24px));background:rgba(26,8,10,.92);border:1px solid #ff8a80;border-radius:12px;padding:8px 10px;box-shadow:0 10px 30px rgba(0,0,0,.5);opacity:0;transition:opacity .3s,transform .3s;pointer-events:auto}
+#hardToast[hidden]{display:none}#hardToast{pointer-events:none}#hardToast .ht-c{pointer-events:auto}#hardToast.in{opacity:1;transform:translate(-50%,0)}#hardToast.out{opacity:0;transform:translate(-50%,-12px)}
+.ht-h{color:#ffb4a8;font-weight:700;font-size:14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline}.ht-h small{font-weight:400;opacity:.6;font-size:11px}
+.ht-c{display:flex;gap:8px;align-items:center;width:100%;text-align:left;font:inherit;color:var(--ink);background:rgba(255,255,255,.04);border:0;border-left:3px solid #ff8a80;border-radius:6px;padding:5px 8px;margin-top:4px;cursor:pointer}
+.ht-c.sp{border-left-color:#c58cff}.ht-g{font-size:20px;color:#ff8a80;width:24px;text-align:center}.ht-c.sp .ht-g{color:#c58cff}
+.ht-t{display:grid;line-height:1.35}.ht-t b{font-size:13.5px}.ht-t b i{font-style:normal;font-size:11px;color:#ffc864;margin-left:4px}.ht-t small{font-size:12px;opacity:.8}.hbar{display:block;height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin:3px 0 1px;overflow:hidden}.hbar i{display:block;height:100%;background:var(--rc)}
+.ht-more{font-size:11px;opacity:.65;margin-top:5px;text-align:center}
+@media (max-height:460px){#hardToast{top:50px;padding:5px 8px;width:min(360px,calc(100% - 24px))}.ht-h{font-size:12.5px;margin-bottom:3px}.ht-c{padding:3px 6px}.ht-t small{font-size:11px}}
 #savePick{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(0,0,0,.6);padding:16px}#savePick[hidden]{display:none}
 .savepick{background:#11161a;border:1px solid rgba(255,200,100,.45);border-radius:14px;padding:20px 22px;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5);display:grid;gap:12px;justify-items:center;text-align:center;padding:6px 0}.savepick .sp-h{font-size:18px;font-weight:700;color:#ffc864}.savepick .sp-s{line-height:1.6}.savepick .sp-s small{opacity:.7}
 .savepick .sp-b{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
@@ -4356,7 +4364,7 @@ function drawHUD(){
   {const bA=bossFloor&&enemies.some(e=>e.hasKey&&!e.dead);const goal=bA?`목표: 보스 '${ET[bossFloor].name}'을 쓰러뜨리고 열쇠 얻기`:!hasKey?"목표: '쇠' 열쇠 찾기":"목표: '잠' 문을 지나 '출구'로";ctx.textAlign='left';ctx.textBaseline='top';ctx.font=`${small}px ${FONT}`;
    ctx.fillStyle='rgba(0,0,0,.55)';const tw=ctx.measureText(goal).width;ctx.fillRect(pad-6,pad-4,tw+12,small+10);ctx.fillStyle=hasKey?'#7ee6a0':'#f2c94c';ctx.fillText(goal,pad,pad+1);
    if(ROUL.id!=='none'){const ev=ROULS.find(r=>r.id===ROUL.id);if(ev){const t2=`룰렛 · ${ev.n}`;ctx.font=`${small}px ${FONT}`;const w2=ctx.measureText(t2).width;ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(pad-6,pad+small+12,w2+12,small+8);ctx.fillStyle=ev.good>0?'#7ee6a0':ev.good<0?'#ff8a80':'#ffc857';ctx.fillText(t2,pad,pad+small+15)}}
-   if(SOLO()&&hardTotal()>0){const all=Object.keys(RUN.hard).filter(k=>RUN.hard[k]>0&&HMAP[k]).sort((a,b)=>RUN.hard[b]-RUN.hard[a]),ids=all.slice(0,6);const t3='고난 '+ids.map(k=>HMAP[k].n+'ⅠⅡⅢⅣⅤ'[RUN.hard[k]-1]).join(' · ')+(all.length>6?` 외 ${all.length-6}`:'')+'  (I 자세히)';ctx.font=`${small}px ${FONT}`;const w3=ctx.measureText(t3).width,y3=pad+(ROUL.id!=='none'?2:1)*(small+12)+3;ctx.fillStyle='rgba(40,0,0,.55)';ctx.fillRect(pad-6,y3-3,w3+12,small+8);ctx.fillStyle='#ff9a8a';ctx.fillText(t3,pad,y3)}
+   if(SOLO()&&hardTotal()>0){const all=Object.keys(RUN.hard).filter(k=>RUN.hard[k]>0&&HMAP[k]).sort((a,b)=>RUN.hard[b]-RUN.hard[a]),ids=all.slice(0,6);const t3=innerWidth<1000?`⚠ 고난 ${all.length}종 · ${hardTotal()}단계`:'⚠ 고난 '+ids.slice(0,3).map(k=>HMAP[k].n+RUN.hard[k]).join(' · ')+(all.length>3?` 외 ${all.length-3}`:'')+'  (I)';ctx.font=`${small}px ${FONT}`;const w3=ctx.measureText(t3).width,y3=pad+(ROUL.id!=='none'?2:1)*(small+12)+3;ctx.fillStyle='rgba(40,0,0,.55)';ctx.fillRect(pad-6,y3-3,w3+12,small+8);ctx.fillStyle='#ff9a8a';ctx.fillText(t3,pad,y3)}
    ctx.fillStyle='rgba(228,236,230,.55)';if(!TOUCH)ctx.fillText((flashOn?'F 손전등 켬':'F 손전등 끔')+' · Tab 지도',pad,pad+small+10)}
   // 메시지
   if(msgT>0){ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`${clamp(Math.floor(H/30),14,22)}px ${DFONT}`;
@@ -4493,7 +4501,7 @@ const PMAP={};for(const p of PERKS)PMAP[p.id]=p;
 function PS(k){if(!AUGON())return 0;let v=0;for(const id in PK){const p=PMAP[id];if(p&&p.s[k])v+=p.s[k]*PK[id]}return v}
 function MAXHP(){return (AUGON()?Math.max(30,100+PS('hp')+predatorN):100)*(ROUL.hpx||1)*(Math.max(.6,1-.05*HL('curse')))}
 function augPower(){let v=0;for(const id in PK){const p=PMAP[id];if(p)v+=TIERW[p.r]*PK[id]}return v}
-function resetPerks(){PK={};RUN={kills:0,hsKills:0,meleeKills:0,gold:0,dashes:0,bosses:0,floorHurt:0,hiddenT:0,shots:0,streak:[],rerolls:3,rerollUsed:0,hard:{},fastFloors:0,blastKills:0,pity:0};perkOffer=null;reviveUsed=false;warpCd=0;frenzyT=0;shadowT=0;shieldT=0;blinkT=0;infT=0;predatorN=0;augQ=0;closeQuick()}
+function resetPerks(){PK={};RUN={kills:0,hsKills:0,meleeKills:0,gold:0,dashes:0,bosses:0,floorHurt:0,hiddenT:0,shots:0,streak:[],rerolls:3,rerollUsed:0,hard:{},fastFloors:0,blastKills:0,pity:0,hv2:1};perkOffer=null;reviveUsed=false;warpCd=0;frenzyT=0;shadowT=0;shieldT=0;blinkT=0;infT=0;predatorN=0;augQ=0;closeQuick()}
 function rollPerks(n,boost){
   const pvp=!SOLO();n=n||((PS('luck')||ROUL.luck?4:3));const lk=(PS('luck')?1:0)+(boost||0)+(ROUL.luck||0),deep=pvp?Math.min(1,(pv.k|0)/24):Math.min(1,level/12);const out=[];
   if(!pvp){const hid=PERKS.filter(p=>p.r===4&&!PK[p.id]&&p.cond&&(()=>{try{return p.cond()}catch(e){return false}})());if(hid.length&&rand()<.35+lk*.15)out.push(hid[(rand()*hid.length)|0])}
@@ -4703,10 +4711,15 @@ function adaptFloor(){if(!SOLO())return;const pp=augPower();ADAPT.dmg=1+Math.min
   {const sc=HL('scarce');if(sc)for(const p of pickups)if(p.k==='A'&&rand()<.25*sc)p.used=true}
   typeAdapt();
   if(pp>0)notes.unshift(`체력·피해 +${Math.round((hpk-1)*100)}%`);
-  if(up.length){notes.push('새 고난: '+up.join(', '));setTimeout(()=>{slashText=2.2;slashMsg='⚠ 적이 적응했다: '+up.join(' · ');sfx('exit')},600)}
+  if(HUP.length){const list=HUP.slice();setTimeout(()=>showHardToast(list),700)}
   const ab=level>=19?Math.floor((level-19)/5)+1:0;
   if(ab){const k=1+.25*ab;for(const e of enemies){e.hp*=k;e.max=(e.max||e.T.hp)*k;if(!e.T.boss&&!e.elite&&rand()<.15*ab)makeElite(e)}ADAPT.dmg*=1+.12*ab;notes.unshift(`심연 ${ab}단계 — 적 체력 +${25*ab}%, 피해 +${12*ab}%`);queueAug(1);RUN.abyss=Math.max(RUN.abyss|0,ab)}
-  ADAPT.note=notes.join(' · ');if(notes.length)setTimeout(()=>say('적이 적응했다: '+ADAPT.note,3),1900)}
+  ADAPT.note=notes.join(' · ');if(notes.length)setTimeout(()=>say(ADAPT.note,2.6),HUP.length?6200:1200)}
+const hToast=document.createElement('div');hToast.id='hardToast';hToast.hidden=true;let hToastT=0;
+function showHardToast(list){if(!list.length)return;document.getElementById('stage').appendChild(hToast);
+  const show=list.slice(0,innerHeight<460?2:4),more=list.length-show.length;
+  hToast.innerHTML=`<div class="ht-h">⚠ 적이 적응했어요 <small>눌러서 자세히</small></div>${show.map(([id,l,o])=>{const h=HMAP[id];if(!h)return '';return `<button type="button" class="ht-c${h.sp?' sp':''}" data-hterm="${id}" data-lv="${l}"><span class="ht-g">${h.g}</span><span class="ht-t"><b>${h.n} Lv${l}${o?` <i>▲${l-o}</i>`:' <i>새로</i>'}</b><small>${hdTxt(h,l)}</small></span></button>`}).join('')}${more>0?`<div class="ht-more">외 ${more}개 — I 키나 증강 버튼으로 보기</div>`:''}`;
+  hToast.hidden=false;hToast.classList.remove('out');void hToast.offsetWidth;hToast.classList.add('in');sfx('exit');clearTimeout(hToastT);hToastT=setTimeout(()=>{hToast.classList.add('out');setTimeout(()=>{hToast.hidden=true},400)},5600)}
 // ================= 랭크: 탈주·잠수 패널티 · 연승 보너스 =================
 let rkActive=false,lastInputT=performance.now(),afkWarned=false;
 ['keydown','mousedown','mousemove','touchstart','wheel'].forEach(t=>addEventListener(t,()=>{lastInputT=performance.now();afkWarned=false},{passive:true}));
@@ -4777,15 +4790,18 @@ const HARDS=[
  {id:'elite',n:'정예화',g:'예',d:l=>`정예 적 확률 +${6*l}%`,score:()=>augPower(),th:[10,22,38]}];
 const HMAP={};for(const h of HARDS)HMAP[h.id]=h;
 const HMUL=()=>SOLO()?1+Math.min(.5,.025*Math.max(0,level-2)):1;
-const HL=id=>SOLO()&&RUN.hard?(RUN.hard[id]|0)*HMUL():0;
-const hdTxt=(h,l)=>h.d(l*HMUL()).replace(/\d+\.\d+/g,x=>String(Math.round(+x*10)/10));
+const HMAX=20,HQ=4;
+const HL=id=>SOLO()&&RUN.hard?(RUN.hard[id]|0)/HQ*HMUL():0;
+const fmtD=t=>t.replace(/\d+\.\d+/g,x=>String(Math.round(+x*10)/10));
+const hdTxt=(h,l)=>fmtD(h.d(l/HQ*HMUL()));
 const hardTotal=()=>Object.values(RUN.hard||{}).reduce((a,b)=>a+b,0);
 const healMul=()=>Math.max(.3,1-.2*HL('wound'));
-function updateHards(){if(!SOLO())return [];RUN.hard=RUN.hard||{};const up=[];
-  for(const h of HARDS){let s=0;try{s=h.score()}catch(e){}let l=0;const th=h.th.length>=5?h.th:[...h.th,h.th[2]*1.6,h.th[2]*2.4];for(const t of th)if(s>=t)l++;l=Math.min(5,l);if(l>(RUN.hard[h.id]|0)){RUN.hard[h.id]=l;up.push(`${h.n} ${'ⅠⅡⅢⅣⅤ'[l-1]}`)}}
+let HUP=[];
+function updateHards(){if(!SOLO())return [];RUN.hard=RUN.hard||{};const up=[];HUP=[];
+  for(const h of HARDS){let s=0;try{s=h.score()}catch(e){}let l=0;const th=h.th.length>=5?h.th:[...h.th,h.th[2]*1.6,h.th[2]*2.4],pts=[th[0]*.4,...th];for(let L=1;L<=HMAX;L++){const x=L/HQ,i=Math.min(4,Math.floor(x)),f=x-i,t=i>=5?pts[5]:pts[i]+(pts[i+1]-pts[i])*f;if(s>=t)l=L;else break}if(l>(RUN.hard[h.id]|0)){HUP.push([h.id,l,RUN.hard[h.id]|0]);RUN.hard[h.id]=l;up.push(`${h.n} ${'ⅠⅡⅢⅣⅤ'[l-1]}`)}}
   return up}
 function hardsHtml(hd){hd=hd||RUN.hard||{};const ids=Object.keys(hd).filter(k=>hd[k]>0);if(!ids.length)return '<p class="pk-tip">아직 적이 적응하지 않았어요</p>';
-  return `${HMUL()>1.001?`<p class="pk-tip">적응 강도 ×${HMUL().toFixed(2)} — 깊은 층일수록 모든 고난이 세져요</p>`:''}<div class="own-row">${ids.map(id=>{const h=HMAP[id];if(!h)return '';const l=hd[id];return `<div class="own-c tm" data-hterm="${id}" data-lv="${l}" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><span>${h.g}</span><div><b>${h.n} ${'ⅠⅡⅢⅣⅤ'[l-1]}</b><small>${hdTxt(h,l)}</small></div></div>`}).join('')}</div>`}
+  return `${HMUL()>1.001?`<p class="pk-tip">적응 강도 ×${HMUL().toFixed(2)} — 깊은 층일수록 모든 고난이 세져요</p>`:''}<div class="own-row">${ids.map(id=>{const h=HMAP[id];if(!h)return '';const l=hd[id];return `<div class="own-c tm" data-hterm="${id}" data-lv="${l}" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><span>${h.g}</span><div><b>${h.n} Lv${l}<span class="hbar"><i style="width:${l/HMAX*100}%"></i></span></b><small>${hdTxt(h,l)}</small></div></div>`}).join('')}</div>`}
 // ================= 층 기록 · 순위 =================
 let RUNS=[];try{RUNS=JSON.parse(localStorage.getItem('gd-runs')||'[]')}catch(e){}
 let lastRun=null;
@@ -5001,9 +5017,9 @@ for(const k of Object.keys(ET)){const T=ET[k];if(T.boss)continue;const g=T.name[
   for(const [m,mn,df,th] of TMOD)HARDS.push({id:'t_'+k+'_'+m,n:`${T.name} ${mn}`,g,d:l=>`${T.name}: ${df(l)}`,score:()=>((RUN.typeKills||{})[k]|0),th,ek:k,em:m})}
 for(const h of HARDS)HMAP[h.id]=h;
 function typeAdapt(){if(!SOLO())return;const hd=RUN.hard||{};
-  for(const e of enemies.slice()){const k=keyOf(e.T),L=m=>(hd['t_'+k+'_'+m]|0)*HMUL();if(!L('hp')&&!L('dmg')&&!L('spd')&&!L('shield'))continue;
+  for(const e of enemies.slice()){const k=keyOf(e.T),L=m=>(hd['t_'+k+'_'+m]|0)/HQ*HMUL();if(!L('hp')&&!L('dmg')&&!L('spd')&&!L('shield'))continue;
     if(L('hp')){e.hp*=1+.15*L('hp');e.max=(e.max||e.T.hp)*(1+.15*L('hp'))}if(L('dmg'))e.dm=(e.dm||1)*(1+.12*L('dmg'));if(L('spd'))e.sm=(e.sm||1)*(1+.1*L('spd'));if(L('shield')&&rand()<.2*L('shield'))e.dr=Math.min(e.dr||1,.6)}
-  for(const id in hd){const h=HMAP[id];if(!h||h.em!=='horde'||!hd[id])continue;for(let i=0;i<Math.round(hd[id]*HMUL());i++){const sp=freeSpot(6);if(sp)spawnEnemy(h.ek,sp[0],sp[1])}}totalEnemies=enemies.length}
+  for(const id in hd){const h=HMAP[id];if(!h||h.em!=='horde'||!hd[id])continue;for(let i=0;i<Math.round(hd[id]/HQ*HMUL());i++){const sp=freeSpot(6);if(sp)spawnEnemy(h.ek,sp[0],sp[1])}}totalEnemies=enemies.length}
 // ================= 도감 =================
 let AUG_SEEN={};try{AUG_SEEN=JSON.parse(localStorage.getItem('gd-aug-seen')||'{}')}catch(e){}
 const codexEl=document.createElement('div');codexEl.id='codex';codexEl.hidden=true;let cxTab='aug',cxTier=-1,cxQ='',cxPage=0;
@@ -5027,7 +5043,7 @@ function renderCxList(){const PER=60,body=codexEl.querySelector('#cxBody'),cnt=c
     body.innerHTML=list.length?`<div class="cx-grid">${list.slice(cxPage*PER,cxPage*PER+PER).map(p=>{const known=AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5);return known?`<div class="cx-c tm${AUG_SEEN[p.id]?' got':''}" data-term="${p.id}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}</b><small>${RAR[p.r].n}${p.gen?' · 조합':''} · ${p.d}</small></div></div>`:`<div class="cx-c" style="--rc:${RAR[p.r].c}"><span>?</span><div><b>???</b><small>${RAR[p.r].n} · ${p.hint||'아주 드물게 나와요'}</small></div></div>`}).join('')}</div>
     ${pages>1?`<div class="cx-pg"><button type="button" data-pg="-1" ${cxPage?'':'disabled'}>이전</button><span>${cxPage+1} / ${pages}</span><button type="button" data-pg="1" ${cxPage<pages-1?'':'disabled'}>다음</button></div>`:''}`:'<p class="pk-tip">찾는 증강이 없어요. 다른 낱말로 검색해 보세요.</p>'}
   else{const list=HARDS.filter(h=>cxMatch(h.n+h.d(1)+h.d(3)));cnt.textContent=`${list.length}종 — 내 증강과 플레이에 맞춰 적이 적응해요 (1~3단계)`;
-    body.innerHTML=list.length?`<div class="cx-grid">${list.map(h=>`<div class="cx-c tm" data-hterm="${h.id}" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><span>${h.g}</span><div><b>${h.n}</b><small>${h.d(1)} → ${h.d(5)}</small></div></div>`).join('')}</div>`:'<p class="pk-tip">찾는 고난이 없어요.</p>'}}
+    body.innerHTML=list.length?`<div class="cx-grid">${list.map(h=>`<div class="cx-c tm" data-hterm="${h.id}" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><span>${h.g}</span><div><b>${h.n}</b><small>Lv1 ${fmtD(h.d(1/HQ))} → Lv20 ${h.d(5)}</small></div></div>`).join('')}</div>`:'<p class="pk-tip">찾는 고난이 없어요.</p>'}}
 codexEl.addEventListener('click',e=>{const b=e.target.closest('button');if(e.target===codexEl||(b&&b.dataset.x!==undefined)){codexEl.hidden=true;return}if(!b)return;
   if(b.dataset.tab){cxTab=b.dataset.tab;cxQ='';cxPage=0;renderCodex();return}if(b.dataset.t!==undefined){cxTier=+b.dataset.t;cxPage=0;codexEl.querySelectorAll('[data-t]').forEach(x=>x.setAttribute('aria-pressed',String(+x.dataset.t===cxTier)));renderCxList();return}
   if(b.dataset.own!==undefined){cxOwn=!cxOwn;b.setAttribute('aria-pressed',String(cxOwn));cxPage=0;renderCxList();return}if(b.dataset.pg){cxPage+=+b.dataset.pg;renderCxList();codexEl.querySelector('.sk-box').scrollTop=0}});
@@ -5147,7 +5163,7 @@ const TERMS=[
  ['중첩','같은 증강을 또 얻으면 효과가 그만큼 더해져요 (×2, ×3 …).'],
  ['리롤','증강 선택지를 새로 뽑아요. 기본 3회, 리롤 증강으로 늘어나요.'],
  ['혼자하기 전용','대전(증강 모드)에서는 나오지 않는 증강이에요.'],
- ['고난','내가 고른 증강과 플레이 방식에 맞춰 적이 적응하는 것이에요. 층을 넘어갈 때 조건을 보고 Ⅰ→Ⅴ 단계로 올라가요. 깊은 층일수록 적응 강도(최대 ×1.5)가 곱해져 더 세져요.'],
+ ['고난','내가 고른 증강과 플레이 방식에 맞춰 적이 적응하는 것이에요. 층을 넘어갈 때 조건을 보고 1→20단계로 조금씩 올라가요. 깊은 층일수록 적응 강도(최대 ×1.5)가 곱해져 더 세져요.'],
  ['적 종류 고난','특정 적을 많이 쓰러뜨리면 그 적 종류만 강해져요 (맷집·독기·민첩·방호·증원).'],
  ['정예','이름 옆에 특수 능력(방어막·신속·흡혈·분열·투명·자폭·재생)이 붙은 강한 적이에요.'],
  ['방어막','체력보다 먼저 깎이는 추가 체력이에요. 적에게 붙으면 받는 피해가 줄어요.'],
@@ -5229,9 +5245,9 @@ function perkDetailHtml(p){const own=PK[p.id]|0,rows=[];
   if(p.gen)ex.push(termRow('조합 증강',TERMS[3][1]));if(p.solo)ex.push(termRow('혼자하기 전용',TERMS[6][1]));ex.push(termRow('중첩',TERMS[4][1]));
   return `<div class="tp-box" style="--rc:${RAR[p.r].c}"><div class="tp-h"><span class="tp-g">${p.g}</span><div><b>${p.n}</b><small>${RAR[p.r].n}${p.gen?' · 조합':''}${own?` · 보유 ×${own}`:''}</small></div><button type="button" class="btn sm" data-tpx>닫기</button></div>
   <p class="tp-d">${p.d}</p>${rows.length?`<div class="tp-s">용어 풀이</div>${rows.join('')}`:''}<div class="tp-s">알아 두기</div>${ex.join('')}</div>`}
-function hardDetailHtml(h,lv){const why=h.ek?`이 적(${ET[h.ek].name})을 많이 쓰러뜨릴수록 그 종류만 적응해요. 처치 수 ${[...h.th,Math.round(h.th[2]*1.6),Math.round(h.th[2]*2.4)].join(' / ')}마리에서 Ⅰ~Ⅴ단계가 돼요.`:(HGLOSS[h.id]||'');
-  return `<div class="tp-box" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><div class="tp-h"><span class="tp-g">${h.g}</span><div><b>${h.n}${lv?' '+'ⅠⅡⅢⅣⅤ'[lv-1]:''}</b><small>${h.sp?'특수 고난':'고난'}${h.ek?' · 적 종류':''}</small></div><button type="button" class="btn sm" data-tpx>닫기</button></div>
-  <p class="tp-d">${[1,2,3,4,5].map(l=>`<span${l===lv?' class="on"':''}>${'ⅠⅡⅢⅣⅤ'[l-1]} ${h.d(l)}</span>`).join('<br>')}${HMUL()>1.001?`<br><small>지금 층의 적응 강도 ×${HMUL().toFixed(2)}가 곱해져요</small>`:''}</p>
+function hardDetailHtml(h,lv){const why=h.ek?`이 적(${ET[h.ek].name})을 많이 쓰러뜨릴수록 그 종류만 적응해요. 처치 수가 쌓일수록 1~20단계로 조금씩 올라가요 (${h.th[0]}마리쯤 4단계, ${Math.round(h.th[2]*2.4)}마리면 20단계).`:(HGLOSS[h.id]||'');
+  return `<div class="tp-box" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><div class="tp-h"><span class="tp-g">${h.g}</span><div><b>${h.n}${lv?` Lv${lv} / ${HMAX}`:''}</b><small>${h.sp?'특수 고난':'고난'}${h.ek?' · 적 종류':''}</small></div><button type="button" class="btn sm" data-tpx>닫기</button></div>
+  <p class="tp-d">${[...new Set([1,5,10,15,20,lv||0])].filter(x=>x>0).sort((a,b)=>a-b).map(l=>`<span${l===lv?' class="on"':''}>Lv${l} ${fmtD(h.d(l/HQ))}</span>`).join('<br>')}${HMUL()>1.001?`<br><small>지금 층의 적응 강도 ×${HMUL().toFixed(2)}가 곱해져요</small>`:''}</p>
   <div class="tp-s">왜 생기나요?</div>${termRow('원인',why)}<div class="tp-s">알아 두기</div>${termRow('고난',TERMS[7][1])}${h.sp?termRow('특수 고난',TERMS[16][1]):''}</div>`}
 function openTerm(html){termPop.innerHTML=html;termPop.hidden=false}
 addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-term],[data-hterm]');if(!t||termPop.contains(t))return;
@@ -5267,7 +5283,7 @@ function savePickHtml(d){const n=Object.values(d.PK).reduce((a,b)=>a+b,0),dt=new
   <div class="sp-b"><button type="button" class="btn" id="spCont">이어하기 · ${d.level+1}층</button><button type="button" class="btn ghost" id="spNew">처음부터</button><button type="button" class="btn ghost sm" id="spBack">뒤로</button></div></div>`}
 function soloContinue(d){initAudio();if(AC&&AC.state==='suspended')AC.resume();
   resetPerks();clearRoul();OPT.inf=!!d.opt.inf;OPT.roul=!!d.opt.roul;OPT.rush=!!d.opt.rush;saveOpt();document.querySelectorAll('#optInf').forEach(x=>x.checked=OPT.inf);document.querySelectorAll('#optRoul,#optRoulP').forEach(x=>x.checked=OPT.roul);
-  for(const id in d.PK)if(PMAP[id])PK[id]=d.PK[id]|0;Object.assign(RUN,d.RUN,{streak:[]});
+  for(const id in d.PK)if(PMAP[id])PK[id]=d.PK[id]|0;Object.assign(RUN,d.RUN,{streak:[]});if(!RUN.hv2){for(const k in RUN.hard||{})RUN.hard[k]=Math.min(HMAX,(RUN.hard[k]|0)*HQ);RUN.hv2=1}
   resetAmmo();score=d.score|0;primary=d.primary;secondary=d.secondary;melee=d.melee;ownedW=new Set(d.ownedW||[6,2]);if(d.armH!=null){armH=d.armH;armB=d.armB}
   loadLevel(d.level|0);const a=d.am||{};
   ({pMag=pMag,paintMag=paintMag,paintRes=paintRes,cyl=cyl,shells=shells,snpMag=snpMag,snpRes=snpRes,arrows=arrows,arMag=arMag,arRes=arRes,spears=spears,nadeN=nadeN,flashN=flashN}=a);
