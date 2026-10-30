@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://adelie1841-del.github.io/geulja-dungeon/sitemap.xml
