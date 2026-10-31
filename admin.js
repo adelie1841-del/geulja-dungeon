@@ -40,7 +40,7 @@ function beamFx(x0,y0,x1,y1,hue){
   burst(x1,y1,.5,12,'벌',hue,100,72,1,3.5,.4,.08,2,false);dyn.push({x:x1,y:y1,r:5,i:1.6,life:.2,max:.2});
 }
 function hitAt(e,dmgSolo){
-  if(e.remote){if(!e.al||(team>=0&&e.tm===team))return false;lastZone='head';damage(e,30,0,0,true);return true}
+  if(e.remote){if(!e.al||(team>=0&&e.tm===team))return false;lastZone='head';damage(e,dmgSolo===KILL?999:30,0,0,true);return true}
   if(e.T&&!e.dead&&e.hp>0){const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy)||1;damage(e,dmgSolo(e),dx/d,dy/d,true);return true}
   return false;
 }
@@ -88,6 +88,8 @@ WEAP.push({name:'신의 심판',admin:1,cd:.14,dmg:12,pellets:1,spread:0,auto:1,
   fs:.55,step:.55,rowH:.62,hipX:.67,hipY:.3,hipR:-.2,pivot:[6,14.5],
   leg:{s:['광',50,100,86,1],B:['천',48,95,64,.7],b:['천',45,85,48,.5],d:['천',42,70,32],g:['벌',280,70,42,.4],G:['벌',285,80,62,.7],L:['손',24,52,54],r:['신',45,70,40],R:['신',48,90,60,.5],k:['금',50,95,62,.8],e:['핵',190,100,62,1],m:['심',45,60,30],M:['심',48,80,50,.4],t:['판',45,40,30],q:['판',45,60,28],Q:['판',48,75,44],h:['손',24,52,58],H:['손',22,45,44]},
   art:WEAP[5].art.slice()});
+// 즉사: 보스·되살아나는 적까지 남은 체력만큼 한 방에 (기록이 터무니없이 커지지 않게 남은 체력만큼만)
+const KILL=x=>{if(x&&x.T){x.revived=1;x.rvE=0;x.split=0;return Math.max(1,(x.hp||1)+1)*3/Math.max(.01,(x.dr||1))}return 9999};
 function adminFire(){
   const w=WEAP[AW];if(state!=='play'||atkCd>0||switchT>0)return;
   if(ranked()){say('랭크전에서는 신의 심판을 쓸 수 없어요',1.4);switchTo(primary>=0?primary:secondary);return}
@@ -95,9 +97,9 @@ function adminFire(){
   recoil=1;flash=.08;GS.vy-=14;GS.vr-=2.5;GS.vx+=(Math.random()-.5)*3;kick+=.02*(aiming?.5:1);crossK=1;
   cast(P.x,P.y,P.a);const L=Math.min(hDist,40),cx=Math.cos(P.a),cy=Math.sin(P.a);let n=0;
   for(const e of targets()){const dx=e.x-P.x,dy=e.y-P.y,t=dx*cx+dy*cy;if(t<=0||t>L+.3)continue;const r=(e.T&&e.T.r)||.3;if(Math.abs(dx*cy-dy*cx)>r+.18)continue;
-    if(hitAt(e,x=>x.T.boss?w.dmg*(fxOn(5)?2:1):9999))n++}
+    if(hitAt(e,KILL))n++}
   const x1=P.x+cx*L,y1=P.y+cy*L,hue=auraHue(cfg.aura);
-  for(const e of targets()){const dx=e.x-x1,dy=e.y-y1;if(dx*dx+dy*dy<1.3*1.3)hitAt(e,x=>x.T.boss?w.dmg*.5:9999)}
+  for(const e of targets()){const dx=e.x-x1,dy=e.y-y1;if(dx*dx+dy*dy<1.3*1.3)hitAt(e,KILL)}
   beamFx(P.x+cx*.5,P.y+cy*.5,x1,y1,hue);dyn.push({x:P.x+cx*.5,y:P.y+cy*.5,r:5,i:1.4,life:.08,max:.08});
   if(MODE==='pvp')netEmit({t:'adm',k:'b',x0:+(P.x+cx*.5).toFixed(2),y0:+(P.y+cy*.5).toFixed(2),x1:+x1.toFixed(2),y1:+y1.toFixed(2)});
   if(n){hitMark=.2;slashText=.5;slashMsg=n>1?`관통 ${n}명!`:'심판!'}
@@ -106,7 +108,7 @@ function adminFire(){
 function equipAW(){
   if(!isAdm()||state!=='play')return;if(ranked()){say('랭크전에서는 신의 심판을 쓸 수 없어요',1.4);return}
   if(cur===AW){cur=prevW>=0&&prevW!==AW?prevW:(primary>=0?primary:secondary);switchT=.32;return}
-  prevW=cur;cur=AW;switchT=.4;atkT=9;reload=null;snpRel=null;arRel=null;gRel=null;atkHeld=false;drawing=false;GS.y=6;sfx('exit');say('⚜ 신의 심판 — 관통 광선 · 무한',1.4);
+  prevW=cur;cur=AW;switchT=.4;atkT=9;reload=null;snpRel=null;arRel=null;gRel=null;atkHeld=false;drawing=false;GS.y=6;sfx('exit');say('신의 심판 — 닿으면 즉사 · 관통 · 무한',1.4);
 }
 const _fire=fire;fire=function(){if(cur===AW)return adminFire();return _fire()};
 const _drawWeapon=drawWeapon;
@@ -117,7 +119,7 @@ drawWeapon=function(){
   withPose(p,()=>drawArt(w,gc,lit,lay,null,k=>k==='e'?[0,Math.sin(time*6)*.08]:null));
   if(flash>0)muzzleAt(w,lay,p,gc);
 };
-drawHUD=patch(drawHUD,"const albl=w.spear?","const albl=w.admin?'신의 심판 ∞':w.spear?");
+drawHUD=patch(drawHUD,"const albl=w.spear?","const albl=w.admin?'신의 심판 · 즉사 ∞':w.spear?");
 // ---------- 대전: 다른 사람 화면 ----------
 netSend=patch(netSend,"kb:pv.kb,","kb:pv.kb,ac:isAdm()?(cfg.aura|0):0,am:isAdm()?String(cfg.msg||'').slice(0,24):'',");
 const _netRecv=netRecv;
