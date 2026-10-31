@@ -9,6 +9,10 @@
 <meta name="robots" content="index,follow">
 <meta name="google-site-verification" content="xspgIFYT_nUywTw9cWb3fHRF-Q5CYiN4eFt4DxQ8aQc">
 <meta name="theme-color" content="#0b0f12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="글자 던전">
 <link rel="canonical" href="https://adelie1841-del.github.io/geulja-dungeon/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="글자 던전">
@@ -196,6 +200,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--mono);overflow:hidd
 .hud button{font:inherit;color:var(--dim);background:none;border:1px solid var(--line);padding:2px 8px;cursor:pointer}
 .hud button:focus-visible,.btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .stage{position:relative;flex:1;min-height:0;border:1px solid var(--line);background:#000;overflow:hidden}
+html.pfs,html.pfs body{overflow:hidden;height:100%}
+html.pfs .stage{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100dvh;z-index:60;border:0}
+#pfsX{display:none;position:fixed;z-index:61;top:calc(4px + env(safe-area-inset-top));right:calc(4px + env(safe-area-inset-right));font:11px inherit;padding:2px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.45);color:#e4ece6;opacity:.7}
+html.pfs #pfsX{display:block}
 canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;gap:12px;
   background:radial-gradient(ellipse at center,rgba(6,7,8,.55),rgba(6,7,8,.9));text-align:center;padding:16px}
@@ -275,7 +283,7 @@ canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 .pk-card.hid{background:linear-gradient(160deg,#2a1030,#11161a 60%);box-shadow:0 0 18px rgba(255,106,213,.35)}
 .pk-card.on{box-shadow:0 0 0 3px var(--rc);transform:translateY(-3px)}.pk-card.off{opacity:.35}
 .pk-tip{font-size:12px;color:var(--dim);margin:4px 0}.pk-list{display:flex;flex-wrap:wrap;gap:6px 12px;justify-content:center;font-size:12px;margin-top:6px}
-#augQuick{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);z-index:12;background:rgba(8,12,12,.86);border:1px solid #2c3a35;border-radius:10px;padding:8px 10px;max-width:calc(100% - 24px)}
+#augQuick{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);z-index:30;background:rgba(8,12,12,.86);border:1px solid #2c3a35;border-radius:10px;padding:8px 10px;max-width:calc(100% - 24px)}
 #augQuick .aq-head{font-size:13px;color:var(--amber);display:flex;gap:10px;justify-content:space-between;margin-bottom:6px}#augQuick .aq-head span{color:var(--dim);font-size:11.5px}
 #augQuick .aq-row,.pk-row.adm{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
 .pk-card.mc{width:128px;min-height:104px;padding:7px 6px}.pk-card.mc .pk-g{font-size:22px}.pk-card.mc b{font-size:13px}.pk-card.mc .pk-d{font-size:11.5px}
@@ -1066,7 +1074,18 @@ const flBtn=document.getElementById('fl'),brBtn=document.getElementById('br');
 {const hudEl=document.querySelector('.hud'),mb=document.getElementById('menuBtn');
  mb.addEventListener('click',e=>{const o=!hudEl.classList.contains('open');hudEl.classList.toggle('open',o);mb.setAttribute('aria-expanded',o?'true':'false');if(o&&state==='play'&&MODE!=='pvp')pause()});
  document.getElementById('tools').addEventListener('click',e=>{if(e.target.tagName==='BUTTON'&&e.target.id!=='fsBtn'&&matchMedia('(pointer:coarse)').matches){hudEl.classList.remove('open');mb.setAttribute('aria-expanded','false')}});
- document.getElementById('fsBtn').addEventListener('click',e=>{const el=document.documentElement;try{if(document.fullscreenElement){document.exitFullscreen()}else{const r=(el.requestFullscreen||el.webkitRequestFullscreen).call(el);if(r&&r.catch)r.catch(()=>say('이 화면에서는 전체 화면을 쓸 수 없어요',1.4))}}catch(_){say('이 화면에서는 전체 화면을 쓸 수 없어요',1.4)}e.currentTarget.blur();setTimeout(resize,300)})}
+ {const pfsX=document.createElement('button');pfsX.type='button';pfsX.id='pfsX';pfsX.textContent='✕ 전체 화면';document.body.appendChild(pfsX);
+  const IOS=/iP(hone|od)/.test(navigator.userAgent)||(/Mac/.test(navigator.platform)&&navigator.maxTouchPoints>1&&!document.documentElement.requestFullscreen);
+  const setPfs=on=>{document.documentElement.classList.toggle('pfs',on);document.getElementById('fsBtn').textContent=on?'전체 화면 끄기':'전체 화면';try{scrollTo(0,0)}catch(_){}setTimeout(resize,60);setTimeout(resize,400)};
+  pfsX.addEventListener('click',()=>setPfs(false));
+  const STANDALONE=navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+  document.getElementById('fsBtn').addEventListener('click',e=>{e.currentTarget.blur();const el=document.documentElement;
+   if(el.classList.contains('pfs')){setPfs(false);return}
+   if(document.fullscreenElement||document.webkitFullscreenElement){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(_){}setTimeout(resize,300);return}
+   const rq=el.requestFullscreen||el.webkitRequestFullscreen;
+   const fall=()=>{setPfs(true);if(IOS&&!STANDALONE){let n=0;try{n=+localStorage.getItem('gd-iosfs')||0}catch(_){}if(n<3){try{localStorage.setItem('gd-iosfs',n+1)}catch(_){}say('아이폰은 주소창까지 숨기려면: Safari 공유 버튼 → 홈 화면에 추가 → 거기서 실행',4.5)}}};
+   if(!rq||IOS){fall();return}
+   try{const r=rq.call(el);if(r&&r.catch)r.catch(fall)}catch(_){fall()}setTimeout(resize,300)})}}
 function toggleFlash(){flashOn=!flashOn;flBtn.textContent=flashOn?'손전등 켬':'손전등 끔';tone(flashOn?1200:800,flashOn?1500:600,.04,.12,'square')}
 function cycleBright(){brightIdx=(brightIdx+1)%3;AMB=BRIGHT[brightIdx];brBtn.textContent='밝기 '+BRIGHT_NAME[brightIdx];try{localStorage.setItem('gd-bright',brightIdx)}catch(e){}}
 try{const b=+localStorage.getItem('gd-bright');if(b>=0&&b<3&&localStorage.getItem('gd-bright')!==null){brightIdx=b;AMB=BRIGHT[b];brBtn.textContent='밝기 '+BRIGHT_NAME[b]}}catch(e){}
@@ -1763,7 +1782,7 @@ function attackDown(){
 function attackUp(){
   atkHeld=false;
   if(WEAP[cur].spear){if(!spCharging)return;spCharging=false;if(state==='play')throwSpear(Math.max(.2,spDraw));spDraw=0;return}
-  if(WEAP[cur].bow){if(!drawing)return;drawing=false;if(bowDraw>=.18&&state==='play')fireArrow(bowDraw);bowDraw=0;return}
+  if(WEAP[cur].bow){if(!drawing)return;drawing=false;if(bowDraw>=.06&&state==='play')fireArrow(Math.max(.25,bowDraw));bowDraw=0;return}
   if(!WEAP[cur].sword||!charging)return;
   const held=time-chargeStart;charging=false;
   if(held>=.6&&state==='play')swordSpin();
@@ -1777,7 +1796,7 @@ function swordSlash(){
   if(act&&act.type!=='block'){if((act.type==='slash'||act.type==='thrust')&&act.t>act.dur*.45)act.queued=true;return}
   if(atkCd>0)return;
   combo=(time-lastSlash<.5)?(combo+1)%3:0;
-  const W_=WEAP[cur],ms=(W_.mspd||1)*(AUGON()?Math.max(.45,1-PS('meleeSpd')-(M_LIGHT(W_)?PS('mLight'):0)):1),st=mStyle(W_);
+  const W_=WEAP[cur],ms=(W_.mspd||1)*(AUGON()?Math.max(.45,1-PS('meleeSpd')-(M_LIGHT(W_)?PS('mLight'):0)-wxv(cur,'mspd')):1),st=mStyle(W_);
   if(W_.cadu&&cadSlash(ms)){sfx('swing');netEmit({t:'sw'});return}
   if(W_.spear){if(combo===2)startAct('thrust',.36,{});else startAct('slash',.3,{side:combo===1?1:-1})}
   else if(st==='heavy'){if(combo===1)startAct('slash',.3*ms,{side:1,st:'sweep'});else startAct('slash',.36*ms,{side:combo===2?1:-1,st:'chop',hk:.5})}
@@ -1837,7 +1856,7 @@ function swordHit(type,second){
     let dd=dmgB*zm*(AU&&(t.T||t.remote)?perkDmgMul(t,zone,MW_,{})*perkExtraMul(t,zone,MW_,{}):1);if(SOLO()&&t.T)dd*=Math.max(.3,1-.1*HL('parry'));let cadO=null;if(MW_.cadu){cadO=cadOnTarget(t,{dd,zone,crit:0});dd=cadO.dd}
     if(SOLO()&&t.T&&rand()<Math.min(.6,.12*HL('sMelee'))){hitFx(t,'튕겨냄! (검의 시련)');sfx('block');continue}
     if(t.T&&t.T.shield&&zone!=='head'&&!(t.stun>0)&&type!=='spin'&&!(cadO&&cadO.noShield)){dd*=PS('pierce')?.6:.35;sfx('block')}
-    let crit=false;if(AU&&t.T&&rand()<PS('meleeCrit')+(MW_.rapier?.12:0)+(type==='thrust'&&M_PIERCE(MW_)?PS('mPierceCrit'):0)+(SOLO()?PS('crit'):0)){crit=true;dd*=2}
+    let crit=false;if(AU&&t.T&&rand()<PS('meleeCrit')+(MW_.rapier?.12:0)+(type==='thrust'&&M_PIERCE(MW_)?PS('mPierceCrit'):0)+wxv(cur,'crit')+(SOLO()?PS('crit'):0)){crit=true;dd*=2}
     if(cadO&&!crit&&(cadO.forceCrit||rand()<cadO.crit)){crit=true;dd*=2}
     lastZone=zone;damage(t,dd,dx/(d||1),dy/(d||1),true);lastZone='body';hits++;if(MW_.cadu)cadAfterHit(t,type);if(t.T){dmgNum(t,zone==='head'?t.T.h*.9:zone==='legs'?t.T.h*.25:t.T.h*.55,dd,zone,crit);if(zone==='legs')t.slow=Math.max(t.slow||0,1.2*(PS('legs')?2:1));if(zone==='head'&&!t.T.ghost)burst(t.x,t.y,t.T.h*.9,6,'피',0,85,40,0,2.2,.6,.07,5,true)}
     if(t.T){t.stun=Math.max(t.stun||0,(type==='thrust'?.55:type==='spin'?.8:.4)*(MW_.mstun||1)*(1+(AU?PS('meleeStun'):0)));t.wind=0;hitFx(t,(zone==='head'?'머리 ':zone==='legs'?'다리 ':'')+(crit?'치명 베기!':type==='thrust'?'찌르기!':type==='spin'?'회전베기!':second?'쌍검 베기!':combo===1?'역베기!':'베기!'));
@@ -1943,6 +1962,7 @@ function applyHit(t,base,zone,dist,cx,cy,o){
   if(t.T&&t.T.boss&&zone==='head')mul*=.75;
   if(t.T&&t.T.weakHead&&zone==='head')mul/=.75;
   if(!o.crit&&SOLO()&&t.T&&rand()<PS('crit'))o.crit=true;
+  if(!o.crit&&(t.T||t.remote)&&rand()<wxv(cur,'crit'))o.crit=true;
   let d=base*mul*(o.noFall?1:falloff(w,dist))*(fxOn(5)?2:1)*perkDmgMul(t,zone,w,o)*perkExtraMul(t,zone,w,o);if(o.crit)d*=(SOLO()&&t.T?Math.max(1.25,2-.25*HL('crit')):2);
   if(o.crit&&t.T&&PS('critHeal'))hp=Math.min(MAXHP(),hp+PS('critHeal')*healMul());
   d*=ROUL.dmgAll*(ROUL.head?(zone==='head'?2:.3):1)*(ROUL.blade?(w&&w.melee?2:.5):1);if(t.helm&&zone==='head')d*=.6;if(t.plate&&zone==='body')d*=.7;if(t.spike&&w&&w.melee&&SOLO()&&!t.dead)setTimeout(()=>hurtPlayer(2*Math.max(1,HL('spike')),t.x,t.y),0);if(o.blast&&t.T&&SOLO())d*=Math.max(.3,1-.15*HL('blast'));
@@ -2025,8 +2045,8 @@ function updatePaint(dt){
 function startArReload(){if(arRel||arMag>=30||arRes<=0||cur!==5)return;arRel={t:0,empty:arMag===0}}
 function startSnpReload(){if(snpRel||snpMag>=5||snpRes<=0||cur!==3)return;snpRel={t:0,empty:snpMag===0};snpBolt=null}
 function fireArrow(c){
-  arrows--;bowCd=.45;const spd=8+17*c,sl=aimSlope(),hs=spd/Math.sqrt(1+sl*sl),a=P.a+(rand()-.5)*.05*(1-c);
-  arrowsW.push({x:P.x+Math.cos(a)*.3,y:P.y+Math.sin(a)*.3,z:eyeZ-.02,vx:Math.cos(a)*hs,vy:Math.sin(a)*hs,vz:sl*hs,dmg:(1.5+5.5*c)*(1+.25*loop),stuck:false,life:30});
+  arrows--;bowCd=.25;const spd=14+20*c,sl=aimSlope(),hs=spd/Math.sqrt(1+sl*sl),a=P.a+(rand()-.5)*.05*(1-c);
+  arrowsW.push({x:P.x+Math.cos(a)*.3,y:P.y+Math.sin(a)*.3,z:eyeZ-.02,vx:Math.cos(a)*hs,vy:Math.sin(a)*hs,vz:sl*hs,dmg:(2.5+6*c)*(1+.25*loop),stuck:false,life:30,bow:1,pierce:c>=.95?1:0});
   sfx('bowRel');GS.vy-=7;GS.vx-=4;addEcho(P.x,P.y,5,.8);netEmit({t:'proj',k:'arrow',ez:+eyeZ.toFixed(2),x:+P.x.toFixed(2),y:+P.y.toFixed(2),a:+a.toFixed(3),sp:+spd.toFixed(1),sl:+sl.toFixed(3)});
 }
 function throwSpear(c){
@@ -2063,29 +2083,33 @@ const CADF=[
  {id:'baxe',n:'전투 도끼',fl:'방패째 쪼개라',st:'heavy',mdmg:1.5,mspd:1.2,mreach:1,mstun:1.2,d:'방패 무시 · 피해 +15%',src:20},
  {id:'mace',n:'메이스',fl:'갑옷 속을 으깨라',st:'heavy',mdmg:1.4,mspd:1.1,mreach:.95,mstun:1.7,d:'방패 무시 · 오래 기절',src:23},
  {id:'halberd',n:'할버드',fl:'멀리서 걸어 넘겨라',st:'heavy',mdmg:1.45,mspd:1.25,mreach:1.65,mstun:1,d:'긴 사거리 · 밀쳐냄',src:null},
- {id:'katar',n:'카타르',fl:'갈비뼈 사이로 밀어 넣어라',st:'quick',mdmg:.7,mspd:.5,mreach:.78,mstun:.5,d:'아주 빠름 · 치명타 +15%',src:19}];
+ {id:'katar',n:'카타르',fl:'갈비뼈 사이로 밀어 넣어라',st:'quick',mdmg:.7,mspd:.5,mreach:.78,mstun:.5,d:'아주 빠름 · 치명타 +15%',src:19},
+ // ---- 숨겨진 형상 (형상이 바뀔 때 낮은 확률로) ----
+ {id:'abyss',hid:1,n:'심연의 대낫',fl:'세계의 가장자리를 베어내라',st:'reap',mdmg:2.1,mspd:1.15,mreach:2.05,mstun:1,d:'숨겨진 형상 · 반원을 아주 크게 베고 검기가 날아감',src:26},
+ {id:'thunder',hid:1,n:'천벌의 망치',fl:'하늘이 대신 내려친다',st:'heavy',mdmg:2,mspd:1.25,mreach:1,mstun:2,d:'숨겨진 형상 · 맞히면 주변 적에게 번개가 튐',src:21},
+ {id:'thousand',hid:1,n:'천 개의 칼날',fl:'모든 칼은 하나에서 나왔다',st:'iai',mdmg:1.3,mspd:.7,mreach:1.3,mstun:.8,d:'숨겨진 형상 · 벨 때마다 칼날이 비처럼 쏟아짐',src:22}];
 const CAD_EXTRA_ART={
  lance:["          K","         KK","        KK ","       KkK ","      KkK  ","     KkK   ","    kKk    ","   kkk     ","  OOO      ","  hh       "," hhhH      ","hhhhH      "," hhH       "],
  halberd:["         K ","        KkK","       kKK ","      KkK  ","     g     ","    g      ","   g       ","  g        ","  g        ","  hh       "," hhhH      ","hhhhH      "," hhH       "],
  whip:["     kk    ","    k  k   ","   k    k  ","         k ","  k       k","  k        ","   k       ","    kk     ","   gg      ","  hh       "," hhhH      ","hhhhH      "," hhH       "]};
-const CAD_PAL=[['흑',230,12,30,.05],['액',230,10,18],['흑',230,8,16],['액',230,8,12]];
+const CAD_PAL=[['흑',230,12,30,.05],['결',44,80,52,.35],['흑',230,8,16],['액',230,8,12]];
 function cadLeg(src){const leg={};const L=src?src.leg:{K:1,k:1,O:1,g:1};let i=0;for(const k in L){if(k==='h'||k==='H')continue;const blade=k==='K'||k==='k';const p=blade?CAD_PAL[k==='K'?0:1]:CAD_PAL[2+(i++%2)];leg[k]=[src&&L[k][0]&&!blade?L[k][0]:p[0],p[1],p[2],blade?p[3]:Math.max(20,Math.min(42,(L[k][3]||40)*.7)),p[4]||0]}return Object.assign(leg,CAD_HAND)}
-for(const f of CADF){const src=f.src!=null?WEAP[f.src]:null;f.art=src?src.art:CAD_EXTRA_ART[f.id];f.leg=cadLeg(src);if(!src){f.leg.K=['흑',230,12,30,.05];f.leg.k=['액',230,10,18];f.leg.O=['흑',230,8,16];f.leg.g=['액',230,8,12]}
+for(const f of CADF){const src=f.src!=null?WEAP[f.src]:null;f.art=src?src.art:CAD_EXTRA_ART[f.id];f.leg=cadLeg(src);if(f.hid){f.leg.K=['흑',230,14,34,.1];f.leg.k=['금',46,95,62,.7]}if(!src){f.leg.K=['흑',230,12,30,.05];f.leg.k=['결',44,80,52,.35];f.leg.O=['흑',230,8,16];f.leg.g=['액',230,8,12]}
   f.leg.Z=['금',45,85,56];f.art=f.art.map((row,r)=>r===8?(row.slice(0,2)+'ZZ'+row.slice(4)):row)}
 WEAP.push({name:'카두세우스',cd:.2,melee:1,sword:1,cadu:1,shake:.12,mdmg:1,mspd:1,mreach:1,mstun:1,leg:CADF[2].leg,art:CADF[2].art,pivot:[2.5,9.6],tip:[10,0],mid:[5,5],x:.2});
 const CADI=WEAP.length-1;
-META[CADI]={st:[7,6,4],mag:'근접',d:'신탁 단말기. 금빛 원통에서 흘러나온 검은 액체가 6초마다 다른 무기로 굳음'};
+META[CADI]={st:[7,6,4],mag:'근접',d:'신탁 단말기. 금빛 원통에서 흘러나온 검은 액체가 6초마다 14가지 무기로 굳음 · 아주 가끔 숨겨진 형상'};
 PRICE[CADI]=1100;SHOP[2].items.push(CADI);
 const CAD={form:2,t:0,morph:1,prevF:null};
-const CAD_PERIOD=6;
+const CAD_PERIOD=6;function cadPeriod(){return CAD_PERIOD-(PK.wx29&&AUGON()?1.5:0)}
 function cadSetForm(f,quick){const w=WEAP[CADI],F=CADF[f];CAD.drawn=F.id==='katana';CAD.seen=CAD.seen||{};CAD.seen[f]=1;try{achCadSeen()}catch(e){}if(!quick&&f!==CAD.form)CAD.prevF=CAD.form;CAD.form=f;CAD.morph=quick?.7:-.35;w.mdmg=F.mdmg;w.mspd=F.mspd;w.mreach=F.mreach;w.mstun=F.mstun;w.art=F.art;w.leg=F.leg;w.scythe=F.id==='scythe'?1:0;w.rapier=F.id==='rapier'?1:0;w.great=F.id==='great'?1:0;
-  if(cur===CADI){try{sfx('swing')}catch(e){}for(let i=0;i<10;i++)burst(P.x+Math.cos(P.a)*.35,P.y+Math.sin(P.a)*.35,eyeZ-.12,1,i%2?'흑':'액',230,8,14,.1,1.4,.5,.06,-2,false);slashText=.8;slashMsg=`${F.n} — ${F.fl}`}}
+  if(cur===CADI){try{sfx('swing')}catch(e){}for(let i=0;i<10;i++)burst(P.x+Math.cos(P.a)*.35,P.y+Math.sin(P.a)*.35,eyeZ-.12,1,i%2?'흑':'액',230,8,14,.1,1.4,.5,.06,-2,false);slashText=F.hid?1.6:.8;slashMsg=F.hid?`★ 숨겨진 형상 — ${F.n} ★`:`${F.n} — ${F.fl}`;if(F.hid){try{sfx('exit')}catch(e){}flashW=Math.max(flashW||0,.25);say(F.fl,2)}}try{CAD.formT=time}catch(e){CAD.formT=0}}
 cadSetForm(2,true);CAD.morph=1;
 function cadForm(){return CADF[CAD.form]}
 function cadTick(dt){
   if(CAD.morph<1)CAD.morph=Math.min(1,CAD.morph+dt/(CAD.morph<0?.7:.9));
   if(cur!==CADI||state!=='play')return;
-  if(!act){CAD.t+=dt;if(CAD.t>=CAD_PERIOD){CAD.t=0;let f;do{f=(rand()*CADF.length)|0}while(f===CAD.form||f===8&&rand()<.5);cadSetForm(f)}}
+  if(!act){CAD.t+=dt;if(CAD.t>=cadPeriod()){CAD.t=0;let f;const HID=CADF.map((x,i)=>x.hid?i:-1).filter(i=>i>=0);if(rand()<.06)f=HID[(rand()*HID.length)|0];else do{f=(rand()*CADF.length)|0}while(f===CAD.form||CADF[f].hid||f===8&&rand()<.5);cadSetForm(f)}}
 }
 // 휘두르기 시작 — 형상별 동작
 function cadSlash(ms){const F=cadForm();
@@ -2097,6 +2121,7 @@ function cadHitMods(o){const F=cadForm(),id=F.id;
   if(id==='great')o.arc=Math.min(Math.PI,o.arc*1.5);
   if(id==='whip')o.arc=Math.max(o.arc,1.25);
   if(id==='scythe')o.arc=Math.min(Math.PI,o.arc*1.9);
+  if(id==='abyss')o.arc=Math.PI;
   if(id==='lance')o.arc=.16;
   return o}
 function cadOnTarget(t,o){const id=cadForm().id;
@@ -2111,14 +2136,17 @@ function cadAfterHit(t,type){const id=cadForm().id;if(!t.T||t.dead)return;
   if(id==='hatchet'||id==='whip'){t.pois=Math.min(6,(t.pois||0)+1.2);t.poisT=4;burst(t.x,t.y,t.T.h*.5,3,'혈',355,90,38,.5,1.2,.4,.06,4,true)}
   if(id==='whip')t.slow=Math.max(t.slow||0,1.5);
   if(id==='great'||id==='hammer'||id==='halberd'){const dx=t.x-P.x,dy=t.y-P.y,d=Math.hypot(dx,dy)||1;const nx=t.x+dx/d*.35,ny=t.y+dy/d*.35;if(!blocked(nx,ny,t.T.r||.25,t))[t.x,t.y]=[nx,ny]}}
-function cadAfterSwing(hits,type,second){if(second)return;if(CAD.drawn&&cadForm().id==='katana')CAD.drawn=false;
+function cadAfterSwing(hits,type,second){if(second)return;{const id=cadForm().id,dmg=1.6*(WEAP[CADI].mdmg||1)*(1+.25*loop);
+    if(id==='abyss')slashWave(dmg*.7);
+    if(id==='thousand'&&hits)thousandBlades(dmg*.35);
+    if(id==='thunder'&&hits){let n=0;for(const o of enemies){if(o.dead||n>=3)continue;const d=Math.hypot(o.x-P.x,o.y-P.y);if(d>6||!los(P.x,P.y,o.x,o.y))continue;n++;for(let z=2;z>.2;z-=.25)burst(o.x,o.y,z,1,'벼',55,100,75,1,.2,.25,.07,0,false);damage(o,dmg*.8,0,0,false);dmgNum(o,o.T.h*.7,dmg*.8,'body',false);o.stun=Math.max(o.stun||0,.6)}if(n){sfx('boom');flashW=Math.max(flashW||0,.12)}}}if(CAD.drawn&&cadForm().id==='katana')CAD.drawn=false;
   if(cadForm().id==='rapier'&&type==='thrust'){for(const dl of [70,140])setTimeout(()=>{if(state==='play'&&cur===CADI)swordHit(type,true)},dl)}
 }
 // HUD: 현재 형상과 다음 변화까지 남은 시간
 function cadHud(ctx,W,H){if(cur!==CADI)return;const F=cadForm(),pad=12,y=H-pad-(TOUCH?190:150),w=200;
   ctx.save();ctx.textAlign='right';ctx.textBaseline='alphabetic';ctx.font=`bold 15px ${FONT}`;ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(W-pad-w,y-18,w,40);
   ctx.fillStyle='hsl(45,85%,62%)';ctx.fillText(`카두세우스 · ${F.n}`,W-pad-6,y);
-  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(W-pad-w+6,y+6,w-12,4);ctx.fillStyle='hsl(45,80%,52%)';ctx.fillRect(W-pad-w+6,y+6,(w-12)*(1-CAD.t/CAD_PERIOD),4);
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(W-pad-w+6,y+6,w-12,4);ctx.fillStyle='hsl(45,80%,52%)';ctx.fillRect(W-pad-w+6,y+6,(w-12)*(1-CAD.t/cadPeriod()),4);
   ctx.font=`12px ${FONT}`;ctx.fillStyle='#ddd';ctx.fillText(F.d,W-pad-6,y+20);ctx.restore()}
 
 let echoes=[],ghosts=[],stepT=0,CW=new Float32Array(2),DK=false;
@@ -2306,15 +2334,15 @@ function flashBoom(x,y,owner){addEcho(x,y,12,1.2);
 }
 function updateArrows(dt){
   for(let i=arrowsW.length-1;i>=0;i--){const a=arrowsW[i];
-    if(a.stuck){a.life-=dt;if(!a.remote&&Math.hypot(a.x-P.x,a.y-P.y)<.6&&a.z<.95){if(a.kind==='spear'){spears++;say('죽창 +1',.6)}else{arrows++;say('화살 +1',.6)}sfx('pick');arrowsW.splice(i,1);continue}if(a.life<=0)arrowsW.splice(i,1);continue}
+    if(a.stuck){a.life-=dt;if(!a.remote&&a.kind!=='spear'){const dd=Math.hypot(a.x-P.x,a.y-P.y);if(dd<3.5&&dd>.01&&los(a.x,a.y,P.x,P.y)){const k=Math.min(1,dt*9/dd);a.x+=(P.x-a.x)*k;a.y+=(P.y-a.y)*k}}if(!a.remote&&Math.hypot(a.x-P.x,a.y-P.y)<(a.kind==='spear'?.6:1.1)&&a.z<.95){if(a.kind==='spear'){spears++;say('죽창 +1',.6)}else{arrows++;say('화살 +1',.6)}sfx('pick');arrowsW.splice(i,1);continue}if(a.life<=0)arrowsW.splice(i,1);continue}
     let gone=false;
-    for(let s=0;s<4&&!gone;s++){const h=dt/4;a.vz-=3.2*h;const nx=a.x+a.vx*h,ny=a.y+a.vy*h,nz=a.z+a.vz*h;
+    for(let s=0;s<4&&!gone;s++){const h=dt/4;a.vz-=(a.bow?1.4:3.2)*h;const nx=a.x+a.vx*h,ny=a.y+a.vy*h,nz=a.z+a.vz*h;
       if(tileSolid(nx,ny)||inTallObj(nx,ny,nz)){a.stuck=true;sfx('thunk');burst(a.x,a.y,a.z,3,'먼',30,6,44,0,.8,.4,.05,1,false);break}
       if(nz<=.02){a.x=nx;a.y=ny;a.z=.02;a.stuck=true;sfx('thunk');break}
       if(nz>=.98){a.z=.98;a.stuck=true;break}
       a.x=nx;a.y=ny;a.z=nz;
-      if(!a.remote)for(const t of targets()){const r=t.T?t.T.r+.05:t.O.r;if(Math.hypot(t.x-a.x,t.y-a.y)>r)continue;const [z0,hh]=entZ(t);if(a.z<z0-.03||a.z>z0+hh+.03)continue;
-        const hv=Math.hypot(a.vx,a.vy)||1;applyHit(t,a.dmg,zoneOf(t,a.z),0,a.vx/hv,a.vy/hv,{z:a.z,headMul:2.5,noFall:true,heavy:true});sfx('arrowHit');gone=true;break}
+      if(!a.remote)for(const t of targets()){const r=(t.T?t.T.r+.05:t.O.r)+(a.bow?.14:0);if(a.hitL&&a.hitL.includes(t))continue;if(Math.hypot(t.x-a.x,t.y-a.y)>r)continue;const [z0,hh]=entZ(t);const zp=a.bow?.12:.03;if(a.z<z0-zp||a.z>z0+hh+zp)continue;
+        const hv=Math.hypot(a.vx,a.vy)||1;applyHit(t,a.dmg,zoneOf(t,a.z),0,a.vx/hv,a.vy/hv,{z:a.z,headMul:2.5,noFall:true,heavy:true});sfx('arrowHit');if(a.pierce>0){a.pierce--;a.dmg*=.8;(a.hitL=a.hitL||[]).push(t);break}if(a.bow&&!a.remote&&rand()<.5){arrows++}gone=true;break}
     }
     if(gone)arrowsW.splice(i,1);
   }
@@ -2487,7 +2515,7 @@ function update(dt){
   if(arRel){const r=arRel;r.t+=dt*perkRld();if(!r.a&&r.t>=.08){r.a=1;sfx('magOut')}if(!r.b&&r.t>=.85){r.b=1;sfx('magIn')}if(r.empty&&!r.c&&r.t>=1.15){r.c=1;sfx('bolt1')}
     if(r.t>=(r.empty?1.35:1.1)){const n=Math.min(30-arMag,arRes);arMag+=n;arRes-=n;arRel=null;say('장전 완료',.6)}}
   aiming=!!((keys.Mouse2||keys.TouchAim)&&(cur===0||cur===1||cur===3||cur===5||cur===6||cur===8||WEAP[cur].gen)&&!reload&&!snpRel&&!arRel&&!gRel&&!gmRel&&switchT===0&&!(cur===3&&snpBolt&&snpBolt.t>=0));
-  if(cur===4){bowCd=Math.max(0,bowCd-dt);if(drawing){const was=bowDraw;bowDraw=Math.min(1,bowDraw+dt/.7);if(was<1&&bowDraw>=1)bowFull=time}}else drawing=false;
+  if(cur===4){bowCd=Math.max(0,bowCd-dt);if(drawing){const was=bowDraw;bowDraw=Math.min(1,bowDraw+dt/.42);if(was<1&&bowDraw>=1)bowFull=time}}else drawing=false;
   if(snpBolt){const b=snpBolt;b.t+=dt;if(b.t>=0&&!b.s1){b.s1=1;sfx('bolt1')}
     if(b.t>=.3&&!b.ej){b.ej=1;sfx('bolt2');const pos=revCylScreen();scr.push({x:pos[0],y:pos[1],vx:220+rand()*120,vy:-300-rand()*100,rot:rand()*3,vr:(rand()-.5)*14,life:1.4,red:false});spawnBrass(false,1,false)}
     if(b.t>=.6&&!b.s3){b.s3=1;sfx('bolt1')}if(b.t>=.72)snpBolt=null}
@@ -3862,7 +3890,7 @@ const WSPEC={
  4:()=>bowM(),
  24:()=>{const m=melee('sword');m.dual=1;return m},25:()=>melee('great'),26:()=>melee('scythe'),27:()=>melee('rapier'),28:()=>melee('saber'),2:()=>melee('sword'),19:()=>melee('dagger'),20:()=>melee('axe'),21:()=>melee('hammer'),22:()=>melee('katana'),23:()=>melee('club'),7:()=>melee('spear'),
 };
-const CAD_KIND=['hatchet','stiletto','bastard','rapier','hammer','great','lance','whip','scythe','katana','axe','mace','halberd','katar'];
+const CAD_KIND=['hatchet','stiletto','bastard','rapier','hammer','great','lance','whip','scythe','katana','axe','mace','halberd','katar','scythe','hammer','katana'];
 function getCadVM(f){const key='cad'+f;if(VM[key])return VM[key];const kind=CAD_KIND[f]||'sword',m=melee(kind);
   const cr=m.parts['core|4']||(m.parts['core|4']=new GB().use(null)),dv=new GB().use(TX.metal),dp=new GB().use(TX.metal);
   // 기본 형태: 손에 쥔 작은 금빛 원통(단말기). 검은 액체는 위쪽 구멍에서 흘러나온다
@@ -3875,9 +3903,13 @@ function getCadVM(f){const key='cad'+f;if(VM[key])return VM[key];const kind=CAD_
   const L=Math.min(.75,(m.len||.5)*.85);if(kind!=='whip'&&kind!=='scythe'){cr.hsl(42,70,46);let pv=null;for(let i=0;i<=16;i++){const u=i/16,y=.07+L*u*.92,x=Math.sin(u*PI*3+f)*.004*(1-u),pt=[x,y,0];if(pv)cr.rod(pv[0],pv[1],.0,pt[0],pt[1],0,.0011*(1-u*.6),4);pv=pt}}
   // 원통 입구에 맺힌 검은 방울
   for(const [x,y,z,r] of [[.018,.026,.006,.0045],[-.014,.022,-.008,.004],[.004,.03,.012,.0035]])dp.save().t(x,y,z).s(1,1.9,1).sph(r,8,6).restore();
+  // 숨겨진 형상 장식
+  const hid=CADF[f]&&CADF[f].hid,hk=hid?CADF[f].id:'';
+  if(hk==='thunder'){const zz=P_core=>0;cr.hsl(195,100,78);for(let i=0;i<5;i++){const a=i*PI*2/5;let x=0,y=.3,z=0;for(let j=0;j<4;j++){const nx=Math.cos(a)*(.05+j*.025)+(Math.random()-.5)*.02,ny=.3+(Math.random()-.5)*.08+j*.01,nz=Math.sin(a)*(.05+j*.025);cr.rod(x,y,z,nx,ny,nz,.0022,4);x=nx;y=ny;z=nz}}}
+  if(hk==='thousand'){const bb=m.parts['blade|1']||(m.parts['blade|1']=new GB().use(TX.metal));for(let i=0;i<8;i++){const a=i*PI*2/8,r=.11+.03*(i%2),y=.2+.06*i;bb.save().t(Math.cos(a)*r,y,Math.sin(a)*r).ry(-a).rz(.4).ext([[0,-.06],[.008,0],[0,.06],[-.008,0]],.003).restore()}}
   m.parts['dev|3']=dv;m.parts['drop|1']=dp;
   const meshes={};for(const k in m.parts){const [name,role]=k.split('|');const mesh=m.parts[k].build();if(!mesh)continue;(meshes[name]||(meshes[name]=[])).push({mesh,role:+role})}
-  m.meshes=meshes;delete m.parts;m.scy=0;m.cadLen=Math.min(.9,m.len||.5);VM[key]=m;return m}
+  m.meshes=meshes;delete m.parts;m.scy=0;m.cadLen=Math.min(.9,m.len||.5);m.hid=hk;m.big=hk==='abyss'?1.4:1;VM[key]=m;return m}
 function getVM(wi){if(VM[wi])return VM[wi];const w=WEAP[wi];let f=WSPEC[wi];
   if(!f){if(w&&w.admin)f=()=>{const g=rifle({barrel:.3,hg:.22,stock:'full',sight:'scope',muzzle:'brake',mag:'drum',recH:.07,recW:.05});const c=g.parts['core|4']=new GB().use(null);c.hsl(46,100,70,.95);
       for(let i=0;i<5;i++)c.save().t(0,.04,-(.22+i*.05)).rx(PI/2).torus(.024,.004,14,4).restore();c.save().t(-.026,.035,-.04).sph(.012,8,6).restore();g.admin=1;return g};
@@ -3985,6 +4017,7 @@ R.drawView=(draw)=>{
     if(m_<0){const k=-m_/.35;sy=Math.max(.03,k*k);wb=(1-k)*.45*Math.sin(time*32)}// 녹아내림
     else{const g=m_<.22?0:Math.min(1,(m_-.22)/.62),ov=g<1?g*(1+.22*Math.sin(g*PI)):1;sy=Math.max(.03,ov);wb=(1-m_)*(m_>.84?.25:.5)*Math.sin(time*30)}// 모였다가 뻗어 나가 출렁이며 굳음
     G=mm(G,SC(1+wb,sy,1-wb*.6))}
+  if(w.cadu&&melRot&&vm.big&&vm.big!==1)G=mm(G,SC(vm.big))
   else G=mm(G,RY(yaw),RX(pit),RZ(rol+tr*.5),RZ(spin));
   if(!melRot&&tr)G=mm(G,RX(-ty*.0),T3(0,0,0));
   const GW=mm(C,G);
@@ -4010,7 +4043,7 @@ R.drawView=(draw)=>{
       if(name==='limbT'||name==='limbB'){const d=bowVis||0;M=mm(GWm,RX((name==='limbT'?1:-1)*d*.25))}
       for(const p of vm.meshes[name]){let o=dO(p.role);if(name==='hopper'){const c=hsl2rgb(paintHue,80,55);o=Object.assign({},o,{mul:new Float32Array(c),alpha:.8,spec:.9,shin:80})}
         if(name==='core'){o={emis:1.2+.4*Math.sin(time*8),lit:false}}
-        if(w.cadu){const T_=name==='dev'?[1.05,.78,.32]:name==='drop'?[.07,.07,.08]:([[.08,.08,.09],[.06,.06,.07],[.04,.04,.05],[.07,.07,.08],[.12,.12,.13]][p.role]||[.07,.07,.08]);const fl=CAD.morph<1?.25*(1-Math.max(0,CAD.morph)):0;o=name==='core'?{emis:.9+.3*Math.sin(time*4)+fl,lit:false,mul:new Float32Array([1,.8,.45])}:Object.assign({},o,{mul:new Float32Array(T_),spec:name==='dev'?1.3:2.6,shin:name==='dev'?70:220,emis:name==='dev'?.06:.02})}
+        if(w.cadu){const T_=name==='dev'?[1.05,.78,.32]:name==='drop'?[.07,.07,.08]:([[.08,.08,.09],[.06,.06,.07],[.04,.04,.05],[.07,.07,.08],[.12,.12,.13]][p.role]||[.07,.07,.08]);const fl=CAD.morph<1?.25*(1-Math.max(0,CAD.morph)):0;const hd=vm.hid;o=name==='core'?{emis:(hd?1.6:.9)+.4*Math.sin(time*4)+fl,lit:false,mul:new Float32Array(hd==='thunder'?[.7,.95,1]:[1,.8,.45])}:(p.role===4&&name!=='dev'&&name!=='drop')?{mul:new Float32Array([1,.74,.3]),spec:1.6,shin:90,emis:(hd?.75:.32)+.18*Math.sin(time*3+name.length)}:Object.assign({},o,{mul:new Float32Array(T_),spec:name==='dev'?1.3:2.6,shin:name==='dev'?70:220,emis:name==='dev'?.06:(hd?.06+.05*Math.sin(time*5):.02)})}
         if(name==='beam'){const c=cols[3].c;o={emis:1.6+.3*Math.sin(time*30),lit:false,mul:new Float32Array([Math.min(1,c[0]*1.4+.25),Math.min(1,c[1]*1.4+.25),Math.min(1,c[2]*1.4+.25)])}}
         if(name==='blade'){const ch=charging&&time-chargeStart>=.6||act&&act.type==='spin';if(ch)o=Object.assign({},o,{emis:.6,mul:new Float32Array([1,.8,.35])});else{o=Object.assign({},o,{spec:1.35,shin:110,emis:(o.emis||0)+.12});if(insp!==null&&!isGun){const sh=Math.max(0,Math.sin((insp-.45)*4.2))*(insp<1.2?1:0);if(sh>0)o.emis=(o.emis||0)+.45*sh}}}
         draw(p.mesh,M,o)}}};
@@ -4025,6 +4058,9 @@ R.drawView=(draw)=>{
     const hm=mk('hand',mHand),arm=mk('arm',mArm);const gp=v3(BM,[0,0,0]);draw(hm,mm(BM,RX(-PI/2),RY(PI/2)));armTo(draw,arm,gp,v3(C,[-.25,-.45,.15]));
     const hp=nock;draw(hm,mm(M4.tr(hp[0],hp[1],hp[2]),RY(PI/2-a),RZ(-.4)));armTo(draw,arm,hp,v3(C,[.28,-.55,-.05]));R.restoreVP();return}
   drawParts(GW);
+  if(w.cadu&&melRot&&CAD.morph>=1){const b=mk('cadBlob',()=>{const g=new GB().use(null);g.hsl(230,8,12).sph(1,14,10);return g.build()});const len=vm.cadLen||.5,bo={mul:new Float32Array([.5,.5,.55]),emis:0,spec:2.6,shin:220};
+    for(let q=0;q<3;q++){const a=time*2.2+q*PI*2/3,r_=.007+.002*Math.sin(time*6+q);draw(b,mm(GW,T3(Math.cos(a)*.034,-.05+.035*Math.sin(time*1.7+q*2),Math.sin(a)*.034),SC(r_,r_*1.3,r_)),bo)}
+    {const ph=(time*.7)%1,r_=.006*(1-ph*.5);draw(b,mm(GW,T3(.006,len*.45*(1-ph)-ph*.25,.004),SC(r_,r_*(1.6+ph*1.5),r_)),bo)}}
   if(w.cadu&&CAD.morph<1){const b=mk('cadBlob',()=>{const g=new GB().use(null);g.hsl(230,8,12).sph(1,14,10);return g.build()});const m_=CAD.morph,len=vm.cadLen||.5,bo={mul:new Float32Array([.5,.5,.55]),emis:0,spec:2.6,shin:220};
     const GB_=mm(C,M4.tr(pos[0],pos[1],pos[2]),RY(melRot?melRot[1]:0),RZ(melRot?melRot[2]:0),RX(melRot?melRot[0]:0),SC(.8));
     if(m_<0){const k=-m_/.35;for(let q=0;q<6;q++){const ph=(time*1.6+q*.37)%1,r_=.016*(1-ph*.6);draw(b,mm(GB_,T3(Math.sin(q*2.3)*.03,len*k*(1-ph)*.6-ph*.12,Math.cos(q*1.7)*.02),SC(r_,r_*1.8,r_)),bo)}}
@@ -4765,9 +4801,14 @@ function drawHUD(){
   if(MODE==='pvp')drawPvpHud(pad,small);else
   {const bA=bossFloor&&enemies.some(e=>e.hasKey&&!e.dead);const goal=bA?`목표: 보스 '${ET[bossFloor].name}'을 쓰러뜨리고 열쇠 얻기`:!hasKey?"목표: '쇠' 열쇠 찾기":"목표: '잠' 문을 지나 '출구'로";ctx.textAlign='left';ctx.textBaseline='top';ctx.font=`${small}px ${FONT}`;
    ctx.fillStyle='rgba(0,0,0,.55)';const tw=ctx.measureText(goal).width;ctx.fillRect(pad-6,pad-4,tw+12,small+10);ctx.fillStyle=hasKey?'#7ee6a0':'#f2c94c';ctx.fillText(goal,pad,pad+1);
+   if(SOLO()&&state==='play'){const al=enemies.filter(e=>!e.dead);let t4=`남은 적 ${al.length}`;let ang=null;
+     if(al.length&&al.length<=3){let b=null,bd=1e9;for(const e of al){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<bd){bd=d;b=e}}if(b){ang=Math.atan2(b.y-P.y,b.x-P.x)-P.a;t4+=` · 가장 가까운 적 ${bd.toFixed(0)}m`}}
+     ctx.font=`bold ${small}px ${FONT}`;const lines=1+(ROUL.id!=='none'?1:0)+(hardTotal()>0?1:0);const y4=pad+lines*(small+12)+3;const w4=ctx.measureText(t4).width+(ang!==null?small+8:0);
+     ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(pad-6,y4-3,w4+12,small+8);ctx.fillStyle=al.length?(al.length<=3?'#ffc857':'#e4ece6'):'#7ee6a0';ctx.textBaseline='top';ctx.fillText(al.length?t4:'적을 모두 처치했어요',pad,y4);
+     if(ang!==null){const cx=pad+w4-small/2,cy=y4+small/2;ctx.save();ctx.translate(cx,cy);ctx.rotate(ang+Math.PI/2);ctx.fillStyle='#ffc857';ctx.beginPath();ctx.moveTo(0,-small*.5);ctx.lineTo(small*.38,small*.4);ctx.lineTo(-small*.38,small*.4);ctx.closePath();ctx.fill();ctx.restore()}}
    if(ROUL.id!=='none'){const ev=ROULS.find(r=>r.id===ROUL.id);if(ev){const t2=`룰렛 · ${ev.n}`;ctx.font=`${small}px ${FONT}`;const w2=ctx.measureText(t2).width;ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(pad-6,pad+small+12,w2+12,small+8);ctx.fillStyle=ev.good>0?'#7ee6a0':ev.good<0?'#ff8a80':'#ffc857';ctx.fillText(t2,pad,pad+small+15)}}
    if(SOLO()&&hardTotal()>0){const all=Object.keys(RUN.hard).filter(k=>RUN.hard[k]>0&&HMAP[k]).sort((a,b)=>RUN.hard[b]-RUN.hard[a]),ids=all.slice(0,6);const t3=innerWidth<1000?`⚠ 고난 ${all.length}종 · ${hardTotal()}단계`:'⚠ 고난 '+ids.slice(0,3).map(k=>HMAP[k].n+RUN.hard[k]).join(' · ')+(all.length>3?` 외 ${all.length-3}`:'')+'  (I)';ctx.font=`${small}px ${FONT}`;const w3=ctx.measureText(t3).width,y3=pad+(ROUL.id!=='none'?2:1)*(small+12)+3;ctx.fillStyle='rgba(40,0,0,.55)';ctx.fillRect(pad-6,y3-3,w3+12,small+8);ctx.fillStyle='#ff9a8a';ctx.fillText(t3,pad,y3)}
-   ctx.fillStyle='rgba(228,236,230,.55)';if(!TOUCH)ctx.fillText((flashOn?'F 손전등 켬':'F 손전등 끔')+' · Tab 지도',pad,pad+small+10)}
+   ctx.fillStyle='rgba(228,236,230,.55)';if(!TOUCH){ctx.textBaseline='top';ctx.font=`${small-1}px ${FONT}`;ctx.fillText((flashOn?'F 손전등 켬':'F 손전등 끔')+' · Tab 지도',pad,pad+(1+(ROUL.id!=='none'?1:0)+(SOLO()&&hardTotal()>0?1:0)+(SOLO()&&state==='play'?1:0))*(small+12)+4)}}
   // 메시지
   if(msgT>0){ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`${clamp(Math.floor(H/30),14,22)}px ${DFONT}`;
     ctx.fillStyle=`rgba(0,0,0,${Math.min(1,msgT)*.6})`;ctx.fillText(msg,W/2+2,H*.28+2);
@@ -4915,9 +4956,9 @@ function rollPerks(n,boost){
   let guard=0;while(out.length<n&&guard++<300){let r=pickR();
     if(out.length===n-1&&!out.some(p=>p.r>=1)&&r<1)r=1; // 최소 골드 1장
     if(out.length===n-1&&!pvp&&(RUN.pity|0)>=2&&!out.some(p=>p.r>=2)&&r<2)r=2; // 3번 연속 프리즘이 없으면 보장
-    const pool=PERKS.filter(p=>p.r===r&&!out.includes(p)&&!(pvp&&p.solo));if(!pool.length)continue;
+    const pool=PERKS.filter(p=>p.r===r&&!out.includes(p)&&!(pvp&&p.solo)&&!(p.wx!==undefined&&!SLOTS().includes(p.wx)));if(!pool.length)continue;
     // 이미 많이 가진 증강은 덜 나오게
-    const w2=pool.map(p=>(p.gen?1:2.5)/(1+(PK[p.id]|0)*.6));let t=w2.reduce((a,c)=>a+c,0)*rand(),k=0;for(;k<pool.length-1;k++){if(t<w2[k])break;t-=w2[k]}out.push(pool[k])}
+    const w2=pool.map(p=>(p.gen?1:p.wx!==undefined?3.5:2.5)/(1+(PK[p.id]|0)*.6));let t=w2.reduce((a,c)=>a+c,0)*rand(),k=0;for(;k<pool.length-1;k++){if(t<w2[k])break;t-=w2[k]}out.push(pool[k])}
   if(!pvp)RUN.pity=out.some(p=>p.r>=2)?0:(RUN.pity|0)+1;
   return out.sort(()=>rand()-.5)}
 function cardHtml(p,i,cls){return `<button type="button" class="pk-card${p.r===4?' hid':''}${p.r===5?' myth':''}${cls||''}" data-pk="${i}" style="--rc:${RAR[p.r].c}"><span class="pk-k">${i+1}</span><span class="pk-g">${p.g}</span><b>${p.n}</b><small>${RAR[p.r].n}${PK[p.id]?` · 보유 ${PK[p.id]}`:''}</small><span class="pk-d">${p.d}</span><span class="tq" data-term="${p.id}" title="자세히 보기">?</span></button>`}
@@ -4949,7 +4990,7 @@ function openQuick(){if(quickOffer||augQ<=0||state!=='play')return;augQ--;quickO
 function quickPick(i){if(!quickOffer)return;const p=quickOffer[i];if(!p)return;grantPerk(p);closeQuick();if(augPaused&&state==='aug'){if(augQ>0){state='play';openQuick();return}augPaused=false;state='play';if(matchMedia('(pointer:fine)').matches)lockPointer()}else if(augQ>0)setTimeout(openQuick,250)}
 function closeQuick(){quickOffer=null;quickEl.hidden=true}
 function queueAug(n){if(!AUGON())return;augQ+=n||1;if(!quickOffer)openQuick()}
-addEventListener('keydown',e=>{if(quickOffer&&/^Digit[7890]$/.test(e.code)){e.preventDefault();e.stopImmediatePropagation();const d=+e.code.slice(5);quickPick(d===0?3:d-7)}else if(quickOffer&&augPaused&&/^Digit[1234]$/.test(e.code)){e.preventDefault();e.stopImmediatePropagation();quickPick(+e.code.slice(5)-1)}else if(quickOffer&&augPaused&&e.code==='KeyR'){e.preventDefault();e.stopImmediatePropagation();rerollQuick()}},true);
+addEventListener('keydown',e=>{const dm_=/^(?:Digit|Numpad)(\d)$/.exec(e.code),dg_=dm_?+dm_[1]:-1;if(quickOffer&&(dg_===7||dg_===8||dg_===9||dg_===0)){e.preventDefault();e.stopImmediatePropagation();quickPick(dg_===0?3:dg_-7)}else if(quickOffer&&augPaused&&dg_>=1&&dg_<=4){e.preventDefault();e.stopImmediatePropagation();quickPick(dg_-1);return}else if(quickOffer&&augPaused&&/^Digit[1234]$/.test(e.code)){e.preventDefault();e.stopImmediatePropagation();quickPick(+e.code.slice(5)-1)}else if(quickOffer&&augPaused&&e.code==='KeyR'){e.preventDefault();e.stopImmediatePropagation();rerollQuick()}},true);
 // ---- 보유 증강 보기 (I 키 · 증강 버튼) ----
 function augSummary(){const parts=[];const f=(k,n,pct,sign)=>{const v=PS(k);if(v)parts.push(`${n} ${v>0&&sign!==false?'+':''}${pct?Math.round(v*100)+'%':Math.round(v*10)/10}`)};
   f('dmg','피해',1);f('hp','최대 체력');f('spd','이동',1);f('rof','연사',1);f('rld','장전',1);f('tough','받는 피해 감소',1);f('head','머리',1);f('crit','치명타',1);f('dodge','회피',1);f('regen','초당 회복');f('vamp','처치 회복');return parts.join(' · ')}
@@ -4996,6 +5037,7 @@ function perkDmgMul(t,zone,w,o){if(!AUGON()||!(t.T||t.remote))return 1;let A=PS(
     if(sw){A+=PS('sDmg');if(PS('sExec')&&t.hp<mx*.4)B+=PS('sExec')}
     if(pw){if(aiming)A+=PS('pAds');if(zone==='head')B+=PS('pHead')}}
   if(swapBuffT>time)A+=PS('swapBuff');
+  {const wi_=w?WEAP.indexOf(w):-1;if(wi_>=0){A+=wxv(wi_,'dmg');if(zone==='head')B+=wxv(wi_,'head');if(wi_===CADI&&wxv(wi_,'cad')&&time-(CAD.formT||-9)<3)A+=.4*wxv(wi_,'cad')}}
   if(zone==='head')B+=PS('head');if(zone==='legs')B+=PS('legs');
   const ex=PS('exec');if(ex&&t.T&&t.hp<mx*.3)B+=ex;
   const br=PS('bloodrage');if(br)B+=br*clamp(1-hp/MAXHP(),0,1);
@@ -5015,7 +5057,7 @@ function perkShot(w){if(!AUGON())return;RUN.shots++;
   if(infT>0)refundShot(w)}
 function refundShot(w){if(w.gen){const st=gmSt(cur);st.mag=Math.min(w.mag,st.mag+1)}else if(w.rifle)arMag=Math.min(30,arMag+1);else if(w.pistol)pMag=Math.min(12,pMag+1);else if(w.revolver)cyl=Math.min(6,cyl+1);else if(w.sniper)snpMag=Math.min(5,snpMag+1);else if(w.pump)shells+=1;else if(w.paint)paintMag=Math.min(40,paintMag+1);else if(w.bow)arrows+=1}
 function addMag(frac){const w=WEAP[cur];if(w.gen){const st=gmSt(cur);st.mag=Math.min(w.mag,st.mag+Math.ceil(w.mag*frac))}else if(w.rifle)arMag=Math.min(30,arMag+Math.ceil(30*frac));else if(w.pistol)pMag=Math.min(12,pMag+Math.ceil(12*frac));else if(w.revolver)cyl=Math.min(6,cyl+Math.ceil(6*frac));else if(w.sniper)snpMag=Math.min(5,snpMag+1);else if(w.pump)shells+=2}
-function perkOnHit(t,d,zone){if(!AUGON()||!t.T||t.dead)return;
+function perkOnHit(t,d,zone){if(!AUGON()||!t.T||t.dead)return;try{wxHit(t)}catch(_){}
   if(PS('ice'))t.slow=Math.max(t.slow||0,1.2);
   if(PS('burn'))t.burn=Math.max(t.burn||0,3);
   if(PS('poison'))t.pois=Math.min(4,(t.pois||0)+1),t.poisT=5;
@@ -5025,7 +5067,7 @@ function perkWallHit(x,y,dmg){if(!AUGON()||!PS('bounce'))return;let best=null,bd
   if(best){burst(x,y,.5,4,'튕',48,90,70,1,2,.25,.05,0,false);applyHit(best,dmg*.6,'body',bd,(best.x-x)/bd,(best.y-y)/bd,{z:.6,noFall:true})}}
 function boomAt(x,y,R,dm,g){RUN.blastKills=(RUN.blastKills|0)+.2;burst(x,y,.5,16,g||'폭',24,95,60,1,3.2,.5,.09,0,false);sfx('boom');shake=Math.max(shake,.25);
   for(const o of enemies){if(o.dead)continue;const d=Math.hypot(o.x-x,o.y-y);if(d<R){const dx=(o.x-x)/(d||1),dy=(o.y-y)/(d||1);damage(o,dm*(1-d/R*.5)*(1+.25*loop)*(1+PS('blast'))*(Math.max(.3,1-.15*HL('blast'))),dx,dy,true)}}}
-function perkOnKill(e,zone){if(!AUGON())return;RUN.kills++;if(e&&e.T&&SOLO()){const k=keyOf(e.T);RUN.typeKills=RUN.typeKills||{};RUN.typeKills[k]=(RUN.typeKills[k]|0)+1}if(zone==='head')RUN.hsKills++;if(WEAP[cur].melee){RUN.meleeKills++;if(PS('mReap'))reapT=time+3}if(e&&e.T&&e.T.boss)RUN.bosses++;
+function perkOnKill(e,zone){if(!AUGON())return;RUN.kills++;if(e&&e.T&&SOLO()){const k=keyOf(e.T);RUN.typeKills=RUN.typeKills||{};RUN.typeKills[k]=(RUN.typeKills[k]|0)+1}if(zone==='head')RUN.hsKills++;if(WEAP[cur].melee){RUN.meleeKills++;if(PS('mReap'))reapT=time+3}try{wxKill()}catch(_){}if(e&&e.T&&e.T.boss)RUN.bosses++;
   const v=PS('vamp')+(zone==='head'?PS('hsheal'):0)+(PS('underdog')&&hp<MAXHP()*.3?6:0);
   if(PS('predator')&&predatorN<60*pkN('predator'))predatorN++;
   if(v>0){hp=Math.min(MAXHP(),hp+v*healMul());heal=Math.max(heal,.3)}
@@ -5061,8 +5103,8 @@ function perkTick(dt){if(state==='play'&&ROUL.regen&&!AUGON()&&hp>0)hp=Math.min(
 function perkJumpLand(fall){if(!AUGON()||!PS('quake')||fall<2.6)return;boomAt(P.x,P.y,2.4,1.4*PS('quake'),'충')}
 const perkSpd=()=>AUGON()?(1+PS('spd'))*(frenzyT>0?1.25:1)*(PS('back')&&keys.KeyS&&!keys.KeyW?2:1)*(reapT>time?1.15:1):1;
 var reapT=0,swapBuffT=0;
-const perkRof=()=>AUGON()?1/((1+PS('rof')+(cur===secondary?PS('sRof'):0))*(frenzyT>0?1.25:1)*(PS('underdog')&&hp<MAXHP()*.3?1.5:1)):1;
-const perkRld=()=>AUGON()?1+PS('rld')+(cur===primary?PS('pRld'):0):1;
+const perkRof=()=>AUGON()?1/((1+PS('rof')+(cur===secondary?PS('sRof'):0)+wxv(cur,'rof'))*(frenzyT>0?1.25:1)*(PS('underdog')&&hp<MAXHP()*.3?1.5:1)):1;
+const perkRld=()=>AUGON()?1+PS('rld')+(cur===primary?PS('pRld'):0)+wxv(cur,'rld'):1;
 
 // ================= 룰렛 이벤트 =================
 // good: 1 좋음, 0 중립, -1 나쁨. pvp: 대전에서도 나옴
@@ -5115,8 +5157,8 @@ const ELITE=[{id:'shield',n:'방어막',f:e=>{e.dr=.6}},{id:'fast',n:'신속',f:
  {id:'invis',n:'투명',f:e=>{e.invis=1}},{id:'bomb',n:'자폭',f:e=>{e.bombEl=1}},{id:'regen',n:'재생',f:e=>{e.regenEl=1}}];
 function makeElite(e,force){if(e.T.boss&&!force)return;const n=rand()<.3?2:1;e.elite=[];const pool=ELITE.slice();for(let i=0;i<n&&pool.length;i++){const m=pool.splice((rand()*pool.length)|0,1)[0];m.f(e);e.elite.push(m.n)}
   e.hp*=1.5;e.max=(e.max||e.T.hp)*1.5;e.dm=(e.dm||1)*1.25}
-function adaptFloor(){if(!SOLO())return;const pp=augPower();ADAPT.dmg=1+Math.min(.8,.02*pp);const notes=[];
-  const up=updateHards();const hpk=(1+Math.min(1.2,.025*pp))*(1+.12*HL('bulk'));
+function adaptFloor(resume){if(!SOLO())return;const pp=augPower();ADAPT.dmg=1+Math.min(.8,.02*pp);const notes=[];
+  const up=resume?(HUP=[],[]):updateHards();const hpk=(1+Math.min(1.2,.025*pp))*(1+.12*HL('bulk'));
   for(const e of enemies){e.hp*=hpk;e.max=(e.max||e.T.hp)*hpk}
   const hz=HL('horde');for(let i=0;i<hz*2+HL('sBal');i++){const pool=['E','E','R','U','s','p','v','x'],k=pool[(rand()*pool.length)|0],sp=freeSpot(6);if(sp){const e=spawnEnemy(k,sp[0],sp[1]);if(e){e.hp*=hpk;e.max=e.hp}}}if(hz||HL('sBal'))totalEnemies=enemies.length;
   {let add=0;const sk=(k,n)=>{for(let i=0;i<Math.round(n);i++){const sp=freeSpot(6);if(!sp)continue;const e=spawnEnemy(k,sp[0],sp[1]);if(e){e.hp*=hpk;e.max=e.hp;add++}}};
@@ -5730,7 +5772,7 @@ function soloContinue(d){initAudio();if(AC&&AC.state==='suspended')AC.resume();
   ({pMag=pMag,paintMag=paintMag,paintRes=paintRes,cyl=cyl,shells=shells,snpMag=snpMag,snpRes=snpRes,arrows=arrows,arMag=arMag,arRes=arRes,spears=spears,nadeN=nadeN,flashN=flashN}=a);
   for(const k in (d.gm||{}))GMAG[k]=d.gm[k];bag=Array.isArray(d.bag)?d.bag:[];
   hp=Math.max(1,Math.min(MAXHP(),+d.hp||100));armor=d.armor|0;cur=WEAP[d.cur]&&!WEAP[d.cur].admin?d.cur:(primary>=0?primary:secondary);
-  if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor();augQ=d.augQ|0;
+  if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor(true);augQ=d.augQ|0;
   act=null;charging=false;trail=[];ov.hidden=true;state='play';atkCd=.2;openShop(true);say(`${level+1}층부터 이어해요`,1.8)}
 function quitSolo(){closeQuick();clearRoul();leaveBtn.hidden=true;const d=soloLoadData();
   state='title';loadLevel(0);showOverlay('글자 던전','',ovP.dataset.home||'','혼자 하기',true);document.getElementById('pvpBtn').hidden=false;document.getElementById('startBtn').hidden=false;
@@ -6035,11 +6077,25 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-10-31d';
+const NOTICE_VER='2026-10-31f';
 const NOTICE=[
+ {v:'2026-10-31 밤',t:'활 개선 · 남은 적 표시 · 고난 버그 수정',items:[
+  '활: 당기는 시간 0.7초 → 0.42초, 살짝만 당겨도 발사, 다음 화살까지 대기 짧아짐',
+  '활: 화살이 더 빠르고 덜 떨어져서 조준한 곳에 잘 꽂혀요. 판정도 조금 넓어지고 피해 증가',
+  '활: 끝까지 당긴 화살은 적 한 명을 꿰뚫어요. 맞히면 50% 확률로 화살을 돌려받아요',
+  '활: 박힌 화살이 가까이(3.5칸) 가면 저절로 끌려와요',
+  '화면 왼쪽 위에 남은 적 수 표시, 3마리 이하면 가장 가까운 적의 방향·거리 화살표',
+  '아이폰: 전체 화면 버튼이 안 되던 문제 — 이제 게임 화면이 화면 전체를 채워요 (위쪽 「전체 화면 끄기」로 돌아가기). 주소창까지 숨기려면 Safari 공유 → 홈 화면에 추가',
+  '버그 수정: 혼자 하기를 나갔다가 이어하면 고난이 한 번 더 오르던 문제'] },
+ {v:'2026-10-31 저녁',t:'카두세우스 숨겨진 형상 · 무기 전용 증강',items:[
+  '카두세우스를 처음부터 바로 쓸 수 있어요 (잠금 해제 필요 없음)',
+  '숨겨진 형상: 형상이 바뀔 때 6% 확률로 등장 — 심연의 대낫(아주 큰 반원 베기 + 검기), 천벌의 망치(주변 적에게 번개), 천 개의 칼날(벨 때마다 칼날 비)',
+  '카두세우스 디자인: 검은 액체 날에 금빛 결이 흐르고, 원통 둘레를 검은 방울이 돌며 날 끝에서 방울이 떨어져요',
+  '무기 전용 증강 30종: 무기마다 하나씩, 그 무기를 들고 있을 때만 나와요 (예: 검 「기사의 맹세」, 스나이퍼 「관통 조준」, 낫 「수확」, 카두세우스 「검은 물의 축복」)',
+  '업적 추가: 숨겨진 형상 보기, 숨겨진 형상 3가지 모두 보기',
+  '무한 증강전: 숫자패드 7·8·9·0으로도 고를 수 있고, 증강 고르기 창이 다른 화면에 가려지지 않게']},
  {v:'2026-10-31 오후 2',t:'업적 · 숨겨진 무기 · 카두세우스 형상 추가',items:[
   '업적 22개 추가 (🏆 업적 버튼): 층 도달, 누적 처치, 머리 처치, 보스, 무피해, 증강 수집, 딜량, 대전 승리 등 · 숨겨진 업적 4개',
-  '숨겨진 무기: 카두세우스는 이제 업적 「칼끝의 길」(근접무기로 200마리 처치)을 달성해야 무기 선택에 나타나요',
   '카두세우스 형상 5가지 추가 (모두 14가지): 태도(바뀐 뒤 첫 공격 +60%), 전투 도끼(방패 무시·피해 +15%), 메이스(방패 무시·오래 기절), 할버드(긴 사거리·밀쳐냄), 카타르(아주 빠름·치명타 +15%)',
   '카두세우스: 지령·은총·업보와 푸리오소를 빼고 무기만 남김 · 작은 금빛 원통에서 검은 액체가 흘러나와 무기로 굳음',
   '형상 변화 연출: 녹아내려 원통으로 빨려 들어감 → 소용돌이치며 모임 → 솟구쳐 뻗어 나감 → 출렁이며 굳음',
@@ -6207,6 +6263,52 @@ const COM=(()=>{
  b.addEventListener('click',()=>COM.setRoom(!COM.isRoom()));if(lb&&lb.parentNode)lb.parentNode.insertBefore(b,lb.nextSibling);
  const hint=document.createElement('p');hint.className='lb-status';hint.style.opacity='.75';hint.textContent='채팅: / 키 · 음성: 사이트에서 같은 방 사람끼리, V 키로 마이크 끄기';if(lb&&lb.parentNode)lb.parentNode.insertBefore(hint,b.nextSibling)}
 
+// ================= 무기 전용 증강 (그 무기를 들고 있을 때만 나옴) =================
+// dmg 피해 · rof 연사 · rld 장전 · crit 치명타 확률 · head 머리 피해 · mspd 휘두르기 속도 · 맞힐 때: pois 중독 burn 화상 slow 둔화 stun 기절 heal 회복 ammo 탄 돌려받기 quake 충격파 · kheal 처치 회복
+const WAUGS={
+ 0:{n:'명사수의 손목',dmg:.25,crit:.15,d:'피해 +25%, 치명타 확률 +15%'},
+ 1:{n:'근거리 폭풍',dmg:.2,stun:.45,d:'피해 +20%, 맞은 적 잠깐 기절'},
+ 2:{n:'기사의 맹세',dmg:.2,heal:1,d:'피해 +20%, 맞힐 때마다 체력 +1'},
+ 3:{n:'관통 조준',head:.5,rld:.2,d:'머리 피해 +50%, 장전 +20%'},
+ 4:{n:'독화살',dmg:.15,pois:2,d:'피해 +15%, 맞은 적 중독'},
+ 5:{n:'전술 탄창',rof:.12,rld:.2,d:'연사 +12%, 장전 +20%'},
+ 6:{n:'빠른 손놀림',rof:.2,dmg:.1,d:'연사 +20%, 피해 +10%'},
+ 7:{n:'대나무 창술',dmg:.3,pois:1.5,d:'피해 +30%, 맞은 적 출혈'},
+ 8:{n:'끈적 페인트',dmg:.15,slow:1.6,d:'피해 +15%, 맞은 적 둔화'},
+ 9:{n:'탄막',rof:.15,ammo:.15,d:'연사 +15%, 15% 확률로 탄 돌려받기'},
+ 10:{n:'제압 사격',dmg:.1,slow:1.2,d:'피해 +10%, 맞은 적 둔화'},
+ 11:{n:'침착한 호흡',head:.35,dmg:.1,d:'머리 피해 +35%, 피해 +10%'},
+ 12:{n:'고폭탄',dmg:.4,d:'유탄 폭발 피해 +40%'},
+ 13:{n:'철갑탄',dmg:.3,stun:.35,d:'피해 +30%, 맞은 적 잠깐 기절'},
+ 14:{n:'연발 손목',rof:.2,rld:.15,d:'연사 +20%, 장전 +15%'},
+ 15:{n:'이중 격발',dmg:.25,stun:.3,d:'피해 +25%, 맞은 적 잠깐 기절'},
+ 16:{n:'정밀 점사',crit:.15,dmg:.1,d:'치명타 확률 +15%, 피해 +10%'},
+ 17:{n:'산탄 폭풍',rof:.12,dmg:.12,d:'연사 +12%, 피해 +12%'},
+ 18:{n:'사냥꾼의 레버',dmg:.25,rld:.25,d:'피해 +25%, 장전 +25%'},
+ 19:{n:'독 묻은 칼날',crit:.15,pois:2,d:'치명타 확률 +15%, 맞은 적 중독'},
+ 20:{n:'쪼개기',dmg:.25,pois:1.5,d:'피해 +25%, 맞은 적 출혈'},
+ 21:{n:'지진 망치',stun:.6,quake:.25,d:'기절 더 길게, 25% 확률로 주변 충격파'},
+ 22:{n:'발도술',crit:.2,dmg:.15,d:'치명타 확률 +20%, 피해 +15%'},
+ 23:{n:'뼈 부수기',dmg:.15,stun:.5,d:'피해 +15%, 기절 더 길게'},
+ 24:{n:'칼춤',mspd:.15,heal:1,d:'휘두르기 속도 +15%, 맞힐 때마다 체력 +1'},
+ 25:{n:'거인의 일격',dmg:.3,stun:.4,d:'피해 +30%, 기절 더 길게'},
+ 26:{n:'수확',dmg:.15,kheal:5,d:'피해 +15%, 처치할 때마다 체력 +5'},
+ 27:{n:'찌르기 달인',crit:.2,pois:1.5,d:'치명타 확률 +20%, 맞은 적 출혈'},
+ 28:{n:'플라스마 칼날',dmg:.15,burn:3,d:'피해 +15%, 맞은 적 화상'},
+ 29:{n:'검은 물의 축복',cad:1,d:'형상이 바뀐 뒤 3초 동안 피해 +40%, 형상이 1.5초 더 빨리 바뀜'}};
+for(const k in WAUGS){const i=+k,a=WAUGS[k],w=WEAP[i];if(!w)continue;PERKS.push({id:'wx'+i,n:a.n,g:w.name[0],r:1,wx:i,d:`[${w.name} 전용] ${a.d}`,s:{['wx'+i]:1}})}
+for(const p of PERKS)PMAP[p.id]=p;
+const wxv=(i,k)=>{const a=WAUGS[i];if(!a||!a[k]||!AUGON())return 0;return a[k]*(PK['wx'+i]|0)};
+function wxHit(t){if(!t||!t.T||t.dead)return;const i=cur;if(!PK['wx'+i])return;
+  const pz=wxv(i,'pois');if(pz){t.pois=Math.min(6,(t.pois||0)+pz);t.poisT=4}
+  if(wxv(i,'burn'))t.burn=Math.max(t.burn||0,wxv(i,'burn'));
+  if(wxv(i,'slow'))t.slow=Math.max(t.slow||0,wxv(i,'slow'));
+  if(wxv(i,'stun')&&!(t.T.boss))t.stun=Math.max(t.stun||0,wxv(i,'stun'));
+  if(wxv(i,'heal'))hp=Math.min(MAXHP(),hp+wxv(i,'heal')*healMul());
+  if(wxv(i,'ammo')&&rand()<wxv(i,'ammo'))refundShot(WEAP[i]);
+  if(wxv(i,'quake')&&rand()<wxv(i,'quake')){const x=t.x,y=t.y;setTimeout(()=>{try{boomAt(x,y,1.6,.9,'충')}catch(e){}},40)}}
+function wxKill(){if(wxv(cur,'kheal'))hp=Math.min(MAXHP(),hp+wxv(cur,'kheal')*healMul())}
+
 // ================= 업적 · 숨겨진 무기 =================
 let ACH={u:{},st:{}};try{const d=JSON.parse(localStorage.getItem('gd-ach')||'null');if(d&&d.u)ACH=Object.assign({u:{},st:{}},d)}catch(e){}
 const achSave=()=>{try{localStorage.setItem('gd-ach',JSON.stringify(ACH))}catch(e){}};
@@ -6221,7 +6323,7 @@ const ACHS=[
  {id:'k100',g:'백',n:'사냥 시작',d:'적 100마리 처치 (누적)',c:()=>AST('kills')>=100,p:()=>[AST('kills'),100]},
  {id:'k1000',g:'천',n:'천의 무덤',d:'적 1000마리 처치 (누적)',c:()=>AST('kills')>=1000,p:()=>[AST('kills'),1000]},
  {id:'hs',g:'머',n:'머리 사냥꾼',d:'머리를 맞혀 100마리 처치 (누적)',c:()=>AST('hs')>=100,p:()=>[AST('hs'),100]},
- {id:'melee',g:'검',n:'칼끝의 길',d:'근접무기로 200마리 처치 (누적)',c:()=>AST('melee')>=200,p:()=>[AST('melee'),200],un:'cadu'},
+ {id:'melee',g:'검',n:'칼끝의 길',d:'근접무기로 200마리 처치 (누적)',c:()=>AST('melee')>=200,p:()=>[AST('melee'),200]},
  {id:'boss1',g:'왕',n:'왕을 베다',d:'보스 처치',c:()=>AST('boss')>=1},
  {id:'boss10',g:'군',n:'군주 사냥꾼',d:'보스 10마리 처치 (누적)',c:()=>AST('boss')>=10,p:()=>[AST('boss'),10]},
  {id:'perfect',g:'무',n:'털끝 하나',d:'한 대도 맞지 않고 층을 넘김',c:()=>AST('perfect')>=1},
@@ -6231,13 +6333,15 @@ const ACHS=[
  {id:'hit1k',g:'한',n:'일격필살',d:'한 방에 피해 1000',c:()=>AST('maxHit')>=1000},
  {id:'pvp1',g:'승',n:'첫 승리',d:'대전에서 이기기',c:()=>AST('pvpWin')>=1},
  {id:'pvpk50',g:'전',n:'전장의 망령',d:'대전에서 50명 처치 (누적)',c:()=>AST('pvpK')>=50,p:()=>[AST('pvpK'),50]},
- {id:'cadAll',g:'형',n:'만 가지 형상',d:'카두세우스의 모든 형상 보기',hid:1,c:()=>Object.keys(ACH.st.cadSeen||{}).length>=CADF.length,p:()=>[Object.keys(ACH.st.cadSeen||{}).length,CADF.length]},
+ {id:'cadAll',g:'형',n:'만 가지 형상',d:'카두세우스의 일반 형상 14가지 모두 보기',hid:1,c:()=>CADF.every((f,i)=>f.hid||(ACH.st.cadSeen||{})[i]),p:()=>[CADF.filter((f,i)=>!f.hid&&(ACH.st.cadSeen||{})[i]).length,CADF.filter(f=>!f.hid).length]},
+ {id:'cadHid',g:'숨',n:'숨겨진 형상',d:'카두세우스의 숨겨진 형상 보기',hid:1,c:()=>CADF.some((f,i)=>f.hid&&(ACH.st.cadSeen||{})[i])},
+ {id:'cadHidAll',g:'진',n:'검은 물의 진실',d:'숨겨진 형상 3가지 모두 보기',hid:1,c:()=>CADF.every((f,i)=>!f.hid||(ACH.st.cadSeen||{})[i])},
  {id:'cadK',g:'흑',n:'검은 물의 주인',d:'카두세우스로 100마리 처치',hid:1,c:()=>AST('cadK')>=100,p:()=>[AST('cadK'),100]},
  {id:'fast',g:'질',n:'질주',d:'한 층을 30초 안에 넘김',hid:1,c:()=>AST('fast')>=1},
  {id:'lowhp',g:'사',n:'사선 위에서',d:'체력 5 이하로 층을 넘김',hid:1,c:()=>AST('lowhp')>=1}];
 const ACHMAP={};for(const a of ACHS)ACHMAP[a.id]=a;
 // 숨겨진 무기: 업적을 달성해야 무기 선택에 나타나요
-const HIDDEN_W={};HIDDEN_W[CADI]='melee';
+const HIDDEN_W={};
 function wLocked(i){try{return !!HIDDEN_W[i]&&!ACH.u[HIDDEN_W[i]]}catch(e){return false}}
 let achQ=[],achShowT=0;
 function achCheck(){let nw=false;for(const a of ACHS){if(ACH.u[a.id])continue;let ok=false;try{ok=a.c()}catch(e){}if(ok){ACH.u[a.id]=Date.now();nw=true;achQ.push(a)}}if(nw){achSave();achPump()}}
