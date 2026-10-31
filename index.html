@@ -565,6 +565,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
 #holoFx .ht{display:grid;justify-items:center;gap:2px}#holoFx .ht small{font-size:12px;letter-spacing:.4em;color:#8fe8ff}#holoFx .ht b{font-size:22px;color:#e9fdff;text-shadow:0 0 12px #39b8ff;letter-spacing:.08em}
 #holoFx .ring{position:absolute;left:50%;top:42%;width:240px;height:60px;border:1px solid rgba(140,235,255,.6);border-radius:50%;transform:translate(-50%,-50%) rotateX(70deg);animation:holoRing 2.4s linear infinite}#holoFx .ring.r2{animation-delay:-1.2s}
 @keyframes holoRing{from{width:120px;height:30px;opacity:1}to{width:520px;height:130px;opacity:0}}
+.overlay:not(.home) .ov-actions{position:sticky;bottom:0;z-index:2;width:100%;padding:10px 0 8px;background:linear-gradient(rgba(8,10,11,0),rgba(8,10,11,.94) 35%)}
 </style>
 
 <div class="wrap">
@@ -1459,7 +1460,7 @@ function loadLevel(n,lv){
   document.getElementById('lvl').textContent=n+1;if(!rows)setTimeout(()=>say(`${levelName} · ${TODS[TOD].n}`,1.6),50);
   computeFlow();
 }
-function spawnEnemy(k,x,y,o){const T=ET[k];if(!T)return null;let hpv=Math.round(T.hp*(1+.45*loop));try{if(SOLO()&&PS('uxScale'))hpv*=15}catch(_){}
+function spawnEnemy(k,x,y,o){const T=ET[k];if(!T)return null;let hpv=Math.round(T.hp*(1+.45*loop));try{if(SOLO()&&PS('uxScale'))hpv*=10}catch(_){}
   const e=Object.assign({T,x,y,hp:hpv,max:hpv,alert:false,cd:rand()*1.2,anim:rand()*4,hit:0,atkT:0,dead:false,dieT:0,ph:rand()*6},o||{});if(T.invis&&!(o&&o.summoned))e.invis=1;if(T.splitMe&&!(o&&o.small))e.split=1;enemies.push(e);return e}
 function bestStartAngle(){let best=0,bd=-1;for(let i=0;i<16;i++){const a=i/16*Math.PI*2;cast(P.x,P.y,a);if(hDist>bd){bd=hDist;best=a}}return best}
 function losTile(x0,y0,tx,ty){
@@ -1644,6 +1645,9 @@ let state='title',mouseTurn=0,wasLocked=false;
 const ov=document.getElementById('ov'),ovT=document.getElementById('ovTitle'),ovS=document.getElementById('ovSub'),ovP=document.getElementById('ovText'),legend=document.getElementById('legend'),btn=document.getElementById('startBtn');
 addEventListener('keydown',e=>{
   if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
+  // 탭을 꾹 누르면(반복 입력) 브라우저가 버튼으로 포커스를 옮겨 게임이 멈추거나 나가지던 문제: 반복 입력도 막아요
+  if(e.code==='Tab'&&(state==='play'||state==='paused'||MODE==='pvp')){e.preventDefault();if(document.activeElement&&document.activeElement!==document.body)try{document.activeElement.blur()}catch(_){}}
+  if(state==='play'&&document.activeElement&&document.activeElement.tagName==='BUTTON'){try{document.activeElement.blur()}catch(_){}if(e.code==='Space'||e.code==='Enter')e.preventDefault()}
   if(e.repeat){keys[e.code]=true;return}
   keys[e.code]=true;
   if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab'].includes(e.code))e.preventDefault();
@@ -5143,7 +5147,7 @@ function perkCardsHtml(){
   ${perkPicked?'':`<button type="button" class="btn ghost sm pk-rr" id="pkReroll" ${rerollLeft()?'':'disabled'}>리롤 (R) · 남은 ${rerollLeft()}회</button>`}<p class="pk-tip">${perkPicked?'고른 증강이 적용됐어요. 다음 층으로 가세요.':perkSel>=0?`<b style="color:${RAR[perkOffer[perkSel].r].c}">${perkOffer[perkSel].n}</b> 선택됨 — 다른 카드를 누르면 바꿀 수 있고, <b>다음 층</b>을 누르면 확정돼요`:'증강을 하나 고르세요 (키보드 1~'+perkOffer.length+')'} · 히든 발견 ${Object.keys(HID_FOUND).length}/${PERKS.filter(p=>p.r===4).length}</p>${perkCount()?`<details class="own-fold"><summary>보유 증강 ${perkCount()}개 보기</summary>${ownedHtml()}</details>`:''}`}
 function perkListHtml(){const ids=Object.keys(PK);if(!ids.length)return '';
   return `<div class="pk-list">${ids.map(id=>{const p=PMAP[id];return `<span style="color:${RAR[p.r].c}" title="${p.d}">${p.g} ${p.n}${PK[id]>1?' ×'+PK[id]:''}</span>`}).join('')}</div>`}
-function grantPerk(p,quiet){if(!grantPerk._in&&p.id!=='uxEcho'&&AUGON()&&PK.uxEcho){grantPerk._in=1;try{grantPerk(p,true)}finally{grantPerk._in=0}}if(p.id==='uxScale'&&!PK.uxScale&&SOLO())for(const e of enemies){if(!e.dead){e.hp*=15;e.max=(e.max||e.T.hp)*15}}PK[p.id]=(PK[p.id]|0)+1;try{achPerk(p)}catch(_){}markSeen(p.id);if(p.s.reroll)RUN.rerolls=(RUN.rerolls|0)+p.s.reroll;if(p.s.hp&&p.s.hp>0)hp=Math.min(MAXHP(),hp+p.s.hp);hp=Math.min(hp,MAXHP());
+function grantPerk(p,quiet){if(!grantPerk._in&&p.id!=='uxEcho'&&AUGON()&&PK.uxEcho){grantPerk._in=1;try{grantPerk(p,true)}finally{grantPerk._in=0}}if(p.id==='uxScale'&&!PK.uxScale&&SOLO())for(const e of enemies){if(!e.dead){e.hp*=10;e.max=(e.max||e.T.hp)*10}}PK[p.id]=(PK[p.id]|0)+1;try{achPerk(p)}catch(_){}markSeen(p.id);if(p.s.reroll)RUN.rerolls=(RUN.rerolls|0)+p.s.reroll;if(p.s.hp&&p.s.hp>0)hp=Math.min(MAXHP(),hp+p.s.hp);hp=Math.min(hp,MAXHP());
   if(p.r===4){HID_FOUND[p.id]=1;try{localStorage.setItem('gd-hidden',JSON.stringify(HID_FOUND))}catch(e){}}
   if(!quiet){sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}}
 function pickPerk(i){
@@ -5227,7 +5231,7 @@ function perkDmgMul(t,zone,w,o){if(!AUGON()||!(t.T||t.remote))return 1;let A=PS(
   let m=(1+dmgSoft(A))*(1+dmgSoft(B));
   if(PS('gamble')&&!(o&&o.crit))m*=.8;
   if(PS('lucky7')&&w&&!w.melee&&RUN.shots%7===0)m*=7;
-  if(PS('uxScale')&&t.T)m*=15;
+  if(PS('uxScale')&&t.T)m*=50;
   return m}
 function perkShot(w){if(!AUGON())return;RUN.shots++;
   if(PS('twin')&&!w.melee&&!w.sniper&&!w.launcher&&!w.paint&&rand()<PS('twin'))setTimeout(()=>{if(state==='play'&&WEAP[cur]===w)trace(P.a+(rand()-.5)*.04,w.dmg,0)},45);
@@ -5473,7 +5477,7 @@ function recordRun(){if(!SOLO())return;const r={floor:level+1,abyss:RUN.abyss|0,
   if(DB&&acct&&acctState==='in'&&(r.floor>(acct.bestFloor|0)||(r.floor===(acct.bestFloor|0)&&r.score>(acct.bestScore|0)))){const upd={bestFloor:r.floor,bestScore:r.score,bestRun:r};Object.assign(acct,upd);try{DB.doc('players/'+myUid).update(upd)}catch(e){}}}
 function runDetailHtml(r){if(!r)return '';const d=new Date(r.t);const ids=Object.keys(r.perks||{});
   return `<div class="rd"><div class="rd-top"><span class="rd-fl">${r.floor}<small>층</small></span><div><b>${esc2(r.nick||'')}</b><small>점수 ${r.score|0} · 처치 ${r.kills|0}${r.dmg!==undefined?` · 딜량 ${fmtBig(r.dmg)} · 최고 한 방 ${fmtBig(r.maxHit)}`:''} · ${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}${r.inf?' · 무한 증강':''}${r.roul?' · 룰렛':''}</small></div></div>
-  <h4>먹은 증강 ${ids.reduce((a,id)=>a+(r.perks[id]|0),0)}개</h4>${ids.length?`<div class="own-row">${ids.map(id=>{const p=PMAP[id];if(!p)return '';return `<div class="own-c tm" data-term="${id}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}${r.perks[id]>1?` ×${r.perks[id]}`:''}</b><small>${RAR[p.r].n} · ${p.d}</small></div></div>`}).join('')}</div>`:'<p class="pk-tip">없음</p>'}
+  <h4>먹은 증강 ${ids.reduce((a,id)=>a+(r.perks[id]|0),0)}개</h4>${ids.length?`<div class="own-row">${ids.map(id=>{const p=PMAP[id];if(!p)return '';const known=AUG_SEEN[id]||PK[id]||HID_FOUND[id]||ADMV();if(p.sec&&!known)return '';return known?`<div class="own-c tm${p.r===5?' myth':''}${p.r===6?' holo cx-c':''}" data-term="${id}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}${r.perks[id]>1?` ×${r.perks[id]}`:''}</b><small>${RAR[p.r].n} · ${p.d}</small></div></div>`:`<div class="own-c" style="--rc:${RAR[p.r].c}"><span>?</span><div><b>???${r.perks[id]>1?` ×${r.perks[id]}`:''}</b><small>${RAR[p.r].n} · 아직 얻어 본 적 없는 증강이에요</small></div></div>`}).join('')}</div>`:'<p class="pk-tip">없음</p>'}
   <h4>고난 (적의 적응)</h4>${hardsHtml(r.hards)}</div>`}
 const fmtBig=v=>{v=+v||0;return v>=1e8?(v/1e8).toFixed(1).replace(/\.0$/,'')+'억':v>=1e4?(v/1e4).toFixed(1).replace(/\.0$/,'')+'만':Math.round(v).toLocaleString()};
 const esc2=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -5961,7 +5965,7 @@ function showOverlay(t,sub,html,btnText,showLegend,showLoad){
 }
 // ================= 혼자 하기 저장 (층을 시작할 때 자동 저장) =================
 const SAVE_K='gd-save';
-function soloSave(){if(!SOLO())return;try{localStorage.setItem(SAVE_K,JSON.stringify({v:1,t:Date.now(),level,score,hp,armor,PK,RUN:Object.assign({},RUN,{streak:[]}),cur,primary,secondary,melee,ownedW:[...ownedW],armH,armB,
+function soloSave(fresh){if(!SOLO())return;try{localStorage.setItem(SAVE_K,JSON.stringify({v:1,fresh:fresh?1:0,t:Date.now(),level,score,hp,armor,PK,RUN:Object.assign({},RUN,{streak:[]}),cur,primary,secondary,melee,ownedW:[...ownedW],armH,armB,
   am:{pMag,paintMag,paintRes,cyl,shells,snpMag,snpRes,arrows,arMag,arRes,spears,nadeN,flashN},gm:GMAG,bag,opt:{inf:!!OPT.inf,roul:!!OPT.roul,rush:!!OPT.rush},augQ}))}catch(e){}refreshSaveHint()}
 function soloLoadData(){try{const d=JSON.parse(localStorage.getItem(SAVE_K)||'null');return d&&d.v===1&&d.PK?d:null}catch(e){return null}}
 function soloClear(){try{localStorage.removeItem(SAVE_K)}catch(e){}refreshSaveHint()}
@@ -5977,9 +5981,10 @@ function soloContinue(d){initAudio();if(AC&&AC.state==='suspended')AC.resume();
   ({pMag=pMag,paintMag=paintMag,paintRes=paintRes,cyl=cyl,shells=shells,snpMag=snpMag,snpRes=snpRes,arrows=arrows,arMag=arMag,arRes=arRes,spears=spears,nadeN=nadeN,flashN=flashN}=a);
   for(const k in (d.gm||{}))GMAG[k]=d.gm[k];bag=Array.isArray(d.bag)?d.bag:[];
   hp=Math.max(1,Math.min(MAXHP(),+d.hp||100));armor=d.armor|0;cur=WEAP[d.cur]&&!WEAP[d.cur].admin?d.cur:(primary>=0?primary:secondary);
-  if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor(true);augQ=d.augQ|0;
+  if(d.fresh){perkFloorStart()}if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor(!d.fresh);augQ=d.augQ|0;if(d.fresh)soloSave();
   act=null;charging=false;trail=[];ov.hidden=true;state='play';atkCd=.2;openShop(true);say(`${level+1}층부터 이어해요`,1.8)}
-function quitSolo(){closeQuick();clearRoul();leaveBtn.hidden=true;const d=soloLoadData();
+function quitSolo(){if(state==='clear'&&SOLO()){if(perkOffer&&!perkPicked){const p=perkOffer[perkSel];if(!p){say('나가기 전에 증강을 하나 골라 주세요 — 고른 증강까지 저장돼요',2.4);return}grantPerk(p,true);perkPicked=true}const L=level;level=L+1;soloSave(true);level=L}
+  closeQuick();clearRoul();leaveBtn.hidden=true;const d=soloLoadData();
   state='title';loadLevel(0);showOverlay('글자 던전','',ovP.dataset.home||'','혼자 하기',true);document.getElementById('pvpBtn').hidden=false;document.getElementById('startBtn').hidden=false;
   say(d?`저장됨 — 다음에 ${d.level+1}층부터 이어할 수 있어요`:'처음 화면으로 나왔어요',2.2)}
 let freshStart=false;
@@ -5990,7 +5995,7 @@ function start(){
   else if(state==='clear'){if(perkOffer&&!perkPicked){const p=perkOffer[perkSel];if(!p)return;grantPerk(p,true);perkPicked=true;perkSel=-1;sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}loadLevel(level+1);clearRoul();perkFloorStart();if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor()}
   else if(state==='title'){resetPerks();clearRoul();hp=100;resetAmmo();cur=primary>=0?primary:secondary;loadLevel(0);adaptFloor();if(OPT.inf)augQ=1}
   act=null;charging=false;trail=[];
-  ov.hidden=true;state='play';atkCd=.2;
+  ov.hidden=true;leaveBtn.hidden=true;state='play';atkCd=.2;
   if(SOLO())soloSave();
   openShop(true);
 }
@@ -6000,6 +6005,7 @@ spEl.addEventListener('click',e=>{const b=e.target.closest('button');if(e.target
   else if(b.id==='spNew'){soloClear();freshStart=true;try{start()}finally{freshStart=false}}});
 addEventListener('keydown',e=>{if(!spEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();spEl.hidden=true}},true);
 function pause(){if(state!=='play')return;state='paused';setTimeout(()=>{if(state==='paused'&&AUGON()&&perkCount()){const pl=document.createElement('details');pl.className='pz-own';pl.innerHTML=`<summary>보유 증강 ${perkCount()}개${SOLO()&&hardTotal()?` · 고난 ${hardTotal()}단계`:''} 보기</summary>`+ownedHtml()+(SOLO()&&hardTotal()?`<div class="own"><div class="own-h">고난</div>${hardsHtml()}</div>`:'');ovP.appendChild(pl)}},0);if(MODE==='pvp'){showOverlay('메뉴','대전 중 — 게임은 계속 진행돼요','계속하거나 대전에서 나갈 수 있어요.<br><button type="button" class="btn ghost sm" id="pzShop">무기 바꾸기 (B)</button>','계속',false);leaveBtn.textContent='대전 나가기';leaveBtn.hidden=false;document.getElementById('pvpBtn').hidden=true}else{showOverlay('일시정지',levelName+` · ${level+1}층`,'클릭하거나 Enter를 누르면 계속합니다.<br><button type="button" class="btn ghost sm" id="pzShop">무기 바꾸기 (B)</button><br><small>층을 시작할 때마다 자동 저장돼요 — 나가도 이 층 처음부터 이어할 수 있어요.</small>','계속',false);leaveBtn.textContent='저장하고 나가기';leaveBtn.hidden=false;document.getElementById('pvpBtn').hidden=true}}
+addEventListener('keydown',e=>{if((e.code==='KeyP'||e.code==='Escape')&&state==='aug'&&quickOffer&&augPaused&&augListEl.hidden&&admAugEl.hidden){e.preventDefault();closeQuick();augQ++;augPaused=false;state='play';pause()}});
 function resume(){ov.hidden=true;leaveBtn.hidden=true;document.getElementById('pvpBtn').hidden=false;state='play';if(matchMedia('(pointer:fine)').matches)lockPointer()}
 function gameOver(){if(SOLO()&&(PS('revive')||PS('revivePerFloor'))&&!reviveUsed){reviveUsed=true;hp=MAXHP()*.5;inv=2.5;fx[2]=Math.max(fx[2]||0,2.5);say('불사조 — 다시 일어선다!',2.2);sfx('exit');flashW=.6;burst(P.x,P.y,.6,30,'불',28,100,60,1,4,1,.1,-2,false);return}state='over';recordRun();soloClear();showOverlay('쓰러짐',`${level+1}층 · 점수 ${score}`,`이번 판: 처치 ${RUN.kills|0} · 증강 ${perkCount()}개 · 고난 ${hardTotal()}단계<br><button type="button" class="btn ghost sm" id="runDetailBtn">이번 판 자세히 보기</button> <button type="button" class="btn ghost sm" id="runLbBtn">층 순위</button>`,'다시 하기',false,true)}
 ovP.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.id==='runDetailBtn'&&lastRun){ovP.innerHTML=runDetailHtml(lastRun)}else if(b.id==='runLbBtn'){openFloorLb()}});
@@ -6010,7 +6016,7 @@ function levelClear(){
   const nb=(level+1)%2===1;
   showOverlay(`${level+1}층 돌파`,levelName,
     `처치 ${kills}/${totalEnemies} · 시간 ${m}:${String(s).padStart(2,'0')} · 보너스 +${bonus}<br>다음: ${level+2}층${nb?' — 보스가 기다린다':''} · 지도는 매번 새로 만들어져요<br>다음 층 시작 전에 무기를 고를 수 있어요.<div id="pkBox"></div>`,'다음 층',false,true);
-  if(SOLO()){perkOffer=rollPerks();perkPicked=false;perkSel=-1;btn.disabled=true;const bx=document.getElementById('pkBox');if(bx){bx.innerHTML=perkCardsHtml();bindPerkCards()}}
+  if(SOLO()){perkOffer=rollPerks();perkPicked=false;perkSel=-1;btn.disabled=true;const bx=document.getElementById('pkBox');if(bx){bx.innerHTML=perkCardsHtml();bindPerkCards()}leaveBtn.textContent='저장하고 나가기';leaveBtn.hidden=false}
 }
 
 ovP.dataset.home=ovP.innerHTML;
@@ -6313,7 +6319,11 @@ const NOTICE=[
   '새 등급 「초월」 추가: 신화보다 훨씬 드물게 나오는 초초초희귀 증강 — 나타나면 푸른 홀로그램이 떠올라요',
   '초월 증강: 별의 심장(체력 +100·피해 +50%·받는 피해 −30%), 되감기(죽을 만큼 맞으면 3초 전으로, 층마다 2번), 종말의 별(8초마다 보이는 모든 적에게 별), 무한 증식(이후 고르는 증강을 하나씩 더)',
   '그리고 도감에도 없는 봉인된 초월 증강이 하나 더 있다는 소문이…',
-  '도감: 신화 등급이 무지개빛으로, 초월 등급이 홀로그램으로 보여요'] },
+  '도감: 신화 등급이 무지개빛으로, 초월 등급이 홀로그램으로 보여요',
+  '버그 수정: Tab을 꾹 눌러 지도를 보면 메뉴 버튼으로 포커스가 옮겨져 게임이 멈추거나 나가지던 문제',
+  '「저장하고 나가기」가 안 보이던 경우 수정: 층 돌파 화면에서도 나갈 수 있어요 (다음 층부터 이어하기), 증강 고르는 중에도 P·Esc로 메뉴, 작은 화면에서는 버튼이 아래에 고정돼요',
+  '층 순위 기록: 내가 아직 얻어 본 적 없는 증강은 ???로 보여요',
+  '창(도감·공지·계정·업적·설정 등)이 새로 그려질 때 스크롤이 맨 위로 튀던 문제 수정'] },
  {v:'2026-11-01 새벽',t:'새 보스 6종 · 새 적 7종 · 고난 · 업적 대폭 추가',items:[
   '새 보스 6종: 미노타우로스(돌진·내려찍기·광폭), 리치 왕(순간이동·해골과 유령 소환·원형 탄막), 검투사 왕(회전베기·방어·돌진), 독룡(독 숨결·번개), 타락한 대사제(부하 치유·소환), 고대 거상(바위·번개·내려찍기)',
   '보스 순서 변경: 새 보스가 기존 보스 사이에 섞여 나와요 (총 19종)',
@@ -6473,7 +6483,13 @@ opsEl.addEventListener('click',e=>{if(e.target===opsEl){opsEl.hidden=true;return
 addEventListener('keydown',e=>{if(!opsEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();opsEl.hidden=true}},true);
 {const b=document.createElement('button');b.type='button';b.id='opsBtn';b.textContent='운영';b.hidden=true;b.addEventListener('click',e=>{e.currentTarget.blur();openOps()});document.getElementById('tools').appendChild(b);
  setInterval(()=>{const on=ADMV();if(b.hidden===on)b.hidden=!on},1500)}
-// ================= 건의함 =================
+// ================= 창을 다시 그려도 스크롤 위치 유지 =================
+function keepScroll(root,fn){const saved=[];const key=el=>{const cls=(el.className&&typeof el.className==='string')?el.className.split(' ')[0]:'';return el.id?'#'+el.id:el.tagName+'.'+cls};
+  try{const all=[root,...root.querySelectorAll('*')];for(const el of all){if(el.scrollTop>0||el.scrollLeft>0){const k=key(el);saved.push([k,[...root.querySelectorAll(k.startsWith('#')?k:(k.split('.')[1]?'.'+k.split('.')[1]:k.split('.')[0]))].indexOf(el),el.scrollTop,el.scrollLeft,el===root])}}}catch(e){}
+  const r=fn();
+  for(const [k,i,t,l,isRoot] of saved){try{const el=isRoot?root:[...root.querySelectorAll(k.startsWith('#')?k:(k.split('.')[1]?'.'+k.split('.')[1]:k.split('.')[0]))][i];if(el){el.scrollTop=t;el.scrollLeft=l}}catch(e){}}
+  return r}
+
 let sugCat='bug',sugMine=[],sugAll=null,sugLast=0,sugAnon=false,sugRe={},sugReLoaded=false;try{sugMine=JSON.parse(localStorage.getItem('gd-sug-mine')||'[]')}catch(e){}
 const SUG_CAT=[['bug','버그'],['idea','건의'],['bal','밸런스'],['etc','기타']];
 const sugOk=()=>{try{return !!(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.auth().currentUser)}catch(e){return false}};
@@ -6694,7 +6710,7 @@ PERKS.push(
  {id:'uxRewind',n:'되감기',g:'되',r:6,d:'죽을 만큼 맞으면 3초 전의 체력과 자리로 되돌아가요 (층마다 2번)',s:{uxRewind:2},solo:1},
  {id:'uxDoom',n:'종말의 별',g:'종',r:6,d:'8초마다 보이는 모든 적에게 별이 떨어져요 (보스는 최대 체력 8%, 나머지는 30%)',s:{uxDoom:1},solo:1},
  {id:'uxEcho',n:'무한 증식',g:'증',r:6,d:'이후 고르는 증강을 하나씩 더 받아요',s:{uxEcho:1},solo:1},
- {id:'uxScale',n:'태초의 저울',g:'저',r:6,sec:1,d:'모든 적의 체력 15배, 내 피해 15배, 처치 점수 3배 — 백만의 상처에 닿는 유일한 길',s:{uxScale:1},solo:1});
+ {id:'uxScale',n:'태초의 저울',g:'저',r:6,sec:1,d:'모든 적의 체력 10배, 내 피해 50배, 처치 점수 3배 — 백만의 상처에 닿는 유일한 길',s:{uxScale:1},solo:1});
 for(const p of PERKS)PMAP[p.id]=p;
 const UX={t:0,hist:[],doomT:0};
 function uxRoll(out,pvp,lk){if(pvp)return;try{
@@ -6847,6 +6863,10 @@ if(wLocked(melee)){melee=2;if(cur===CADI)cur=2}
 
 resize();loadLevel(0);syncNick();setMode('friendly');initAccount();
 if(document.fonts){document.fonts.load(`bold 16px "Nanum Gothic Coding"`).then(resetAtlas).catch(()=>{});document.fonts.ready.then(resetAtlas).catch(()=>{})}
+// 다시 그릴 때 스크롤이 맨 위로 튀지 않게
+{const KS=(f,root)=>function(){return keepScroll(root(),()=>f.apply(this,arguments))};
+ renderOps=KS(renderOps,()=>opsEl);renderNotice=KS(renderNotice,()=>noticeEl);renderAdmAug=KS(renderAdmAug,()=>admAugEl);renderAcct=KS(renderAcct,()=>acctEl);
+ renderCodex=KS(renderCodex,()=>codexEl);renderAch=KS(renderAch,()=>achEl);renderSettings=KS(renderSettings,()=>setEl)}
 window.__GD=c=>eval(c);
 requestAnimationFrame(frame);
 })();
