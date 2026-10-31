@@ -1819,7 +1819,7 @@ function updateSword(dt){
 function swordHit(type,second){
   const SP=WEAP[cur].spear,MW_=WEAP[cur],AU=AUGON();
   const reach=(MW_.mreach||1)*(1+PS('reach')+(AUGON()&&M_HEAVY(MW_)?PS('mWide'):0))*(SP?(type==='thrust'?2.8:type==='spin'?2.3:2.5):type==='thrust'?2.15:type==='spin'?2:1.75)*(type==='spin'&&AU?1+PS('spinPow')*.43:1);
-  let arc=SP?(type==='spin'?Math.PI:.3):type==='thrust'?.3:type==='spin'?Math.PI:.85;if(MW_.scythe&&type!=='spin'&&!MW_.cadu)arc=Math.min(Math.PI,arc*1.7);if(MW_.cadu&&type!=='spin')arc=cadHitMods({arc,furi:act&&act.furi}).arc;
+  let arc=SP?(type==='spin'?Math.PI:.3):type==='thrust'?.3:type==='spin'?Math.PI:.85;if(MW_.scythe&&type!=='spin'&&!MW_.cadu)arc=Math.min(Math.PI,arc*1.7);if(MW_.cadu&&type!=='spin')arc=cadHitMods({arc}).arc;
   let dmgB=(SP?(type==='thrust'?3.4:type==='spin'?2.4:2.1):type==='thrust'?2.6:type==='spin'?3:1.6)*(1+.25*loop)*(fxOn(5)?2:1)*(MW_.mdmg||1);
   if(MW_.rapier&&type==='thrust')dmgB*=1.6;
   if(AU){if(type==='thrust')dmgB*=1+PS('finisher');if(type==='spin')dmgB*=1+PS('spinPow');if(RUN.mrT>0)dmgB*=1+.3*(RUN.mrN|0)}
@@ -1830,7 +1830,7 @@ function swordHit(type,second){
     if(!los(P.x,P.y,t.x,t.y))continue;
     let zone='body';if(type!=='spin'&&(t.T||t.remote)){const [z0,hh]=entZ(t),zz=clamp(eyeZ+aimSlope()*d,z0,z0+hh),f=(zz-z0)/hh;zone=f>.68?'head':(f<.32&&!(t.T&&t.T.ghost))?'legs':'body'}
     const zm=zone==='head'?(t.T&&t.T.boss?1.35:1.6)*(t.T&&t.T.weakHead?1.33:1)*(t.helm?.6:1):zone==='legs'?.75:(t.plate?.7:1);
-    let dd=dmgB*zm*(AU&&(t.T||t.remote)?perkDmgMul(t,zone,MW_,{})*perkExtraMul(t,zone,MW_,{}):1);if(SOLO()&&t.T)dd*=Math.max(.3,1-.1*HL('parry'));let cadO=null;if(MW_.cadu){cadO=cadOnTarget(t,{dd,zone,crit:0,furi:act&&act.furi});dd=cadO.dd}
+    let dd=dmgB*zm*(AU&&(t.T||t.remote)?perkDmgMul(t,zone,MW_,{})*perkExtraMul(t,zone,MW_,{}):1);if(SOLO()&&t.T)dd*=Math.max(.3,1-.1*HL('parry'));let cadO=null;if(MW_.cadu){cadO=cadOnTarget(t,{dd,zone,crit:0});dd=cadO.dd}
     if(SOLO()&&t.T&&rand()<Math.min(.6,.12*HL('sMelee'))){hitFx(t,'튕겨냄! (검의 시련)');sfx('block');continue}
     if(t.T&&t.T.shield&&zone!=='head'&&!(t.stun>0)&&type!=='spin'&&!(cadO&&cadO.noShield)){dd*=PS('pierce')?.6:.35;sfx('block')}
     let crit=false;if(AU&&t.T&&rand()<PS('meleeCrit')+(MW_.rapier?.12:0)+(type==='thrust'&&M_PIERCE(MW_)?PS('mPierceCrit'):0)+(SOLO()?PS('crit'):0)){crit=true;dd*=2}
@@ -2043,7 +2043,7 @@ const G_=()=>GMS[GM];
 const isRound=()=>MODE==='pvp'&&!!GMS[GM].rounds,isDark=()=>MODE==='pvp'&&!!GMS[GM].dark,isFfa=()=>MODE==='pvp'&&GM==='ffa';
 const PRICE={6:0,2:0,19:100,23:200,7:300,20:400,21:500,22:600,24:500,25:700,26:600,27:500,28:900,0:400,14:500,13:700,15:900,8:600,1:1200,4:1400,9:1800,18:2000,17:2300,12:2500,5:2700,16:2900,10:3200,11:3500,3:4500},APRICE={h:[0,400,800],b:[0,650,1100]};
 // ================= 신탁 단말기 [카두세우스] =================
-// 붉은 액체 금속이 일정 시간마다 다른 무기의 형상을 갖춘다. 9번째 적중마다 낫(푸리오소). 지령 대상을 처치하면 은총, 놓치면 업보.
+// 작은 금빛 원통(단말기)에서 검은 액체가 흘러나와 일정 시간마다 다른 무기의 형상으로 굳는다.
 const CAD_HAND={h:['손',24,52,58],H:['손',22,45,46]};
 const CADF=[
  {id:'hatchet',n:'손도끼',fl:'갈비뼈를 쪼개라',st:'heavy',mdmg:1.05,mspd:.8,mreach:.85,mstun:1.1,d:'맞히면 출혈',src:20},
@@ -2058,42 +2058,33 @@ const CADF=[
 const CAD_EXTRA_ART={
  lance:["          K","         KK","        KK ","       KkK ","      KkK  ","     KkK   ","    kKk    ","   kkk     ","  OOO      ","  hh       "," hhhH      ","hhhhH      "," hhH       "],
  whip:["     kk    ","    k  k   ","   k    k  ","         k ","  k       k","  k        ","   k       ","    kk     ","   gg      ","  hh       "," hhhH      ","hhhhH      "," hhH       "]};
-const CAD_PAL=[['혈',355,82,50,.25],['액',350,85,38,.15],['혈',0,70,30],['액',355,60,24]];
+const CAD_PAL=[['흑',230,12,30,.05],['액',230,10,18],['흑',230,8,16],['액',230,8,12]];
 function cadLeg(src){const leg={};const L=src?src.leg:{K:1,k:1,O:1,g:1};let i=0;for(const k in L){if(k==='h'||k==='H')continue;const blade=k==='K'||k==='k';const p=blade?CAD_PAL[k==='K'?0:1]:CAD_PAL[2+(i++%2)];leg[k]=[src&&L[k][0]&&!blade?L[k][0]:p[0],p[1],p[2],blade?p[3]:Math.max(20,Math.min(42,(L[k][3]||40)*.7)),p[4]||0]}return Object.assign(leg,CAD_HAND)}
-for(const f of CADF){const src=f.src!=null?WEAP[f.src]:null;f.art=src?src.art:CAD_EXTRA_ART[f.id];f.leg=cadLeg(src);if(!src){f.leg.K=['혈',355,82,52,.25];f.leg.k=['액',350,85,40,.15];f.leg.O=['쇠',0,10,30];f.leg.g=['쇠',0,10,26]}}
+for(const f of CADF){const src=f.src!=null?WEAP[f.src]:null;f.art=src?src.art:CAD_EXTRA_ART[f.id];f.leg=cadLeg(src);if(!src){f.leg.K=['흑',230,12,30,.05];f.leg.k=['액',230,10,18];f.leg.O=['흑',230,8,16];f.leg.g=['액',230,8,12]}
+  f.leg.Z=['금',45,85,56];f.art=f.art.map((row,r)=>r===8?(row.slice(0,2)+'ZZ'+row.slice(4)):row)}
 WEAP.push({name:'카두세우스',cd:.2,melee:1,sword:1,cadu:1,shake:.12,mdmg:1,mspd:1,mreach:1,mstun:1,leg:CADF[2].leg,art:CADF[2].art,pivot:[2.5,9.6],tip:[10,0],mid:[5,5],x:.2});
 const CADI=WEAP.length-1;
-META[CADI]={st:[7,6,4],mag:'근접',d:'신탁 단말기. 6초마다 다른 무기로 형상이 바뀜 · 9번째 적중은 푸리오소 · 지령을 수행해 은총을 쌓음'};
+META[CADI]={st:[7,6,4],mag:'근접',d:'신탁 단말기. 금빛 원통에서 흘러나온 검은 액체가 6초마다 다른 무기로 굳음'};
 PRICE[CADI]=1100;SHOP[2].items.push(CADI);
-const CAD={form:2,t:0,morph:1,hits:0,furiNext:false,furiAct:false,prev:2,mark:null,markT:0,nextMark:6,grace:0,karma:0,fx:0};
+const CAD={form:2,t:0,morph:1,prevF:null};
 const CAD_PERIOD=6;
-function cadSetForm(f,quick){const w=WEAP[CADI],F=CADF[f];CAD.form=f;CAD.morph=quick?.6:0;w.mdmg=F.mdmg*(1+.05*CAD.grace);w.mspd=F.mspd;w.mreach=F.mreach;w.mstun=F.mstun;w.art=F.art;w.leg=F.leg;w.scythe=F.id==='scythe'?1:0;w.rapier=F.id==='rapier'?1:0;w.great=F.id==='great'?1:0;
-  if(cur===CADI){try{sfx('swing')}catch(e){}for(let i=0;i<10;i++)burst(P.x+Math.cos(P.a)*.35,P.y+Math.sin(P.a)*.35,eyeZ-.12,1,i%2?'혈':'액',355,85,45,.4,1.4,.5,.06,-2,false);slashText=.8;slashMsg=`${F.n} — ${F.fl}`}}
+function cadSetForm(f,quick){const w=WEAP[CADI],F=CADF[f];if(!quick&&f!==CAD.form)CAD.prevF=CAD.form;CAD.form=f;CAD.morph=quick?.7:-.35;w.mdmg=F.mdmg;w.mspd=F.mspd;w.mreach=F.mreach;w.mstun=F.mstun;w.art=F.art;w.leg=F.leg;w.scythe=F.id==='scythe'?1:0;w.rapier=F.id==='rapier'?1:0;w.great=F.id==='great'?1:0;
+  if(cur===CADI){try{sfx('swing')}catch(e){}for(let i=0;i<10;i++)burst(P.x+Math.cos(P.a)*.35,P.y+Math.sin(P.a)*.35,eyeZ-.12,1,i%2?'흑':'액',230,8,14,.1,1.4,.5,.06,-2,false);slashText=.8;slashMsg=`${F.n} — ${F.fl}`}}
 cadSetForm(2,true);CAD.morph=1;
 function cadForm(){return CADF[CAD.form]}
 function cadTick(dt){
-  if(CAD.morph<1)CAD.morph=Math.min(1,CAD.morph+dt/.55);
+  if(CAD.morph<1)CAD.morph=Math.min(1,CAD.morph+dt/(CAD.morph<0?.7:.9));
   if(cur!==CADI||state!=='play')return;
   if(!act){CAD.t+=dt;if(CAD.t>=CAD_PERIOD){CAD.t=0;let f;do{f=(rand()*9)|0}while(f===CAD.form||f===8&&rand()<.5);cadSetForm(f)}}
-  // 지령: 보이는 적 하나를 지목. 제한 시간 안에 쓰러뜨리면 은총, 놓치면 업보
-  if(!SOLO())return;
-  if(CAD.mark){CAD.markT-=dt;const m=CAD.mark;
-    if(m.dead){CAD.grace=Math.min(9,CAD.grace+1);CAD.karma=Math.max(0,CAD.karma-20);hp=Math.min(MAXHP(),hp+8);slashText=.9;slashMsg=`지령 수행 — 은총 ${CAD.grace}`;try{sfx('pick')}catch(e){}CAD.mark=null;CAD.nextMark=8;cadSetForm(CAD.form,true)}
-    else if(CAD.markT<=0){CAD.karma=Math.min(100,CAD.karma+15);slashText=.9;slashMsg=`지령 실패 — 업보 ${CAD.karma}`;CAD.mark=null;CAD.nextMark=8}
-    else{CAD.fx-=dt;if(CAD.fx<=0){CAD.fx=.18;const h=(m.T&&m.T.h)||1;burst(m.x,m.y,h+.25,1,'령',355,95,60,1,.3,.35,.08,-.3,false);burst(m.x+(rand()-.5)*.4,m.y+(rand()-.5)*.4,h*.5,1,'혈',355,90,40,.6,.4,.3,.05,1,false)}}}
-  else{CAD.nextMark-=dt;if(CAD.nextMark<=0){CAD.nextMark=3;const c=enemies.filter(e=>!e.dead&&!(e.T&&e.T.boss)&&Math.hypot(e.x-P.x,e.y-P.y)<11&&los(P.x,P.y,e.x,e.y));
-    if(c.length){CAD.mark=c[(rand()*c.length)|0];CAD.markT=10;slashText=.9;slashMsg=`지령 — ${CAD.mark.T.name}을(를) 10초 안에 쓰러뜨려라`;try{sfx('clink')}catch(e){}}}}}
-// 업보: 받는 피해 증가 (10당 +2%)
-function cadKarmaMul(){return cur===CADI&&SOLO()?1+.002*CAD.karma:1}
-// 휘두르기 시작 — 형상별 동작, 푸리오소
+}
+// 휘두르기 시작 — 형상별 동작
 function cadSlash(ms){const F=cadForm();
-  if(CAD.furiNext){CAD.furiNext=false;CAD.prev=CAD.form;cadSetForm(8,true);CAD.furiAct=true;slashText=1;slashMsg='푸리오소';startAct('slash',.42*ms,{side:1,st:'reap',hk:.4,furi:1});return true}
   if(F.st==='lance'){startAct('thrust',.32*ms,{st:'lunge',hk:.34});return true}
   if(F.st==='whip'){startAct('slash',.28*ms,{side:combo===1?1:-1,st:'iai',hk:.38});return true}
   return false}
 // 적중 처리 보정
 function cadHitMods(o){const F=cadForm(),id=F.id;
-  if(id==='great'||o.furi)o.arc=Math.min(Math.PI,o.arc*(o.furi?2.2:1.5));
+  if(id==='great')o.arc=Math.min(Math.PI,o.arc*1.5);
   if(id==='whip')o.arc=Math.max(o.arc,1.25);
   if(id==='scythe')o.arc=Math.min(Math.PI,o.arc*1.9);
   if(id==='lance')o.arc=.16;
@@ -2101,7 +2092,6 @@ function cadHitMods(o){const F=cadForm(),id=F.id;
 function cadOnTarget(t,o){const id=cadForm().id;
   if(id==='bastard'&&o.zone==='head')o.dd*=1.4;
   if(id==='stiletto'){o.noShield=1;o.crit+=.25}
-  if(o.furi){o.forceCrit=1;o.dd*=1.3}
   return o}
 function cadAfterHit(t,type){const id=cadForm().id;if(!t.T||t.dead)return;
   if(id==='hatchet'||id==='whip'){t.pois=Math.min(6,(t.pois||0)+1.2);t.poisT=4;burst(t.x,t.y,t.T.h*.5,3,'혈',355,90,38,.5,1.2,.4,.06,4,true)}
@@ -2109,14 +2099,13 @@ function cadAfterHit(t,type){const id=cadForm().id;if(!t.T||t.dead)return;
   if(id==='great'||id==='hammer'){const dx=t.x-P.x,dy=t.y-P.y,d=Math.hypot(dx,dy)||1;const nx=t.x+dx/d*.35,ny=t.y+dy/d*.35;if(!blocked(nx,ny,t.T.r||.25,t))[t.x,t.y]=[nx,ny]}}
 function cadAfterSwing(hits,type,second){if(second)return;
   if(cadForm().id==='rapier'&&type==='thrust'){for(const dl of [70,140])setTimeout(()=>{if(state==='play'&&cur===CADI)swordHit(type,true)},dl)}
-  if(hits){CAD.hits++;if(CAD.hits%9===8&&!CAD.furiAct){CAD.furiNext=true;slashText=.7;slashMsg=`다음 일격: 푸리오소`}}
-  if(CAD.furiAct&&act&&act.furi){CAD.furiAct=false;setTimeout(()=>{if(cur===CADI)cadSetForm(CAD.prev,true)},260)}}
+}
 // HUD: 현재 형상과 다음 변화까지 남은 시간
 function cadHud(ctx,W,H){if(cur!==CADI)return;const F=cadForm(),pad=12,y=H-pad-(TOUCH?190:150),w=200;
   ctx.save();ctx.textAlign='right';ctx.textBaseline='alphabetic';ctx.font=`bold 15px ${FONT}`;ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(W-pad-w,y-18,w,40);
-  ctx.fillStyle='hsl(355,85,62)';ctx.fillText(`⚕ ${F.n}${CAD.furiNext?' · 다음: 푸리오소':''}`,W-pad-6,y);
-  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(W-pad-w+6,y+6,w-12,4);ctx.fillStyle='hsl(355,85,55)';ctx.fillRect(W-pad-w+6,y+6,(w-12)*(1-CAD.t/CAD_PERIOD),4);
-  ctx.font=`12px ${FONT}`;ctx.fillStyle='#ddd';ctx.fillText(`${SOLO()?`은총 ${CAD.grace} · 업보 ${CAD.karma}`:''}${CAD.mark?` · 지령 ${Math.ceil(CAD.markT)}초`:''}  적중 ${CAD.hits%9}/9`,W-pad-6,y+20);ctx.restore()}
+  ctx.fillStyle='hsl(45,85%,62%)';ctx.fillText(`카두세우스 · ${F.n}`,W-pad-6,y);
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(W-pad-w+6,y+6,w-12,4);ctx.fillStyle='hsl(45,80%,52%)';ctx.fillRect(W-pad-w+6,y+6,(w-12)*(1-CAD.t/CAD_PERIOD),4);
+  ctx.font=`12px ${FONT}`;ctx.fillStyle='#ddd';ctx.fillText(F.d,W-pad-6,y+20);ctx.restore()}
 
 let echoes=[],ghosts=[],stepT=0,CW=new Float32Array(2),DK=false;
 function addEcho(x,y,R,k){if(!isDark())return;echoes.push({x,y,R,k:k||1,t:time,sp:9});if(echoes.length>40)echoes.shift()}
@@ -2419,7 +2408,7 @@ function enemyBoom(x,y,src){
   const pd=Math.hypot(P.x-x,P.y-y);if(pd<Rr&&los(x,y,P.x,P.y))hurtPlayer(40*(1-pd/Rr)+5,x,y,null,null,'blast');
 }
 function hurtPlayer(d,sx,sy,src,killer,zone){
-  zone=zone||'body';d*=cadKarmaMul();
+  zone=zone||'body';
   if(fxOn(2)){if(sx!==undefined){burst(P.x+Math.cos(P.a)*.4,P.y+Math.sin(P.a)*.4,eyeZ,4,'무',48,90,70,1,1.5,.3,.06,0,false);sfx('block')}return 'miss'}
   if((state!=='play'&&MODE!=='pvp')||inv>0||(MODE==='pvp'&&(!pv.alive||pv.inv>0)))return 'miss';
   if(blocking&&sx!==undefined){let rel=Math.atan2(sy-P.y,sx-P.x)-P.a;rel=Math.atan2(Math.sin(rel),Math.cos(rel));
@@ -3743,18 +3732,18 @@ function melee(kind){const [parts,P_]=gunParts();const bl=P_('blade',1),h=P_('bo
     ac.save().t(.0,.645,0).rz(-.25).lathe([[.016,0],[.009,.04],[0,.09]],8).restore();
     for(const z of [-1,1])ac.save().t(-.005,.635,z*.022).rx(z*.9).rz(.5).lathe([[.008,0],[.004,.025],[0,.05]],6).restore();
     // 큰 낫날
-    {const L=.8,n=24,S=[],E=[],B=[];for(let i=0;i<=n;i++){const u=i/n,w=.1*Math.pow(1-u,.7)+.0014,xo=.38*Math.pow(u,1.75);S.push([L*u,w,.0105*(1-.7*u),1,xo]);E.push([.02+L*u,.6-(xo+w)]);B.push([.02+L*u,.6-(xo-w)])}
+    {const L=1.02,n=26,S=[],E=[],B=[];for(let i=0;i<=n;i++){const u=i/n,w=.125*Math.pow(1-u,.7)+.0016,xo=.5*Math.pow(u,1.75);S.push([L*u,w,.012*(1-.7*u),1,xo]);E.push([.02+L*u,.6-(xo+w)]);B.push([.02+L*u,.6-(xo-w)])}
      bl.save().t(.02,.6,0).rz(-PI/2);blade3(bl,S,true);bl.restore();
      // 날 가장자리 은빛 + 혼불 빛줄기
-     for(let i=0;i<n;i++){const u=i/n,bw=.022*(1-.55*u),th=2*.0105*(1-.7*u)*.5;fx.hsl(205,10,i%2?66:70).ext([[E[i][0],E[i][1]+.002],[E[i+1][0],E[i+1][1]+.002],[E[i+1][0],E[i+1][1]+bw*.9],[E[i][0],E[i][1]+bw]],th)}
+     for(let i=0;i<n;i++){const u=i/n,bw=.027*(1-.55*u),th=2*.012*(1-.7*u)*.5;fx.hsl(205,10,i%2?66:70).ext([[E[i][0],E[i][1]+.002],[E[i+1][0],E[i+1][1]+.002],[E[i+1][0],E[i+1][1]+bw*.9],[E[i][0],E[i][1]+bw]],th)}
      fx.hsl(205,12,88);for(let i=0;i<n;i++)fx.rod(E[i][0],E[i][1]+.004,0,E[i+1][0],E[i+1][1]+.004,0,.003,5);
      cr.hsl(186,100,66);for(let i=0;i<n;i++)cr.rod(E[i][0],E[i][1],0,E[i+1][0],E[i+1][1],0,.0024,5);
      // 등날 톱니
-     for(const k of [2,4,6,8,10,12,14,16]){const p=B[k],q=B[k+1],s=(1-k/n*.6)*1.35;bl.save().t(p[0],p[1],0).rz(Math.atan2(q[1]-p[1],q[0]-p[0])).ext([[0,0],[-.014*s,.04*s],[.03*s,0]],.007).restore()}
+     for(const k of [2,4,6,8,10,12,14,16]){const p=B[k],q=B[k+1],s=(1-k/n*.6)*1.65;bl.save().t(p[0],p[1],0).rz(Math.atan2(q[1]-p[1],q[0]-p[0])).ext([[0,0],[-.014*s,.04*s],[.03*s,0]],.007).restore()}
      // 날 끝 아래로 꺾인 갈고리 + 핏빛 홈
      {const p=E[n-2];bl.save().t(p[0],p[1],0).rz(-.6).ext([[0,0],[.02,-.05],[.004,-.004]],.006).restore()}
      // 날 위 룬 홈
-     for(let i=2;i<n-6;i++){const u=i/n,u2=(i+1)/n;cr.hsl(275,90,62).rod(.02+L*u,.6-.38*Math.pow(u,1.75)-.006,0,.02+L*u2,.6-.38*Math.pow(u2,1.75)-.006,0,.0022,4)}}
+     for(let i=2;i<n-6;i++){const u=i/n,u2=(i+1)/n;cr.hsl(275,90,62).rod(.02+L*u,.6-.5*Math.pow(u,1.75)-.008,0,.02+L*u2,.6-.5*Math.pow(u2,1.75)-.008,0,.0026,4)}}
     // 반대쪽 갈고리 날
     bl.save().t(-.03,.6,0).ext([[0,-.026],[-.08,-.012],[-.17,.05],[-.12,.004],[-.05,.016],[0,.026]],.008).restore();
     bl.save().t(-.02,.66,0).ext([[0,-.01],[-.05,.03],[-.09,.1],[-.04,.04],[0,.01]],.006).restore();
@@ -3762,7 +3751,7 @@ function melee(kind){const [parts,P_]=gunParts();const bl=P_('blade',1),h=P_('bo
     // 사슬 + 찢긴 천
     for(let i=0;i<5;i++)ac.save().t(.03,.53-i*.024,0).rx(i%2?PI/2:0).torus(.009,.0026,10,4).restore();
     fx.hsl(355,55,22);for(const [x,z,l] of [[-.024,.012,.17],[-.02,-.014,.13],[.004,.02,.15]])fx.save().t(x,.535,z).ext([[-.007,0],[.007,0],[.005,-l*.6],[.008,-l],[.0,-l*.82],[-.004,-l*.95],[-.006,-l*.55]],.002).restore();
-    return {parts,kind:'heavy',len:.85,scy:1}}
+    return {parts,kind:'heavy',len:1.05,scy:1}}
   if(kind==='axe'){// 전투 도끼: 양날, 위 창끝, 쇠 덧댐
     fx.hsl(18,30,15).save().t(0,.12,0).cyl(.018,.016,.58,10).restore();
     fx.hsl(355,50,22);wrap(-.14,.02,.019,6);
@@ -3842,11 +3831,21 @@ const WSPEC={
  24:()=>{const m=melee('sword');m.dual=1;return m},25:()=>melee('great'),26:()=>melee('scythe'),27:()=>melee('rapier'),28:()=>melee('saber'),2:()=>melee('sword'),19:()=>melee('dagger'),20:()=>melee('axe'),21:()=>melee('hammer'),22:()=>melee('katana'),23:()=>melee('club'),7:()=>melee('spear'),
 };
 const CAD_KIND=['hatchet','stiletto','bastard','rapier','hammer','great','lance','whip','scythe'];
-function getCadVM(f){const key='cad'+f;if(VM[key])return VM[key];const m=melee(CAD_KIND[f]||'sword');
-  // 단말기: 손목 고리와 붉은 핵 — 모든 형상이 여기서 흘러나온다
-  const dv=new GB().use(TX.metal);dv.hsl(0,10,22).save().t(0,-.005,0).torus(.024,.006,14,5).restore();const cr=m.parts['core|4']||(m.parts['core|4']=new GB().use(null));cr.hsl(355,100,55).save().t(0,-.005,.026).sph(.009,8,6).restore().save().t(0,-.005,-.026).sph(.009,8,6).restore();
-  m.parts['dev|3']=dv;const meshes={};for(const k in m.parts){const [name,role]=k.split('|');const mesh=m.parts[k].build();if(!mesh)continue;(meshes[name]||(meshes[name]=[])).push({mesh,role:+role})}
-  m.meshes=meshes;delete m.parts;m.scy=0;VM[key]=m;return m}
+function getCadVM(f){const key='cad'+f;if(VM[key])return VM[key];const kind=CAD_KIND[f]||'sword',m=melee(kind);
+  const cr=m.parts['core|4']||(m.parts['core|4']=new GB().use(null)),dv=new GB().use(TX.metal),dp=new GB().use(TX.metal);
+  // 기본 형태: 손에 쥔 작은 금빛 원통(단말기). 검은 액체는 위쪽 구멍에서 흘러나온다
+  dv.save().t(0,-.06,0).cyl(.022,.022,.15,16).restore();
+  for(const y of [-.128,-.09,-.03,.008])dv.save().t(0,y,0).cyl(.0245,.0245,.008,16).restore();
+  dv.save().t(0,.016,0).lathe([[.022,0],[.025,.004],[.019,.012],[.011,.014]],16).restore();dv.save().t(0,-.136,0).lathe([[0,-.01],[.016,-.008],[.024,0]],16).restore();
+  for(let i=0;i<6;i++){const a=i*PI/3;dv.save().t(Math.cos(a)*.0225,-.06,Math.sin(a)*.0225).ry(-a).box(0,0,0,.002,.05,.004).restore()}
+  cr.hsl(45,100,70).save().t(0,.024,0).torus(.009,.0018,12,4).restore();
+  // 흐르는 결 (아주 은은한 금빛 줄)
+  const L=Math.min(.75,(m.len||.5)*.85);if(kind!=='whip'&&kind!=='scythe'){cr.hsl(42,70,46);let pv=null;for(let i=0;i<=16;i++){const u=i/16,y=.07+L*u*.92,x=Math.sin(u*PI*3+f)*.004*(1-u),pt=[x,y,0];if(pv)cr.rod(pv[0],pv[1],.0,pt[0],pt[1],0,.0011*(1-u*.6),4);pv=pt}}
+  // 원통 입구에 맺힌 검은 방울
+  for(const [x,y,z,r] of [[.018,.026,.006,.0045],[-.014,.022,-.008,.004],[.004,.03,.012,.0035]])dp.save().t(x,y,z).s(1,1.9,1).sph(r,8,6).restore();
+  m.parts['dev|3']=dv;m.parts['drop|1']=dp;
+  const meshes={};for(const k in m.parts){const [name,role]=k.split('|');const mesh=m.parts[k].build();if(!mesh)continue;(meshes[name]||(meshes[name]=[])).push({mesh,role:+role})}
+  m.meshes=meshes;delete m.parts;m.scy=0;m.cadLen=Math.min(.9,m.len||.5);VM[key]=m;return m}
 function getVM(wi){if(VM[wi])return VM[wi];const w=WEAP[wi];let f=WSPEC[wi];
   if(!f){if(w&&w.admin)f=()=>{const g=rifle({barrel:.3,hg:.22,stock:'full',sight:'scope',muzzle:'brake',mag:'drum',recH:.07,recW:.05});const c=g.parts['core|4']=new GB().use(null);c.hsl(46,100,70,.95);
       for(let i=0;i<5;i++)c.save().t(0,.04,-(.22+i*.05)).rx(PI/2).torus(.024,.004,14,4).restore();c.save().t(-.026,.035,-.04).sph(.012,8,6).restore();g.admin=1;return g};
@@ -3873,7 +3872,7 @@ let swingTrail=[];
 R.drawView=(draw)=>{
   if(state==='title'||!P)return;
   const w=WEAP[cur];if(!w)return;
-  const wi=cur,vm=w.cadu?getCadVM(CAD.form):getVM(wi);
+  const wi=cur,vm=w.cadu?getCadVM(CAD.morph<0&&CAD.prevF!=null?CAD.prevF:CAD.form):getVM(wi);
   // 투영 (고정 시야)
   const fov=.95,PV=M4.persp(fov,W/H,.01,30);R.setVP(PV,VV,camPos);
   // 카메라 월드 행렬
@@ -3938,7 +3937,7 @@ R.drawView=(draw)=>{
     if(w.dual&&!act&&!charging&&!blocking){rZ=.16;rX=-1.0;px+=.03}
     let bsp=act&&act.tw?act.tw:0;
     if(insp!==null&&!w.spear&&!act&&!blocking&&!charging){const t=insp,e=easeIO,up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;
-      const dl=w.dual;let tX=dl?-.35:-.08,tY=dl?.15:.3,tZ=dl?.55:1.35,tx=dl?-.04:-.1,ty=dl?.1:.21,tz=dl?.02:.05;if(vm.scy){tx+=.24;tz-=.14}
+      const dl=w.dual;let tX=dl?-.35:-.08,tY=dl?.15:.3,tZ=dl?.55:1.35,tx=dl?-.04:-.1,ty=dl?.1:.21,tz=dl?.02:.05;if(vm.scy){tx+=.34;tz-=.24}
       if(t>.4&&t<1.1){const k=(t-.4)/.7;tX+=.22*Math.sin(k*PI);tx+=.03*Math.sin(k*PI)}
       if(t>=1.1&&t<1.7)bsp=PI*e((t-1.1)/.6);else if(t>=1.7)bsp=PI;
       if(t>=1.7&&t<2.3){const k=(t-1.7)/.6;tY+=1.0*Math.sin(k*PI);ty+=.02*Math.sin(k*PI)}
@@ -3950,7 +3949,10 @@ R.drawView=(draw)=>{
   // 총 행렬 (카메라 공간)
   let G=M4.tr(pos[0],pos[1],pos[2]);
   if(melRot){G=mm(G,RY(melRot[1]),RZ(melRot[2]),RX(melRot[0]),RY(melRot[3]||0),SC(.8))}
-  if(w.cadu&&melRot&&CAD.morph<1){const m_=CAD.morph,eb=.06+.94*Math.pow(m_,1.4)+.08*Math.sin(m_*PI),wb=(1-m_)*.55*Math.sin(time*30);G=mm(G,SC(1+wb,eb,1-wb*.6))}
+  if(w.cadu&&melRot&&CAD.morph<1){const m_=CAD.morph;let sy,wb;
+    if(m_<0){const k=-m_/.35;sy=Math.max(.03,k*k);wb=(1-k)*.45*Math.sin(time*32)}// 녹아내림
+    else{const g=m_<.22?0:Math.min(1,(m_-.22)/.62),ov=g<1?g*(1+.22*Math.sin(g*PI)):1;sy=Math.max(.03,ov);wb=(1-m_)*(m_>.84?.25:.5)*Math.sin(time*30)}// 모였다가 뻗어 나가 출렁이며 굳음
+    G=mm(G,SC(1+wb,sy,1-wb*.6))}
   else G=mm(G,RY(yaw),RX(pit),RZ(rol+tr*.5),RZ(spin));
   if(!melRot&&tr)G=mm(G,RX(-ty*.0),T3(0,0,0));
   const GW=mm(C,G);
@@ -3976,7 +3978,7 @@ R.drawView=(draw)=>{
       if(name==='limbT'||name==='limbB'){const d=bowVis||0;M=mm(GWm,RX((name==='limbT'?1:-1)*d*.25))}
       for(const p of vm.meshes[name]){let o=dO(p.role);if(name==='hopper'){const c=hsl2rgb(paintHue,80,55);o=Object.assign({},o,{mul:new Float32Array(c),alpha:.8,spec:.9,shin:80})}
         if(name==='core'){o={emis:1.2+.4*Math.sin(time*8),lit:false}}
-        if(w.cadu){const T_=[[.62,.06,.08],[.7,.07,.09],[.3,.04,.05],[.55,.08,.09],[.95,.22,.25]][p.role]||[.8,.1,.12];o=name==='core'?{emis:1.4+.5*Math.sin(time*6),lit:false,mul:new Float32Array([1,.18,.2])}:Object.assign({},o,{mul:new Float32Array(T_),spec:1.4,shin:120,emis:.1+.06*Math.sin(time*3+p.role)})}
+        if(w.cadu){const T_=name==='dev'?[1.05,.78,.32]:name==='drop'?[.07,.07,.08]:([[.08,.08,.09],[.06,.06,.07],[.04,.04,.05],[.07,.07,.08],[.12,.12,.13]][p.role]||[.07,.07,.08]);const fl=CAD.morph<1?.25*(1-Math.max(0,CAD.morph)):0;o=name==='core'?{emis:.9+.3*Math.sin(time*4)+fl,lit:false,mul:new Float32Array([1,.8,.45])}:Object.assign({},o,{mul:new Float32Array(T_),spec:name==='dev'?1.3:2.6,shin:name==='dev'?70:220,emis:name==='dev'?.06:.02})}
         if(name==='beam'){const c=cols[3].c;o={emis:1.6+.3*Math.sin(time*30),lit:false,mul:new Float32Array([Math.min(1,c[0]*1.4+.25),Math.min(1,c[1]*1.4+.25),Math.min(1,c[2]*1.4+.25)])}}
         if(name==='blade'){const ch=charging&&time-chargeStart>=.6||act&&act.type==='spin';if(ch)o=Object.assign({},o,{emis:.6,mul:new Float32Array([1,.8,.35])});else{o=Object.assign({},o,{spec:1.35,shin:110,emis:(o.emis||0)+.12});if(insp!==null&&!isGun){const sh=Math.max(0,Math.sin((insp-.45)*4.2))*(insp<1.2?1:0);if(sh>0)o.emis=(o.emis||0)+.45*sh}}}
         draw(p.mesh,M,o)}}};
@@ -3991,7 +3993,12 @@ R.drawView=(draw)=>{
     const hm=mk('hand',mHand),arm=mk('arm',mArm);const gp=v3(BM,[0,0,0]);draw(hm,mm(BM,RX(-PI/2),RY(PI/2)));armTo(draw,arm,gp,v3(C,[-.25,-.45,.15]));
     const hp=nock;draw(hm,mm(M4.tr(hp[0],hp[1],hp[2]),RY(PI/2-a),RZ(-.4)));armTo(draw,arm,hp,v3(C,[.28,-.55,-.05]));R.restoreVP();return}
   drawParts(GW);
-  if(w.cadu&&CAD.morph<1){const b=mk('cadBlob',()=>{const g=new GB().use(null);g.hsl(355,80,34).sph(1,14,10);return g.build()});const m_=CAD.morph;for(let q=0;q<5;q++){const r_=.05*(1-m_)*(1+.35*Math.sin(time*20+q*2)),yy=.01+q*.12*m_;draw(b,mm(GW,T3(Math.sin(time*13+q)*.012,yy,Math.cos(time*11+q)*.008),SC(r_,r_*(1.3+.5*Math.sin(time*17+q)),r_)),{mul:new Float32Array([1,.2,.22]),emis:.4,spec:1.4,shin:110})}}
+  if(w.cadu&&CAD.morph<1){const b=mk('cadBlob',()=>{const g=new GB().use(null);g.hsl(230,8,12).sph(1,14,10);return g.build()});const m_=CAD.morph,len=vm.cadLen||.5,bo={mul:new Float32Array([.5,.5,.55]),emis:0,spec:2.6,shin:220};
+    const GB_=mm(C,M4.tr(pos[0],pos[1],pos[2]),RY(melRot?melRot[1]:0),RZ(melRot?melRot[2]:0),RX(melRot?melRot[0]:0),SC(.8));
+    if(m_<0){const k=-m_/.35;for(let q=0;q<6;q++){const ph=(time*1.6+q*.37)%1,r_=.016*(1-ph*.6);draw(b,mm(GB_,T3(Math.sin(q*2.3)*.03,len*k*(1-ph)*.6-ph*.12,Math.cos(q*1.7)*.02),SC(r_,r_*1.8,r_)),bo)}}
+    else if(m_<.3){const c=m_/.3;for(let q=0;q<7;q++){const a=time*7+q*PI*2/7,rr=.09*(1-c)+.006;const r_=.014+.02*c;draw(b,mm(GB_,T3(Math.cos(a)*rr*.6,.035+Math.sin(time*9+q)*.008+(1-c)*.04,Math.sin(a)*rr*.6),SC(r_,r_*(1.1+.3*Math.sin(time*15+q)),r_)),bo)}}
+    else{const g=Math.min(1,(m_-.22)/.62),fy=.02+len*g*(.95),r_=.026*(1-Math.min(1,(m_-.3)/.6))+.002;draw(b,mm(GB_,T3(Math.sin(time*25)*.004,fy,0),SC(r_,r_*1.6,r_)),bo);
+      if(m_>.8){const f_=(m_-.8)/.2;for(let q=0;q<3;q++){const r2=.006*(1-f_);draw(b,mm(GB_,T3((q-1)*.02,len*.5-f_*.25,.01),SC(r2,r2*2,r2)),bo)}}}}
   if(w.dual&&melRot){const G2=mm(C,M4.tr(-pos[0]+.02,pos[1]+.01,pos[2]+.03),RY(-melRot[1]),RZ(-melRot[2]),RX(melRot[0]),RY(-(melRot[3]||0)),SC(.8));drawParts(G2);
     const hm2=mk('hand',mHand),arm2=mk('arm',mArm),g2=v3(G2,[0,0,0]);draw(hm2,mm(G2,RX(-PI/2),RY(PI/2)));armTo(draw,arm2,g2,v3(C,[-.3,-.48,.25]))}
   // 탄피·탄창 낙하
@@ -4326,7 +4333,7 @@ function drawSpear(){
   ctx.restore();
 }
 function drawSword(){
-  const w=WEAP[cur],gc=clamp(Math.floor(H/21),14,36),step=gc*.6,rowH=gc*.88,art=w.art;
+  const w=WEAP[cur],gc=clamp(Math.floor(H/21),14,36),step=gc*.6,rowH=gc*.88,melt_=w.cadu&&CAD.morph<0&&CAD.prevF!=null,art=melt_?CADF[CAD.prevF].art:w.art,LG_=melt_?CADF[CAD.prevF].leg:w.leg;
   const pose=swordPose();
   if(!act&&!RM){pose.px+=Math.sin(P.walk*.5)*gc*.5;pose.py+=Math.abs(Math.cos(P.walk*.5))*gc*.35}
   pose.py+=switchT>0?Math.sin(switchT/.32*Math.PI)*gc*6:0;
@@ -4337,10 +4344,11 @@ function drawSword(){
   for(const mir of (w.dual?[-1,1]:[1])){
   ctx.save();ctx.translate(mir<0?W-pose.px+gc*1.5:pose.px,pose.py);ctx.rotate(pose.rot*mir);ctx.scale(pose.sc*(pose.fx||1)*(w.dual?.88:1),pose.sc*(w.dual?.88:1));
   ctx.font=`bold ${gc}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
-  const occM=(i,r)=>!!(art[r]&&art[r][i]&&art[r][i]!==' '&&w.leg[art[r][i]]);const DET=QL<=1;const skf=skinOf(cur).f;
-  for(let pass=0;pass<2;pass++)for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k===' ')continue;let e=w.leg[k];if(skf&&e[0]!=='손')e=skf(e,k,i,r);
+  const occM=(i,r)=>!!(art[r]&&art[r][i]&&art[r][i]!==' '&&LG_[art[r][i]]);const DET=QL<=1;const skf=skinOf(cur).f;
+  for(let pass=0;pass<2;pass++)for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k===' ')continue;let e=LG_[k];if(skf&&e[0]!=='손')e=skf(e,k,i,r);
     let x=(i-w.pivot[0])*step*mir,y=(r-w.pivot[1])*rowH;
-    if(w.cadu&&CAD.morph<1&&e[0]!=='손'){const dd_=Math.hypot(i-w.pivot[0],r-w.pivot[1]),grow=CAD.morph*13;if(dd_>grow)continue;const wob=(1-CAD.morph)*(1-Math.max(0,dd_-grow+2)/2);x+=Math.sin(time*26+r*1.7)*step*.35*(1-CAD.morph);y+=Math.cos(time*22+i*1.3)*rowH*.2*(1-CAD.morph)+Math.max(0,dd_-grow+1.5)*rowH*.3;e=[dd_>grow-1.5?'액':e[0],355,85,Math.max(20,e[3]-10*wob),e[4]]}
+    if(w.cadu&&CAD.morph<0&&e[0]!=='손'){const k_=-CAD.morph/.35,dd_=Math.hypot(i-w.pivot[0],r-w.pivot[1]);if(dd_>k_*13)continue;y+=(1-k_)*rowH*(dd_*.5)*(.6+.4*Math.sin(i*2.1));x+=Math.sin(time*20+r)*step*.2*(1-k_);e=[(i+r)%3?e[0]:'액',230,8,Math.max(8,e[3]*(.5+.5*k_)),e[4]]}
+    else if(w.cadu&&CAD.morph<1&&e[0]!=='손'){const dd_=Math.hypot(i-w.pivot[0],r-w.pivot[1]),grow=CAD.morph*13;if(dd_>grow)continue;const wob=(1-CAD.morph)*(1-Math.max(0,dd_-grow+2)/2);x+=Math.sin(time*26+r*1.7)*step*.35*(1-CAD.morph);y+=Math.cos(time*22+i*1.3)*rowH*.2*(1-CAD.morph)+Math.max(0,dd_-grow+1.5)*rowH*.3;e=[dd_>grow-1.5?'액':e[0],230,10,Math.max(8,e[3]-8*wob),e[4]]}
     if(DET&&e[0]!=='손'){const bl=k==='K'||k==='k',L0=bl?e[3]:e[3]*lit;ctx.font=`bold ${Math.round(gc*.52)}px ${FONT}`;
       for(const dy of [-1,1])for(const dx of [-1,1]){const hx=occM(i+dx,r),vy=occM(i,r+dy);let g=e[0],lm=1;
         if(bl){g=dx===dy?e[0]:'/';lm=dx===dy?1:1.18}else if(!hx&&!vy){g=dx===dy?'/':'\\';lm=.7}else if(!vy){g=dy<0?'¯':'_';lm=dy<0?1.2:.7}else if(!hx){g='|';lm=.8}else if(!(dx<0&&dy<0))g=bl?(dx>0&&dy>0?'=':'-'):'#';
@@ -4354,9 +4362,9 @@ function drawSword(){
     if(blade&&blocking){L=Math.min(95,L+6)}
     ctx.fillStyle=`hsl(${hue},${sat}%,${clamp(L,4,95)}%)`;ctx.fillText(e[0],x,y)}
   if(charged){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(255,190,80,${.35+.25*Math.sin(time*20)})`;
-    for(let r=0;r<8;r++){const x=(w.art[r].search(/[Kj]/)-w.pivot[0])*step*mir,y=(r-w.pivot[1])*rowH;ctx.fillText('기',x+(rand()-.5)*gc*.8,y+(rand()-.5)*gc*.8)}}
-  if(w.cadu&&CAD.morph<1){ctx.globalCompositeOperation='source-over';const mm_=CAD.morph;for(let q=0;q<7;q++){const a=time*3+q*.9,rr=(1-mm_)*gc*(1.2+.5*Math.sin(time*9+q));ctx.fillStyle=`hsl(355,85%,${38+12*Math.sin(time*7+q)}%)`;ctx.fillText(q%2?'혈':'액',Math.cos(a)*rr,Math.sin(a)*rr*.7+gc*.3*Math.sin(time*5+q))}}
-  if(inspT>=0&&!act){const sh=Math.max(0,Math.sin((inspT-.45)*4.2))*(inspT<1.2?1:0);if(sh>0){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(255,255,255,${.35*sh})`;for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k==='K'||k==='k')ctx.fillText(w.leg[k][0],(i-w.pivot[0])*step*mir,(r-w.pivot[1])*rowH)}ctx.globalCompositeOperation='source-over'}}
+    for(let r=0;r<8;r++){const x=(art[r].search(/[Kj]/)-w.pivot[0])*step*mir,y=(r-w.pivot[1])*rowH;ctx.fillText('기',x+(rand()-.5)*gc*.8,y+(rand()-.5)*gc*.8)}}
+  if(w.cadu&&CAD.morph<1){ctx.globalCompositeOperation='source-over';const mm_=Math.max(0,CAD.morph);for(let q=0;q<7;q++){const a=time*3+q*.9,rr=(1-mm_)*gc*(1.2+.5*Math.sin(time*9+q));ctx.fillStyle=`hsl(230,10%,${12+8*Math.sin(time*7+q)}%)`;ctx.fillText(q%2?'흑':'액',Math.cos(a)*rr,Math.sin(a)*rr*.7+gc*.3*Math.sin(time*5+q))}}
+  if(inspT>=0&&!act){const sh=Math.max(0,Math.sin((inspT-.45)*4.2))*(inspT<1.2?1:0);if(sh>0){ctx.globalCompositeOperation='lighter';ctx.fillStyle=`rgba(255,255,255,${.35*sh})`;for(let r=0;r<art.length;r++)for(let i=0;i<art[r].length;i++){const k=art[r][i];if(k==='K'||k==='k')ctx.fillText(LG_[k][0],(i-w.pivot[0])*step*mir,(r-w.pivot[1])*rowH)}ctx.globalCompositeOperation='source-over'}}
   ctx.restore()}
 }
 // ===== 총 모션: 스프링 =====
@@ -5996,10 +6004,9 @@ function frame(now){
 const NOTICE_VER='2026-10-31c';
 const NOTICE=[
  {v:'2026-10-31 오후',t:'신탁 단말기 카두세우스 · 피해 공식 개편',items:[
-  '새 근접무기 "카두세우스": 붉은 액체 금속이 6초마다 다른 무기로 굳어요 — 손도끼(출혈), 스틸레토(방패 무시·치명타), 바스타드 소드(머리 +40%), 레이피어(찌르기 3연타), 망치(긴 기절), 대검(넓게 베고 밀침), 랜스(일직선 관통), 채찍(멀리 휘감아 출혈·둔화), 낫(반원 베기)',
-  '9번째 적중마다 다음 일격이 낫으로 바뀌는 "푸리오소" (확정 치명타 +30%)',
-  '지령: 가끔 적 하나가 지목되고 10초 안에 쓰러뜨리면 은총(카두세우스 피해 +5%씩·체력 회복), 놓치면 업보(받는 피해 증가)',
-  '낫을 더 크고 위협적으로: 날 길이·폭 확대, 등날 톱니 8개, 갈고리 날 추가',
+  '새 근접무기 "카두세우스": 손에 쥔 작은 금빛 원통에서 검은 액체가 흘러나와 6초마다 다른 무기로 굳어요 — 손도끼(출혈), 스틸레토(방패 무시·치명타), 바스타드 소드(머리 +40%), 레이피어(찌르기 3연타), 망치(긴 기절), 대검(넓게 베고 밀침), 랜스(일직선 관통), 채찍(멀리 휘감아 출혈·둔화), 낫(반원 베기)',
+  '형상이 바뀔 때: 이전 무기가 녹아내려 원통으로 빨려 들어가고, 다시 솟구쳐 뻗어 나가 출렁이며 새 무기로 굳어요',
+  '낫을 훨씬 크고 위협적으로: 날 길이·폭 크게 확대, 등날 톱니 8개, 갈고리 날 추가',
   '피해 공식 개편: 같은 종류 증강은 더하고, 묶음끼리만 곱하며, 너무 커지면 덜 오르게. 수십만 피해는 럭키 세븐 같은 특별한 순간에만',
   '고난 다시 조정: 층마다 더 많이·높이 오르고 적응 강도 최대 ×1.6, 보스는 내 증강이 강할수록 체력이 늘어남',
   '신화 증강이 덜 나오게 (초반엔 아주 드물게), 히든 증강도 조금 덜',
