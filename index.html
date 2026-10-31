@@ -541,6 +541,30 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
 .sug-reply{grid-column:2;display:flex;gap:6px;margin-top:4px}.sug-reply input{flex:1;font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid rgba(170,200,180,.3);background:#0b0f12;color:#e8e8e8;border-radius:2px}
 #sugBtn.has-new::after{content:'';display:inline-block;width:6px;height:6px;background:#ff5a3c;margin-left:5px;vertical-align:2px}
 .ops-f{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.ops-f button{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid rgba(170,200,180,.3);background:#0b0f12;color:#cfd6d2;border-radius:2px;cursor:pointer}.ops-f button[aria-pressed="true"]{background:#ffb347;color:#1a1206;border-color:#ffb347}
+
+/* 신화: 무지개 · 초월: 푸른 홀로그램 */
+@keyframes rbw{to{background-position:200% 0}}
+.cx-c.myth,.own-c.myth{border-left:3px solid transparent;border-image:linear-gradient(180deg,#ff4d6d,#ffc857,#7fe6ff,#c58bff) 1;background:linear-gradient(90deg,rgba(255,77,109,.10),rgba(255,200,87,.08),rgba(127,230,255,.08),rgba(197,139,255,.10));opacity:1}
+.cx-c.myth>span,.cx-c.myth b{background:linear-gradient(90deg,#ff4d6d,#ffc857,#7fe6ff,#c58bff,#ff4d6d);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rbw 3s linear infinite}
+@keyframes holoSweep{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
+@keyframes holoScan{to{background-position:0 6px}}
+@keyframes holoGlow{0%,100%{box-shadow:0 0 18px rgba(110,220,255,.45),inset 0 0 14px rgba(110,220,255,.2)}50%{box-shadow:0 0 34px rgba(110,220,255,.85),inset 0 0 24px rgba(110,220,255,.35)}}
+@keyframes holoGlitch{0%,92%,100%{transform:none;opacity:1}93%{transform:translate(2px,-1px) skewX(10deg);opacity:.6}95%{transform:translate(-2px,1px) skewX(-6deg);opacity:.9}97%{transform:translate(1px,0);opacity:.75}}
+.pk-card.holo,.cx-c.holo{position:relative;overflow:hidden;border:1px solid rgba(140,235,255,.85)!important;background:linear-gradient(135deg,rgba(18,70,105,.88),rgba(8,26,58,.92))!important;animation:holoGlow 2.2s ease-in-out infinite;opacity:1;color:#dff9ff}
+.pk-card.holo::before,.cx-c.holo::before{content:'';position:absolute;inset:-40% -60%;background:linear-gradient(110deg,transparent 42%,rgba(150,240,255,.28) 47%,rgba(255,255,255,.55) 50%,rgba(150,240,255,.28) 53%,transparent 58%);animation:holoSweep 2.6s linear infinite;pointer-events:none;mix-blend-mode:screen}
+.pk-card.holo::after,.cx-c.holo::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(140,235,255,.13) 0 1px,transparent 1px 3px);animation:holoScan .9s linear infinite;pointer-events:none}
+.pk-card.holo .pk-g,.cx-c.holo>span{color:#c8f8ff!important;text-shadow:0 0 6px #6fe0ff,0 0 18px #39b8ff,2px 0 0 rgba(255,80,200,.5),-2px 0 0 rgba(80,255,240,.5);animation:holoGlitch 3.2s steps(1) infinite;background:none!important}
+.pk-card.holo:hover{transform:perspective(700px) rotateX(7deg) rotateY(-9deg) translateY(-4px)}
+.cx-c.holo b{color:#bff6ff}
+#holoFx{position:absolute;inset:0;z-index:45;pointer-events:none;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 60%,rgba(40,140,200,.28),rgba(0,10,20,.55) 70%);opacity:0;transition:opacity .35s}
+#holoFx.in{opacity:1}#holoFx.out{opacity:0}#holoFx[hidden]{display:none}
+#holoFx .hb{position:relative;display:grid;place-items:center;gap:6px;transform:translateY(-4%)}
+#holoFx .cone{position:absolute;bottom:-46%;left:50%;width:min(60vw,520px);height:min(50vh,360px);transform:translateX(-50%);background:linear-gradient(0deg,rgba(120,230,255,.0),rgba(120,230,255,.22) 60%,rgba(120,230,255,0));clip-path:polygon(46% 100%,54% 100%,100% 0,0 0);filter:blur(2px)}
+#holoFx .hg{font-family:var(--display);font-size:min(28vh,190px);line-height:1;color:rgba(190,248,255,.92);text-shadow:0 0 10px #6fe0ff,0 0 40px #2aa8ff,4px 0 0 rgba(255,80,200,.45),-4px 0 0 rgba(80,255,240,.45);background:repeating-linear-gradient(0deg,rgba(255,255,255,.0) 0 3px,rgba(0,20,40,.35) 3px 5px);-webkit-background-clip:text;background-clip:text;animation:holoGlitch 1.6s steps(1) infinite,holoSpin 4s ease-in-out infinite}
+@keyframes holoSpin{0%,100%{transform:perspective(600px) rotateY(-18deg)}50%{transform:perspective(600px) rotateY(18deg)}}
+#holoFx .ht{display:grid;justify-items:center;gap:2px}#holoFx .ht small{font-size:12px;letter-spacing:.4em;color:#8fe8ff}#holoFx .ht b{font-size:22px;color:#e9fdff;text-shadow:0 0 12px #39b8ff;letter-spacing:.08em}
+#holoFx .ring{position:absolute;left:50%;top:42%;width:240px;height:60px;border:1px solid rgba(140,235,255,.6);border-radius:50%;transform:translate(-50%,-50%) rotateX(70deg);animation:holoRing 2.4s linear infinite}#holoFx .ring.r2{animation-delay:-1.2s}
+@keyframes holoRing{from{width:120px;height:30px;opacity:1}to{width:520px;height:130px;opacity:0}}
 </style>
 
 <div class="wrap">
@@ -1435,7 +1459,7 @@ function loadLevel(n,lv){
   document.getElementById('lvl').textContent=n+1;if(!rows)setTimeout(()=>say(`${levelName} · ${TODS[TOD].n}`,1.6),50);
   computeFlow();
 }
-function spawnEnemy(k,x,y,o){const T=ET[k];if(!T)return null;const hpv=Math.round(T.hp*(1+.45*loop));
+function spawnEnemy(k,x,y,o){const T=ET[k];if(!T)return null;let hpv=Math.round(T.hp*(1+.45*loop));try{if(SOLO()&&PS('uxScale'))hpv*=15}catch(_){}
   const e=Object.assign({T,x,y,hp:hpv,max:hpv,alert:false,cd:rand()*1.2,anim:rand()*4,hit:0,atkT:0,dead:false,dieT:0,ph:rand()*6},o||{});if(T.invis&&!(o&&o.summoned))e.invis=1;if(T.splitMe&&!(o&&o.small))e.split=1;enemies.push(e);return e}
 function bestStartAngle(){let best=0,bd=-1;for(let i=0;i<16;i++){const a=i/16*Math.PI*2;cast(P.x,P.y,a);if(hDist>bd){bd=hDist;best=a}}return best}
 function losTile(x0,y0,tx,ty){
@@ -5098,6 +5122,7 @@ function resetPerks(){try{NX.souls=0;NX.secondFloor=-1;NX.killN=0;NX.combo=0}cat
 function rollPerks(n,boost){
   const pvp=!SOLO();n=n||((PS('luck')||ROUL.luck?4:3));const lk=(PS('luck')?1:0)+(boost||0)+(ROUL.luck||0),deep=pvp?Math.min(1,(pv.k|0)/24):Math.min(1,level/12);const out=[];
   if(!pvp){const hid=PERKS.filter(p=>p.r===4&&!PK[p.id]&&p.cond&&(()=>{try{return p.cond()}catch(e){return false}})());if(hid.length&&rand()<.18+lk*.1)out.push(hid[(rand()*hid.length)|0])}
+  try{uxRoll(out,pvp,lk)}catch(_){}
   // 등급 가중치: 깊이·행운에 따라 높은 등급이 잘 나옴
   const wt=[Math.max(18,52-30*deep-12*lk),28+4*deep,14+14*deep+8*lk,4+9*deep+5*lk];
   // 신화: 초반엔 아주 드물고 깊은 층(20층 쯤)에서야 조금 보이게
@@ -5111,14 +5136,14 @@ function rollPerks(n,boost){
     const w2=pool.map(p=>(p.gen?1:p.wx!==undefined?3.5:2.5)/(1+(PK[p.id]|0)*.6));let t=w2.reduce((a,c)=>a+c,0)*rand(),k=0;for(;k<pool.length-1;k++){if(t<w2[k])break;t-=w2[k]}out.push(pool[k])}
   if(!pvp)RUN.pity=out.some(p=>p.r>=2)?0:(RUN.pity|0)+1;
   return out.sort(()=>rand()-.5)}
-function cardHtml(p,i,cls){return `<button type="button" class="pk-card${p.r===4?' hid':''}${p.r===5?' myth':''}${cls||''}" data-pk="${i}" style="--rc:${RAR[p.r].c}"><span class="pk-k">${i+1}</span><span class="pk-g">${p.g}</span><b>${p.n}</b><small>${RAR[p.r].n}${PK[p.id]?` · 보유 ${PK[p.id]}`:''}</small><span class="pk-d">${p.d}</span><span class="tq" data-term="${p.id}" title="자세히 보기">?</span></button>`}
+function cardHtml(p,i,cls){return `<button type="button" class="pk-card${p.r===4?' hid':''}${p.r===5?' myth':''}${p.r===6?' holo':''}${cls||''}" data-pk="${i}" style="--rc:${RAR[p.r].c}"><span class="pk-k">${i+1}</span><span class="pk-g">${p.g}</span><b>${p.n}</b><small>${RAR[p.r].n}${PK[p.id]?` · 보유 ${PK[p.id]}`:''}</small><span class="pk-d">${p.d}</span><span class="tq" data-term="${p.id}" title="자세히 보기">?</span></button>`}
 function perkCardsHtml(){
   if(!perkOffer)return '';
   return `<div class="pk-row">${perkOffer.map((p,i)=>cardHtml(p,i,!perkPicked&&perkSel>=0?(i===perkSel?' on':' dim'):'')).join('')}</div>
   ${perkPicked?'':`<button type="button" class="btn ghost sm pk-rr" id="pkReroll" ${rerollLeft()?'':'disabled'}>리롤 (R) · 남은 ${rerollLeft()}회</button>`}<p class="pk-tip">${perkPicked?'고른 증강이 적용됐어요. 다음 층으로 가세요.':perkSel>=0?`<b style="color:${RAR[perkOffer[perkSel].r].c}">${perkOffer[perkSel].n}</b> 선택됨 — 다른 카드를 누르면 바꿀 수 있고, <b>다음 층</b>을 누르면 확정돼요`:'증강을 하나 고르세요 (키보드 1~'+perkOffer.length+')'} · 히든 발견 ${Object.keys(HID_FOUND).length}/${PERKS.filter(p=>p.r===4).length}</p>${perkCount()?`<details class="own-fold"><summary>보유 증강 ${perkCount()}개 보기</summary>${ownedHtml()}</details>`:''}`}
 function perkListHtml(){const ids=Object.keys(PK);if(!ids.length)return '';
   return `<div class="pk-list">${ids.map(id=>{const p=PMAP[id];return `<span style="color:${RAR[p.r].c}" title="${p.d}">${p.g} ${p.n}${PK[id]>1?' ×'+PK[id]:''}</span>`}).join('')}</div>`}
-function grantPerk(p,quiet){PK[p.id]=(PK[p.id]|0)+1;try{achPerk(p)}catch(_){}markSeen(p.id);if(p.s.reroll)RUN.rerolls=(RUN.rerolls|0)+p.s.reroll;if(p.s.hp&&p.s.hp>0)hp=Math.min(MAXHP(),hp+p.s.hp);hp=Math.min(hp,MAXHP());
+function grantPerk(p,quiet){if(!grantPerk._in&&p.id!=='uxEcho'&&AUGON()&&PK.uxEcho){grantPerk._in=1;try{grantPerk(p,true)}finally{grantPerk._in=0}}if(p.id==='uxScale'&&!PK.uxScale&&SOLO())for(const e of enemies){if(!e.dead){e.hp*=15;e.max=(e.max||e.T.hp)*15}}PK[p.id]=(PK[p.id]|0)+1;try{achPerk(p)}catch(_){}markSeen(p.id);if(p.s.reroll)RUN.rerolls=(RUN.rerolls|0)+p.s.reroll;if(p.s.hp&&p.s.hp>0)hp=Math.min(MAXHP(),hp+p.s.hp);hp=Math.min(hp,MAXHP());
   if(p.r===4){HID_FOUND[p.id]=1;try{localStorage.setItem('gd-hidden',JSON.stringify(HID_FOUND))}catch(e){}}
   if(!quiet){sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}}
 function pickPerk(i){
@@ -5165,7 +5190,7 @@ admAugEl.addEventListener('click',e=>{const b=e.target.closest('button');if(e.ta
   if(b.dataset.pk!==undefined){grantPerk(PERKS[+b.dataset.pk]);renderAdmAug()}});
 addEventListener('keydown',e=>{if(e.code==='Backslash'&&isAdm()&&(state==='play'||state==='paused'||state==='clear')){e.preventDefault();if(!AUGON()){say('이 모드에서는 증강을 쓸 수 없어요',1.4);return}admAugEl.hidden=!admAugEl.hidden;if(!admAugEl.hidden){renderAdmAug();try{document.exitPointerLock()}catch(_){}}}});
 // ---- 층 시작 ----
-function perkFloorStart(){if(!SOLO())return;RUN.floorHurt=0;
+function perkFloorStart(){if(!SOLO())return;RUN.floorHurt=0;RUN.rwN=0;try{UX.hist=[]}catch(_){}
   const nd=PS('nade');nadeN+=nd;flashN+=nd;
   if(PS('floorFull'))hp=MAXHP();else if(PS('floorHeal'))hp=Math.min(MAXHP(),hp+PS('floorHeal'));
   if(PS('supply')){gmRefillAll();arRes=Math.max(arRes,120)+30;snpRes=Math.max(snpRes,15)+3;shells=Math.max(shells,16)+6;arrows=Math.max(arrows,16)+6;paintRes=Math.max(paintRes,200);spears=Math.max(spears,3)}
@@ -5202,6 +5227,7 @@ function perkDmgMul(t,zone,w,o){if(!AUGON()||!(t.T||t.remote))return 1;let A=PS(
   let m=(1+dmgSoft(A))*(1+dmgSoft(B));
   if(PS('gamble')&&!(o&&o.crit))m*=.8;
   if(PS('lucky7')&&w&&!w.melee&&RUN.shots%7===0)m*=7;
+  if(PS('uxScale')&&t.T)m*=15;
   return m}
 function perkShot(w){if(!AUGON())return;RUN.shots++;
   if(PS('twin')&&!w.melee&&!w.sniper&&!w.launcher&&!w.paint&&rand()<PS('twin'))setTimeout(()=>{if(state==='play'&&WEAP[cur]===w)trace(P.a+(rand()-.5)*.04,w.dmg,0)},45);
@@ -5228,7 +5254,7 @@ function perkOnKill(e,zone){if(!AUGON())return;RUN.kills++;if(e&&e.T&&SOLO()){co
   if(!e||!e.T)return;const ex=e.x,ey=e.y;
   if(PS('mine'))setTimeout(()=>boomAt(ex,ey,1.8,1.6,'뢰'),1500);
   if(PS('chain')||(PS('bladestorm')&&WEAP[cur].melee)){const big=PS('chain')>0;setTimeout(()=>{if(big)boomAt(ex,ey,2.2,2.2);else{burst(ex,ey,.5,14,'검',200,90,60,1,3,.5,.08,0,false);for(const o of enemies){if(o.dead||o===e)continue;const d=Math.hypot(o.x-ex,o.y-ey);if(d<2.2)damage(o,1.6*(1+.25*loop),(o.x-ex)/(d||1),(o.y-ey)/(d||1),true)}}},90)}}
-function perkHurt(d,src){if(!AUGON())return d;{const nd=nxHurt(d,src);if(nd<0)return -1;d=nd}try{d=rxHurt(d,src)}catch(_){}if(WEAP[cur]&&WEAP[cur].melee&&PS('meleeGuard'))d*=1-Math.min(.5,PS('meleeGuard'));
+function perkHurt(d,src){if(!AUGON())return d;{const ud=uxHurt(d);if(ud<0)return -1}{const nd=nxHurt(d,src);if(nd<0)return -1;d=nd}try{d=rxHurt(d,src)}catch(_){}if(WEAP[cur]&&WEAP[cur].melee&&PS('meleeGuard'))d*=1-Math.min(.5,PS('meleeGuard'));
   if(rand()<Math.min(.6,PS('dodge')+(hp<MAXHP()*.35?PS('lowDodge'):0))){slashText=.5;slashMsg='회피!';sfx('dash');return -1}
   if(shadowT>0)return -1;
   if(src&&src.vampEl&&!src.dead)src.hp=Math.min(src.max||src.T.hp,src.hp+d*.04);
@@ -5570,7 +5596,7 @@ function perkKillExtra(e,zone){if(!AUGON())return;const ks=PS('killShield');if(k
   if(PS('overkill')&&e.hp<0){const ov=-e.hp*PS('overkill');let best=null,bd=2.8;for(const o of enemies){if(o.dead||o===e)continue;const d=Math.hypot(o.x-ex,o.y-ey);if(d<bd){bd=d;best=o}}if(best){burst(ex,ey,.6,6,'과',0,80,60,1,2,.3,.06,0,false);damage(best,ov,(best.x-ex)/(bd||1),(best.y-ey)/(bd||1),false)}}
   if(PS('killBolt')){const near=enemies.filter(o=>!o.dead&&o!==e&&Math.hypot(o.x-ex,o.y-ey)<5).sort((a,b)=>Math.hypot(a.x-ex,a.y-ey)-Math.hypot(b.x-ex,b.y-ey)).slice(0,2);
     for(const o of near){burst(o.x,o.y,1.2,10,'벼',55,100,75,1,3,.35,.08,0,false);damage(o,2.2*PS('killBolt')*(1+.25*loop),0,0,true)}if(near.length){sfx('boom');flashW=Math.max(flashW,.15)}}}
-function perkTickExtra(dt){if(!AUGON()||state!=='play')return;try{nxTick(dt)}catch(_){}try{rxTick(dt)}catch(_){}
+function perkTickExtra(dt){if(!AUGON()||state!=='play')return;try{nxTick(dt)}catch(_){}try{uxTick(dt)}catch(_){}try{rxTick(dt)}catch(_){}
   if(RUN.momT>0){RUN.momT-=dt;if(RUN.momT<=0)RUN.mom=0}if(RUN.mrT>0){RUN.mrT-=dt;if(RUN.mrT<=0)RUN.mrN=0}
   if(PS('slowAura'))for(const e of enemies)if(!e.dead&&Math.hypot(e.x-P.x,e.y-P.y)<3)e.slow=Math.max(e.slow||0,.3);
   if(PS('nadeRegen')){nadeT+=dt*PS('nadeRegen');if(nadeT>=20){nadeT=0;nadeN=Math.min(9,nadeN+1);say('수류탄 +1',.8)}}
@@ -5691,18 +5717,18 @@ function cxNorm(t){return String(t).toLowerCase().replace(/\s+/g,'')}
 function cxMatch(text){if(!cxQ)return true;const t=cxNorm(text);return cxNorm(cxQ).split(/[,·]/).filter(Boolean).every(w=>t.includes(w))}
 function renderCodex(){
   codexEl.innerHTML=`<div class="sk-box"><div class="sk-head"><h2>도감</h2><button type="button" class="btn sm" data-x>닫기</button></div>
-  <div class="sk-tabs"><button type="button" data-tab="aug" aria-pressed="${cxTab==='aug'}">증강 ${PERKS.length}</button><button type="button" data-tab="hard" aria-pressed="${cxTab==='hard'}">고난 ${HARDS.length}</button><button type="button" data-tab="term" aria-pressed="${cxTab==='term'}">용어 풀이</button>
-  ${cxTab==='aug'?`<span class="cx-sep"></span><button type="button" data-t="-1" aria-pressed="${cxTier<0}">전체</button>${RAR.map((r,i)=>`<button type="button" data-t="${i}" aria-pressed="${cxTier===i}" style="color:${r.c}">${r.n} ${PERKS.filter(p=>p.r===i).length}</button>`).join('')}<span class="cx-sep"></span><button type="button" data-own aria-pressed="${!!cxOwn}">얻어 본 것만</button>`:''}</div>
+  <div class="sk-tabs"><button type="button" data-tab="aug" aria-pressed="${cxTab==='aug'}">증강 ${PERKS.filter(p=>!p.sec||ADMV()).length}</button><button type="button" data-tab="hard" aria-pressed="${cxTab==='hard'}">고난 ${HARDS.length}</button><button type="button" data-tab="term" aria-pressed="${cxTab==='term'}">용어 풀이</button>
+  ${cxTab==='aug'?`<span class="cx-sep"></span><button type="button" data-t="-1" aria-pressed="${cxTier<0}">전체</button>${RAR.map((r,i)=>`<button type="button" data-t="${i}" aria-pressed="${cxTier===i}" style="color:${r.c}">${r.n} ${PERKS.filter(p=>p.r===i&&(!p.sec||ADMV())).length}</button>`).join('')}<span class="cx-sep"></span><button type="button" data-own aria-pressed="${!!cxOwn}">얻어 본 것만</button>`:''}</div>
   <div class="cx-bar"><input id="cxQ" type="search" autocomplete="off" placeholder="${cxTab==='aug'?'이름·효과 검색 (예: 치명타, 이동)':cxTab==='term'?'용어 검색 (예: 처형, 방어막)':'고난 검색 (예: 들개, 방패)'}" value="${esc2(cxQ)}"><span id="cxCount"></span></div><div id="cxBody"></div></div>`;
   const q=codexEl.querySelector('#cxQ');q.addEventListener('input',()=>{cxQ=q.value.trim();cxPage=0;renderCxList()});renderCxList()}
 let cxOwn=false;
 function renderCxList(){const PER=60,body=codexEl.querySelector('#cxBody'),cnt=codexEl.querySelector('#cxCount');if(!body)return;
   if(cxTab==='term'){const [n,h]=termListHtml();cnt.textContent=`${n}개 — 증강·고난 카드를 누르면 자세히 볼 수 있어요`;body.innerHTML=h;return}
-  if(cxTab==='aug'){let list=PERKS.filter(p=>(cxTier<0||p.r===cxTier)&&(!cxOwn||AUG_SEEN[p.id]||HID_FOUND[p.id]));
-    list=list.filter(p=>{const known=(ADMV()||AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5));return cxMatch(known?p.n+p.d+RAR[p.r].n:RAR[p.r].n+(p.hint||''))});
+  if(cxTab==='aug'){let list=PERKS.filter(p=>(!p.sec||ADMV())&&(cxTier<0||p.r===cxTier)&&(!cxOwn||AUG_SEEN[p.id]||HID_FOUND[p.id]));
+    list=list.filter(p=>{const known=(ADMV()||AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5&&p.r!==6));return cxMatch(known?p.n+p.d+RAR[p.r].n:RAR[p.r].n+(p.hint||''))});
     const pages=Math.max(1,Math.ceil(list.length/PER));cxPage=Math.min(cxPage,pages-1);
     cnt.textContent=`${list.length}종${cxQ?` 찾음`:''} · 얻어 본 것 ${list.filter(p=>AUG_SEEN[p.id]||HID_FOUND[p.id]).length}`;
-    body.innerHTML=list.length?`<div class="cx-grid">${list.slice(cxPage*PER,cxPage*PER+PER).map(p=>{const known=(ADMV()||AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5));return known?`<div class="cx-c tm${AUG_SEEN[p.id]?' got':''}" data-term="${p.id}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}</b><small>${RAR[p.r].n}${p.gen?' · 조합':''} · ${p.d}</small></div></div>`:`<div class="cx-c" style="--rc:${RAR[p.r].c}"><span>?</span><div><b>???</b><small>${RAR[p.r].n} · ${p.hint||'아주 드물게 나와요'}</small></div></div>`}).join('')}</div>
+    body.innerHTML=list.length?`<div class="cx-grid">${list.slice(cxPage*PER,cxPage*PER+PER).map(p=>{const known=(ADMV()||AUG_SEEN[p.id]||HID_FOUND[p.id]||(p.r!==4&&p.r!==5&&p.r!==6));return known?`<div class="cx-c tm${AUG_SEEN[p.id]?' got':''}${p.r===5?' myth':''}${p.r===6?' holo':''}" data-term="${p.id}" style="--rc:${RAR[p.r].c}"><span>${p.g}</span><div><b>${p.n}</b><small>${RAR[p.r].n}${p.gen?' · 조합':''} · ${p.d}</small></div></div>`:`<div class="cx-c${p.r===5?' myth':''}${p.r===6?' holo':''}" style="--rc:${RAR[p.r].c}"><span>?</span><div><b>???</b><small>${RAR[p.r].n} · ${p.hint||'아주 드물게 나와요'}</small></div></div>`}).join('')}</div>
     ${pages>1?`<div class="cx-pg"><button type="button" data-pg="-1" ${cxPage?'':'disabled'}>이전</button><span>${cxPage+1} / ${pages}</span><button type="button" data-pg="1" ${cxPage<pages-1?'':'disabled'}>다음</button></div>`:''}`:'<p class="pk-tip">찾는 증강이 없어요. 다른 낱말로 검색해 보세요.</p>'}
   else{const list=HARDS.filter(h=>cxMatch(h.n+h.d(1)+h.d(3)));cnt.textContent=`${list.length}종 — 내 증강과 플레이에 맞춰 적이 적응해요 (1~3단계)`;
     body.innerHTML=list.length?`<div class="cx-grid">${list.map(h=>`<div class="cx-c tm" data-hterm="${h.id}" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><span>${h.g}</span><div><b>${h.n}</b><small>Lv1 ${fmtD(h.d(1/HQ))} → Lv20 ${h.d(5)}</small></div></div>`).join('')}</div>`:'<p class="pk-tip">찾는 고난이 없어요.</p>'}}
@@ -6281,17 +6307,20 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-01b';
+const NOTICE_VER='2026-11-01c';
 const NOTICE=[
+ {v:'2026-11-01 새벽 2',t:'초월 등급 증강 · 홀로그램',items:[
+  '새 등급 「초월」 추가: 신화보다 훨씬 드물게 나오는 초초초희귀 증강 — 나타나면 푸른 홀로그램이 떠올라요',
+  '초월 증강: 별의 심장(체력 +100·피해 +50%·받는 피해 −30%), 되감기(죽을 만큼 맞으면 3초 전으로, 층마다 2번), 종말의 별(8초마다 보이는 모든 적에게 별), 무한 증식(이후 고르는 증강을 하나씩 더)',
+  '그리고 도감에도 없는 봉인된 초월 증강이 하나 더 있다는 소문이…',
+  '도감: 신화 등급이 무지개빛으로, 초월 등급이 홀로그램으로 보여요'] },
  {v:'2026-11-01 새벽',t:'새 보스 6종 · 새 적 7종 · 고난 · 업적 대폭 추가',items:[
   '새 보스 6종: 미노타우로스(돌진·내려찍기·광폭), 리치 왕(순간이동·해골과 유령 소환·원형 탄막), 검투사 왕(회전베기·방어·돌진), 독룡(독 숨결·번개), 타락한 대사제(부하 치유·소환), 고대 거상(바위·번개·내려찍기)',
   '보스 순서 변경: 새 보스가 기존 보스 사이에 섞여 나와요 (총 19종)',
   '새 적 7종: 암살자(반투명·빠름), 석궁병(강한 화살), 창술사(돌진 찌르기), 독 슬라임(죽으면 둘로 갈라짐), 주술사(박쥐 소환), 석상 수호자(단단함·내려찍기), 도깨비불(떠다니며 불덩이)',
   '새 고난 13종: 그림자 습격, 점액 범람, 석상 행렬, 도깨비불 무리, 주술 결사, 석궁 매복, 불타는 땅, 시한폭탄, 포위 압박, 흡혈 적, 협공, 최후의 발악, 보스 질주 + 새 적마다 맷집·독기·민첩·방호·증원 고난 35종',
   '업적 24개 추가 (총 48개): 40·50층, 누적 처치 5000·20000, 모든 보스·모든 적 처치, 무기 장인, 명궁, 사신, 무결, 역경 등 · 숨겨진 업적도 있어요',
-  '카두세우스: 형상이 바뀔 때 화면 가운데 뜨던 문구를 없앴어요',
-  '운영자 무기 「신의 심판」: 닿으면 보스까지 즉사 (랭크전 제외)',
-  '운영 창에 운영자용 건의함: 모든 사람의 건의를 안 읽음·종류별로 보고, 바로 답장 · 처리함 · 삭제'] },
+  '카두세우스: 형상이 바뀔 때 화면 가운데 뜨던 문구를 없앴어요'] },
  {v:'2026-11-01',t:'설정 통합 · 공지 개편 · 건의함 · 새 증강 26종',items:[
   '설정을 한 창으로 묶음: 화면 · 조작 · 소리 · 글자 화면 탭 (전체 화면, 마우스 감도, 효과음·음성 크기 추가)',
   'UI 크기 추가: 자동이면 화면 크기에 맞춰 버튼·글자·창 크기가 바뀌어요 (설정 → 화면 → UI 크기)',
@@ -6429,12 +6458,13 @@ function renderOps(){const q=opsQ.trim().toLowerCase(),GN=k=>(GMS[k]||{}).n||k||
     body=sugAll?`<div class="ops-f">${F.map(([k,n])=>`<button type="button" data-opsf="${k}" aria-pressed="${k===opsSugF}">${n}</button>`).join('')}</div>
     <div class="sug-list adm">${L.map(m=>`<div class="sug-it${m.d?' done':''}"><b>${CAT[m.c]||''}</b><span>${esc(m.x)}</span><small>${m.a?'익명':esc(m.n||'익명')} · ${fmtT(m.t)} (${agoT(m.t)}) · ${esc(m.v||'')}${m.m?' · 모바일':''}${m.d?' · 처리함':''}</small>${m.re?`<div class="sug-re"><b>보낸 답변</b><span>${esc(m.re.x)}</span><small>${fmtT(m.re.t)}</small></div>`:''}<div class="sug-reply"><input data-sugin="${esc(m.k)}" maxlength="300" placeholder="${m.re?'답변 고치기':'답변 쓰기 (Enter로 보내기)'}" autocomplete="off"><button type="button" class="mini" data-sugre="${esc(m.k)}">답변 보내기</button></div><div class="sug-act"><button type="button" class="mini" data-sugd="${esc(m.k)}">${m.d?'안 읽음으로':'처리함'}</button><button type="button" class="mini" data-sugx="${esc(m.k)}">삭제</button></div></div>`).join('')||'<p class="pk-tip">해당하는 건의가 없어요</p>'}</div>`:'<p class="pk-tip">불러오는 중…</p>'}
   opsEl.innerHTML=`<div class="nt-card wide"><div class="nt-head"><b>운영 <small>운영자만 보여요</small></b><button type="button" class="mini" data-opsx>닫기</button></div>
-  <div class="nt-tabs">${[['users','신규 유저'],['log','대전 전적'],['sug','건의함']].map(([k,n])=>`<button type="button" data-opst="${k}" aria-selected="${k===opsTab}">${n}</button>`).join('')}<span style="flex:1"></span><button type="button" data-opsr>새로고침</button></div>
+  <div class="nt-tabs">${[['users','신규 유저'],['log','대전 전적'],['sug','건의함']].map(([k,n])=>`<button type="button" data-opst="${k}" aria-selected="${k===opsTab}">${n}</button>`).join('')}<span style="flex:1"></span><button type="button" data-opsaug>증강 고르기 (\\)</button><button type="button" data-opsr>새로고침</button></div>
   <div class="nt-body"><div class="nt-search"><input id="opsQ" type="search" placeholder="${opsTab==='sug'?'내용 · 아이디로 찾기':'아이디'+(opsTab==='log'?' · 방 번호':'')+'로 찾기'}" value="${esc(opsQ)}" autocomplete="off"></div>${body}</div></div>`;
   const qi=opsEl.querySelector('#opsQ');qi.addEventListener('input',()=>{opsQ=qi.value;const pos=qi.selectionStart;renderOps();const q2=opsEl.querySelector('#opsQ');q2.focus();try{q2.setSelectionRange(pos,pos)}catch(e){}});qi.addEventListener('keydown',e=>e.stopPropagation());opsEl.querySelectorAll('[data-sugin]').forEach(i=>i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'){const b=opsEl.querySelector(`[data-sugre="${i.dataset.sugin}"]`);if(b)b.click()}}))}
 function openOps(tab){if(!ADMV()){say('운영자만 쓸 수 있어요',1.4);return}if(tab)opsTab=tab;opsEl.hidden=false;renderOps();opsLoad();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
 opsEl.addEventListener('click',e=>{if(e.target===opsEl){opsEl.hidden=true;return}const b=e.target.closest('button,tr[data-ouid]');if(!b)return;
   if(b.dataset.opsx!==undefined){opsEl.hidden=true;return}
+  if(b.dataset.opsaug!==undefined){if(!AUGON()||!(state==='play'||state==='paused'||state==='clear'||state==='aug')){say('혼자 하기나 증강 대전 중에 열 수 있어요',1.8);return}opsEl.hidden=true;admAugEl.hidden=false;renderAdmAug();try{document.exitPointerLock()}catch(_){}return}
   if(b.dataset.opst){opsTab=b.dataset.opst;renderOps();opsLoad();return}
   if(b.dataset.opsf){opsSugF=b.dataset.opsf;renderOps();return}
   if(b.dataset.sugre||b.dataset.sugd||b.dataset.sugx)return opsSugAct(b);
@@ -6642,7 +6672,7 @@ function nxHit(t,d,zone){if(!t||!t.T)return;t._nxH=(t._nxH|0)+1;
   if(PS('nxStatic')&&rand()<PS('nxStatic')){let b=null,bd=6;for(const o of enemies){if(o.dead||o===t)continue;const dd=Math.hypot(o.x-t.x,o.y-t.y);if(dd<bd&&los(t.x,t.y,o.x,o.y)){bd=dd;b=o}}if(b){nxBolt(b,Math.max(1,d*.5));sfx('hit')}}
   if(PS('nxEcho')&&zone==='head'&&rand()<PS('nxEcho')){const x=t;setTimeout(()=>{try{if(!x.dead){damage(x,Math.max(.5,d*.4),0,0,false);dmgNum(x,x.T.h,d*.4,'head',false)}}catch(e){}},120)}
   if(PS('nxFrost')&&time>NX.novaT){NX.novaT=time+8;for(const o of enemies){if(o.dead||Math.hypot(o.x-t.x,o.y-t.y)>3)continue;o.slow=Math.max(o.slow||0,2);o.stun=Math.max(o.stun||0,o.T.boss?.3:1.2);burst(o.x,o.y,.5,6,'얼',195,70,80,1,1.5,.5,.07,0,false)}sfx('crate')}}
-function nxKill(e,zone){if(!e||!e.T)return;
+function nxKill(e,zone){if(!e||!e.T)return;if(PS('uxScale')&&SOLO())score+=(e.T.score|0)*2;
   if(PS('nxKheal'))hp=Math.min(MAXHP(),hp+PS('nxKheal')*healMul());
   if(PS('nxScrap')&&rand()<PS('nxScrap'))armor=Math.min(100,armor+5);
   if(PS('nxElite')&&(e.elite||e.T.boss)){hp=Math.min(MAXHP(),hp+15*healMul());NX.eliteT=time+5}
@@ -6657,6 +6687,29 @@ function nxTick(dt){if(!AUGON()||state!=='play'||hp<=0)return;
   if(PS('nxSecond')&&hp<MAXHP()*.3&&NX.secondFloor!==level){NX.secondFloor=level;hp=Math.min(MAXHP(),hp+30*healMul());say('두 번째 바람!',1)}
   if(PS('nxMist')){let n=0;for(const o of enemies)if(!o.dead&&Math.hypot(o.x-P.x,o.y-P.y)<3)n++;if(n)hp=Math.min(MAXHP(),hp+PS('nxMist')*n*dt*healMul())}
   if(PS('nxStorm')&&time>NX.stormT){NX.stormT=time+2.5;let b=null,bd=9;for(const o of enemies){if(o.dead)continue;const d=Math.hypot(o.x-P.x,o.y-P.y);if(d<bd&&los(P.x,P.y,o.x,o.y)){bd=d;b=o}}if(b){nxBolt(b,(3+level*.25)*(1+.25*loop));sfx('boom')}}}
+// ================= 초월 증강 (초초초희귀 · 홀로그램) =================
+RAR.push({n:'초월',c:'#8fe8ff'});TIERW.push(14);
+PERKS.push(
+ {id:'uxStar',n:'별의 심장',g:'별',r:6,d:'최대 체력 +100, 모든 피해 +50%, 받는 피해 −30%',s:{hp:100,dmg:.5,tough:.3},solo:1},
+ {id:'uxRewind',n:'되감기',g:'되',r:6,d:'죽을 만큼 맞으면 3초 전의 체력과 자리로 되돌아가요 (층마다 2번)',s:{uxRewind:2},solo:1},
+ {id:'uxDoom',n:'종말의 별',g:'종',r:6,d:'8초마다 보이는 모든 적에게 별이 떨어져요 (보스는 최대 체력 8%, 나머지는 30%)',s:{uxDoom:1},solo:1},
+ {id:'uxEcho',n:'무한 증식',g:'증',r:6,d:'이후 고르는 증강을 하나씩 더 받아요',s:{uxEcho:1},solo:1},
+ {id:'uxScale',n:'태초의 저울',g:'저',r:6,sec:1,d:'모든 적의 체력 15배, 내 피해 15배, 처치 점수 3배 — 백만의 상처에 닿는 유일한 길',s:{uxScale:1},solo:1});
+for(const p of PERKS)PMAP[p.id]=p;
+const UX={t:0,hist:[],doomT:0};
+function uxRoll(out,pvp,lk){if(pvp)return;try{
+  const sc=PMAP.uxScale;if(sc&&!PK.uxScale&&level>=2&&out.length<4&&rand()<.0018+.0012*lk){out.push(sc);holoAnnounce(sc,true);return}
+  const ux=PERKS.filter(p=>p.r===6&&!p.sec&&!PK[p.id]);if(ux.length&&out.length<4&&rand()<.0045+.003*lk+.004*Math.min(1,level/25)){const p=ux[(rand()*ux.length)|0];out.push(p);holoAnnounce(p)}}catch(e){}}
+function uxTick(dt){if(!AUGON()||state!=='play'||hp<=0)return;
+  if(PS('uxRewind')){UX.t+=dt;if(UX.t>.2){UX.t=0;UX.hist.push({tm:time,hp,x:P.x,y:P.y});while(UX.hist.length&&time-UX.hist[0].tm>3.2)UX.hist.shift()}}
+  if(PS('uxDoom')){UX.doomT-=dt;if(UX.doomT<=0){UX.doomT=8;let n=0;for(const o of enemies){if(o.dead||Math.hypot(o.x-P.x,o.y-P.y)>18||!los(P.x,P.y,o.x,o.y))continue;n++;const v=(o.max||o.T.hp)*(o.T.boss?.08:.3);for(let z=3;z>.2;z-=.3)burst(o.x,o.y,z,1,'별',195,90,80,1,.3,.3,.08,0,false);burst(o.x,o.y,.3,10,'광',195,100,75,1,2.4,.5,.08,0,false);damage(o,v,0,0,false);try{dmgNum(o,o.T.h,v,'body',true)}catch(e){}}if(n){sfx('boom');flashW=Math.max(flashW||0,.15);slashText=.6;slashMsg='종말의 별'}}}}
+function uxHurt(d){if(!PS('uxRewind')||hp-d>0||(RUN.rwN|0)>=PS('uxRewind'))return d;const s0=UX.hist[0];RUN.rwN=(RUN.rwN|0)+1;
+  hp=Math.max(s0?s0.hp:0,MAXHP()*.35);if(s0&&!blocked(s0.x,s0.y,.25,null)){P.x=s0.x;P.y=s0.y}inv=Math.max(inv||0,1.2);UX.hist=[];
+  holoFlash('되감기',`${PS('uxRewind')-RUN.rwN}번 남음`);sfx('exit');return -1}
+// 홀로그램 연출
+const holoEl=document.createElement('div');holoEl.id='holoFx';holoEl.hidden=true;document.getElementById('stage').appendChild(holoEl);let holoT=0;
+function holoAnnounce(p,secret){holoEl.innerHTML=`<div class="hb"><div class="cone"></div><div class="hg">${esc(p.g)}</div><div class="ht"><small>${secret?'봉인된 기록 감지':'초월 증강 감지'}</small><b>${esc(p.n)}</b></div><i class="ring r1"></i><i class="ring r2"></i></div>`;holoEl.hidden=false;holoEl.classList.remove('out');void holoEl.offsetWidth;holoEl.classList.add('in');try{sfx('exit')}catch(e){}clearTimeout(holoT);holoT=setTimeout(()=>{holoEl.classList.add('out');setTimeout(()=>{holoEl.hidden=true},500)},2600)}
+function holoFlash(a,b){holoAnnounce({g:a[0],n:a+(b?' · '+b:'')})}
 // ================= 무기 전용 증강 (그 무기를 들고 있을 때만 나옴) =================
 // dmg 피해 · rof 연사 · rld 장전 · crit 치명타 확률 · head 머리 피해 · mspd 휘두르기 속도 · 맞힐 때: pois 중독 burn 화상 slow 둔화 stun 기절 heal 회복 ammo 탄 돌려받기 quake 충격파 · kheal 처치 회복
 const WAUGS={
