@@ -518,7 +518,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
       <button class="pb fireL" data-k="Fire" type="button">공격</button>
       <button class="pb big jump" data-k="Space" type="button">점프</button>
       <button class="pb tog crouch" data-t="KeyC" aria-pressed="false" type="button">앉기</button>
-      <button class="pb tog aim gun" data-t="KeyV" aria-pressed="false" type="button">조준</button>
+      <button class="pb tog aim gun" data-t="TouchAim" aria-pressed="false" type="button">조준</button>
       <button class="pb reload gun" data-k="KeyR" type="button">장전</button>
       <button class="pb mel block" data-k="KeyZ" type="button">막기</button>
       <button class="pb mel dashb" data-k="KeyE" type="button">돌진</button>
@@ -532,9 +532,9 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
       <h1 id="ovTitle">글자 던전</h1>
       <p class="sub" id="ovSub">모든 것이 글자로 된 실외 전장</p>
       <p id="ovText"><span class="touch-help">왼쪽 화면을 누르고 끌어서 이동 · 오른쪽 화면을 끌어서 둘러보기 · <b>공격</b>·<b>점프</b> 버튼을 누른 채 끌면 그대로 조준<br>아래 가운데 칸을 눌러 무기 바꾸기·아이템 쓰기 · 조준·앉기는 한 번 눌러 켜고 다시 눌러 꺼요 · 위쪽 <b>메뉴</b>에서 시점 감도·전체 화면<br>머리·몸통·다리마다 피해가 달라요 · 바닥의 ◆ 아이템은 <b>아이템</b> 버튼으로 사용</span><span class="key-help"><kbd>W A S D</kbd> 이동 · <kbd>마우스</kbd>/<kbd>← →</kbd> 회전 · <kbd>클릭</kbd>/<kbd>Enter</kbd> 공격 · <kbd>Space</kbd> 점프 · <kbd>C</kbd> 웅크리기 (상자 위로 점프해서 올라설 수 있어요)<br>
-        <b style="color:#9fd8ff">검술</b> 연타 = 베기→역베기→찌르기 · 길게 눌렀다 놓기 = 회전베기 · <kbd>E</kbd> 돌진베기 · <kbd>Z</kbd>(검 들고 우클릭) 막기 (맞기 직전에 막으면 튕겨내기)<br>
-        <b style="color:#ffc857">총</b> <kbd>우클릭</kbd>/<kbd>V</kbd> 조준 · <kbd>R</kbd> 장전 · 스나이퍼 조준 중 <kbd>Shift</kbd> 숨 참기 · <b style="color:#ffc857">활</b> 길게 당겼다 놓기, 박힌 화살은 다시 주울 수 있음<br>
-        <kbd>Y</kbd> 총 구경 · <kbd>.</kbd> 스킨 고르기 · <kbd>,</kbd> 다음 스킨 · <kbd>1</kbd> 주무기 <kbd>2</kbd> 보조무기 <kbd>3</kbd> 근접 · <kbd>B</kbd> 무기 선택 · <kbd>G</kbd> 수류탄 <kbd>H</kbd> 섬광탄 · 페인트총 <kbd>X</kbd> 색 바꿈 · <kbd>Q</kbd>/휠 무기 바꿈 · <kbd>P</kbd> 일시정지<br><kbd>F</kbd> 손전등 · <kbd>N</kbd> 밝기 · 위쪽 메뉴 <b>그래픽</b>에서 <b>3D 세미 리얼</b>·<b>3D 던전 리얼</b>을 고를 수 있고, 눈이 아프면 <b>혼합 1·2</b>나 <b>블록</b>으로 · <kbd>Tab</kbd> 전체 지도 · <kbd>Shift</kbd> 달리기 · <kbd>[</kbd> <kbd>]</kbd> 마우스 감도 · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> 위아래 보기 · <kbd>Home</kbd> 시선 정면<br>
+        <b style="color:#9fd8ff">검술</b> 연타 = 무기마다 다른 연속 동작 (검 베기→역베기→찌르기 · 도끼·망치·대검 내려찍기→가로베기 · 낫 크게 휘두르기 · 단검·레이피어 찌르기 위주 · 태도 빠른 가로베기 · 광선검 회전베기) · 길게 눌렀다 놓기 = 회전베기 · <kbd>E</kbd> 돌진베기 · <kbd>Z</kbd>(검 들고 우클릭) 막기 (맞기 직전에 막으면 튕겨내기)<br>
+        <b style="color:#ffc857">총</b> <kbd>우클릭</kbd> 조준 · <kbd>R</kbd> 장전 · 스나이퍼 조준 중 <kbd>Shift</kbd> 숨 참기 · <b style="color:#ffc857">활</b> 길게 당겼다 놓기, 박힌 화살은 다시 주울 수 있음<br>
+        <kbd>Y</kbd> 총 구경 · <kbd>.</kbd> 스킨 고르기 · <kbd>,</kbd> 다음 스킨 · <kbd>1</kbd> 주무기 <kbd>2</kbd> 보조무기 <kbd>3</kbd> 근접 · <kbd>B</kbd> 무기 선택 · <kbd>G</kbd> 수류탄 <kbd>H</kbd> 섬광탄 · 페인트총 <kbd>X</kbd> 색 바꿈 · <kbd>Q</kbd>/휠 무기 바꿈 · <kbd>P</kbd> 일시정지 · 대전 <kbd>/</kbd> 채팅 · <kbd>V</kbd> 음성 마이크 끄고 켜기<br><kbd>F</kbd> 손전등 · <kbd>N</kbd> 밝기 · 위쪽 메뉴 <b>그래픽</b>에서 <b>3D 세미 리얼</b>·<b>3D 던전 리얼</b>을 고를 수 있고, 눈이 아프면 <b>혼합 1·2</b>나 <b>블록</b>으로 · <kbd>Tab</kbd> 전체 지도 · <kbd>Shift</kbd> 달리기 · <kbd>[</kbd> <kbd>]</kbd> 마우스 감도 · <kbd>PgUp</kbd>/<kbd>PgDn</kbd> 위아래 보기 · <kbd>Home</kbd> 시선 정면<br>
         <b style="color:#5ff0c8">아이템</b> 바닥의 빛나는 ◆를 주워 <kbd>4</kbd> <kbd>5</kbd> <kbd>6</kbd>(또는 <kbd>T</kbd>)로 사용 · 산데비스탄·무적·도약·신속·광폭·재생·은신·무한탄<br>
         마우스가 잠기지 않는 화면에서는 끌어서 둘러볼 수 있어요<br>
         머리·몸통·다리마다 피해가 달라요. 다리를 맞히면 적이 느려지고, 멀수록 약해집니다. 스나이퍼는 모든 명중이 치명타<br>
@@ -1590,7 +1590,7 @@ document.addEventListener('pointerlockchange',()=>{
 
 // ================= 무기 =================
 const SLOTS=()=>[primary,secondary,melee];
-function switchTo(i){if(i<0||!SLOTS().includes(i)||i===cur)return;cur=i;inspT=-1;switchT=.32;atkT=9;reload=null;snpRel=null;arRel=null;gmRel=null;atkHeld=false;drawing=false;bowDraw=0;GS.y=6;GS.vy=0;GS.r=.3;GS.vr=0}
+function switchTo(i){if(i<0||!SLOTS().includes(i)||i===cur)return;cur=i;inspT=-1;switchT=.32*(i===secondary&&AUGON()?Math.max(.3,1-PS('sSwap')):1);if(AUGON()&&PS('swapBuff'))swapBuffT=time+2;atkT=9;reload=null;snpRel=null;arRel=null;gmRel=null;atkHeld=false;drawing=false;bowDraw=0;GS.y=6;GS.vy=0;GS.r=.3;GS.vr=0}
 function spawnBrass(red,n,drop){
   for(let i=0;i<n;i++){const s=P.a+(drop?0:1.1)+(rand()-.5)*.8;brass.push({x:P.x+Math.cos(P.a)*.38+Math.cos(P.a+1.57)*.16,y:P.y+Math.sin(P.a)*.38+Math.sin(P.a+1.57)*.16,z:drop?.38:.45,
     vx:Math.cos(s)*(drop?.25:1.5)+(rand()-.5)*.4,vy:Math.sin(s)*(drop?.25:1.5)+(rand()-.5)*.4,vz:drop?-.2:1.4+rand()*.8,red,life:40})}
@@ -1761,13 +1761,22 @@ function attackUp(){
   if(held>=.6&&state==='play')swordSpin();
 }
 function startAct(type,dur,o){act=Object.assign({type,t:0,dur,hit:false,hit2:false,queued:false},o||{});if(type!=='block')trail=[]}
+// 근접무기 종류별 동작
+function mStyle(w){if(!w)return 'sword';const n=w.name;if(w.dual)return 'dual';if(w.scythe)return 'reap';if(w.rapier)return 'pierce';if(w.saber)return 'saber';if(w.great||n==='도끼'||n==='망치'||n==='몽둥이')return 'heavy';if(n==='단검')return 'quick';if(n==='태도')return 'iai';return 'sword'}
+const M_HEAVY=w=>!!w&&w.melee&&mStyle(w)==='heavy'||!!(w&&w.scythe),M_LIGHT=w=>!!w&&w.melee&&['quick','pierce','iai','dual','sword','saber'].includes(mStyle(w)),M_PIERCE=w=>!!w&&w.melee&&['quick','pierce'].includes(mStyle(w));
 function swordSlash(){
   if(switchT>0)return;
   if(act&&act.type!=='block'){if((act.type==='slash'||act.type==='thrust')&&act.t>act.dur*.45)act.queued=true;return}
   if(atkCd>0)return;
   combo=(time-lastSlash<.5)?(combo+1)%3:0;
-  const ms=(WEAP[cur].mspd||1)*(AUGON()?Math.max(.5,1-PS('meleeSpd')):1);
-  if(WEAP[cur].spear){if(combo===2)startAct('thrust',.36,{});else startAct('slash',.3,{side:combo===1?1:-1})}
+  const W_=WEAP[cur],ms=(W_.mspd||1)*(AUGON()?Math.max(.45,1-PS('meleeSpd')-(M_LIGHT(W_)?PS('mLight'):0)):1),st=mStyle(W_);
+  if(W_.spear){if(combo===2)startAct('thrust',.36,{});else startAct('slash',.3,{side:combo===1?1:-1})}
+  else if(st==='heavy'){if(combo===1)startAct('slash',.3*ms,{side:1,st:'sweep'});else startAct('slash',.36*ms,{side:combo===2?1:-1,st:'chop',hk:.5})}
+  else if(st==='reap'){if(combo===2)startAct('slash',.36*ms,{side:1,st:'chop',hk:.5});else startAct('slash',.32*ms,{side:combo===1?1:-1,st:'reap',hk:.42})}
+  else if(st==='quick'){if(combo===1)startAct('slash',.2*ms,{side:1,st:'quick',hk:.3});else startAct('thrust',.22*ms,{st:'stab',hk:.3})}
+  else if(st==='pierce'){if(combo===2)startAct('slash',.22*ms,{side:1,st:'flick',hk:.32});else startAct('thrust',.24*ms,{st:'lunge',hk:.34})}
+  else if(st==='iai'){if(combo===2)startAct('thrust',.28*ms,{});else startAct('slash',.24*ms,{side:combo===1?1:-1,st:'iai',hk:.3})}
+  else if(st==='saber'){if(combo===2)startAct('slash',.36*ms,{side:1,st:'twirl',hk:.4});else startAct('slash',.25*ms,{side:combo===1?1:-1,st:'saber'})}
   else if(combo===2)startAct('thrust',.3*ms,{});else startAct('slash',.26*ms,{side:combo===1?1:-1});
   sfx('swing');netEmit({t:'sw'});
 }
@@ -1789,7 +1798,7 @@ function updateSword(dt){
   else{blockHeld=0;if(act&&act.type==='block')act=null}
   if(!act||act.type==='block')return;
   act.t+=dt;const k=act.t/act.dur;
-  if(act.type!=='dash'&&!act.hit&&k>=(act.type==='spin'?.2:.36)){act.hit=true;swordHit(act.type)}
+  if(act.type!=='dash'&&!act.hit&&k>=(act.type==='spin'?.2:(act.hk||.36))){act.hit=true;swordHit(act.type)}
   if(act.type==='spin'&&!act.hit2&&k>=.66){act.hit2=true;swordHit('spin')}
   if(act.type==='dash'){
     const sp=9*dt,fx=Math.cos(P.a),fy=Math.sin(P.a);
@@ -1801,7 +1810,7 @@ function updateSword(dt){
 }
 function swordHit(type,second){
   const SP=WEAP[cur].spear,MW_=WEAP[cur],AU=AUGON();
-  const reach=(MW_.mreach||1)*(1+PS('reach'))*(SP?(type==='thrust'?2.8:type==='spin'?2.3:2.5):type==='thrust'?2.15:type==='spin'?2:1.75)*(type==='spin'&&AU?1+PS('spinPow')*.43:1);
+  const reach=(MW_.mreach||1)*(1+PS('reach')+(AUGON()&&M_HEAVY(MW_)?PS('mWide'):0))*(SP?(type==='thrust'?2.8:type==='spin'?2.3:2.5):type==='thrust'?2.15:type==='spin'?2:1.75)*(type==='spin'&&AU?1+PS('spinPow')*.43:1);
   let arc=SP?(type==='spin'?Math.PI:.3):type==='thrust'?.3:type==='spin'?Math.PI:.85;if(MW_.scythe&&type!=='spin')arc=Math.min(Math.PI,arc*1.7);
   let dmgB=(SP?(type==='thrust'?3.4:type==='spin'?2.4:2.1):type==='thrust'?2.6:type==='spin'?3:1.6)*(1+.25*loop)*(fxOn(5)?2:1)*(MW_.mdmg||1);
   if(MW_.rapier&&type==='thrust')dmgB*=1.6;
@@ -1816,7 +1825,7 @@ function swordHit(type,second){
     let dd=dmgB*zm*(AU&&(t.T||t.remote)?perkDmgMul(t,zone,MW_,{})*perkExtraMul(t,zone,MW_,{}):1);if(SOLO()&&t.T)dd*=Math.max(.3,1-.1*HL('parry'));
     if(SOLO()&&t.T&&rand()<Math.min(.6,.12*HL('sMelee'))){hitFx(t,'튕겨냄! (검의 시련)');sfx('block');continue}
     if(t.T&&t.T.shield&&zone!=='head'&&!(t.stun>0)&&type!=='spin'){dd*=PS('pierce')?.6:.35;sfx('block')}
-    let crit=false;if(AU&&t.T&&rand()<PS('meleeCrit')+(MW_.rapier?.12:0)+(SOLO()?PS('crit'):0)){crit=true;dd*=2}
+    let crit=false;if(AU&&t.T&&rand()<PS('meleeCrit')+(MW_.rapier?.12:0)+(type==='thrust'&&M_PIERCE(MW_)?PS('mPierceCrit'):0)+(SOLO()?PS('crit'):0)){crit=true;dd*=2}
     lastZone=zone;damage(t,dd,dx/(d||1),dy/(d||1),true);lastZone='body';hits++;if(t.T){dmgNum(t,zone==='head'?t.T.h*.9:zone==='legs'?t.T.h*.25:t.T.h*.55,dd,zone,crit);if(zone==='legs')t.slow=Math.max(t.slow||0,1.2*(PS('legs')?2:1));if(zone==='head'&&!t.T.ghost)burst(t.x,t.y,t.T.h*.9,6,'피',0,85,40,0,2.2,.6,.07,5,true)}
     if(t.T){t.stun=Math.max(t.stun||0,(type==='thrust'?.55:type==='spin'?.8:.4)*(MW_.mstun||1)*(1+(AU?PS('meleeStun'):0)));t.wind=0;hitFx(t,(zone==='head'?'머리 ':zone==='legs'?'다리 ':'')+(crit?'치명 베기!':type==='thrust'?'찌르기!':type==='spin'?'회전베기!':second?'쌍검 베기!':combo===1?'역베기!':'베기!'));
       if(AU&&!t.dead){perkOnHit(t,dd,'body');const bl=PS('meleeBleed');if(bl){t.pois=Math.min(6,(t.pois||0)+bl);t.poisT=4}}
@@ -2386,7 +2395,7 @@ function update(dt){
   for(let i=dmgNums.length-1;i>=0;i--){dmgNums[i].life-=dt;if(dmgNums[i].life<=0)dmgNums.splice(i,1)}
   if(arRel){const r=arRel;r.t+=dt*perkRld();if(!r.a&&r.t>=.08){r.a=1;sfx('magOut')}if(!r.b&&r.t>=.85){r.b=1;sfx('magIn')}if(r.empty&&!r.c&&r.t>=1.15){r.c=1;sfx('bolt1')}
     if(r.t>=(r.empty?1.35:1.1)){const n=Math.min(30-arMag,arRes);arMag+=n;arRes-=n;arRel=null;say('장전 완료',.6)}}
-  aiming=!!((keys.Mouse2||keys.KeyV)&&(cur===0||cur===1||cur===3||cur===5||cur===6||cur===8||WEAP[cur].gen)&&!reload&&!snpRel&&!arRel&&!gRel&&!gmRel&&switchT===0&&!(cur===3&&snpBolt&&snpBolt.t>=0));
+  aiming=!!((keys.Mouse2||keys.TouchAim)&&(cur===0||cur===1||cur===3||cur===5||cur===6||cur===8||WEAP[cur].gen)&&!reload&&!snpRel&&!arRel&&!gRel&&!gmRel&&switchT===0&&!(cur===3&&snpBolt&&snpBolt.t>=0));
   if(cur===4){bowCd=Math.max(0,bowCd-dt);if(drawing){const was=bowDraw;bowDraw=Math.min(1,bowDraw+dt/.7);if(was<1&&bowDraw>=1)bowFull=time}}else drawing=false;
   if(snpBolt){const b=snpBolt;b.t+=dt;if(b.t>=0&&!b.s1){b.s1=1;sfx('bolt1')}
     if(b.t>=.3&&!b.ej){b.ej=1;sfx('bolt2');const pos=revCylScreen();scr.push({x:pos[0],y:pos[1],vx:220+rand()*120,vy:-300-rand()*100,rot:rand()*3,vr:(rand()-.5)*14,life:1.4,red:false});spawnBrass(false,1,false)}
@@ -3785,12 +3794,24 @@ R.drawView=(draw)=>{
     else{if(charging&&!act&&time-chargeStart>.15){const c=Math.min(1,(time-chargeStart)/.6);rX-=.6*c;rZ+=.5*c;if(c>=1)px+=Math.sin(time*40)*.003}
       if(blocking||(act&&act.type==='block')){rX=-.2;rY=1.3;rZ=1.45;px=-.12;py=.08}
       if(act){const kk=Math.min(1,act.t/act.dur),e3=1-Math.pow(1-kk,3);
-        if(act.type==='slash'){const sd=act.side<0?-1:1;rY=.3;rX=-.6-.6*Math.sin(kk*PI);rZ=sd>0?(1.6-3.2*e3):(-1.6+3.2*e3);px=sd>0?(.05-.3*e3):(-.25+.3*e3);py=.05*Math.sin(kk*PI);pz=-.05*Math.sin(kk*PI)}
-        else if(act.type==='thrust'){const f=kk<.45?Math.sin(kk/.45*PI/2):1-(kk-.45)/.55;rX=-1.45;rY=0;rZ=0;px=-.08;pz=-.25*f;py=.05}
+        if(act.type==='slash'){const sd=act.side<0?-1:1,st=act.st;
+          if(st==='chop'){// 머리 위로 들었다가 내려찍기
+            const up=kk<.3?easeIO(kk/.3):1,dn=kk<.3?0:1-Math.pow(1-(kk-.3)/.7,4);rX=-.85+1.55*up-2.35*dn;rY=.12;rZ=.35-.25*up;px=-.06-.04*dn;py=.12*up-.16*dn;pz=.04*up-.14*dn}
+          else if(st==='sweep'){const ee=kk<.15?0:1-Math.pow(1-(kk-.15)/.85,3);rX=-1.4;rZ=sd*.35;rY=sd*(1.1-2.2*ee);px=sd>0?(.03-.28*ee):(-.25+.28*ee);py=.06;pz=-.06*Math.sin(kk*PI)}
+          else if(st==='reap'){// 크게 가로로 휘두르기
+            const ee=kk<.18?-.12*Math.sin(kk/.18*PI/2):(1-Math.pow(1-(kk-.18)/.82,3));rX=-1.25-.15*Math.sin(kk*PI);rY=sd*(1.25-2.5*Math.max(0,ee))*-1;rZ=sd>0?(1.75-3.5*Math.max(0,ee)):(-1.75+3.5*Math.max(0,ee));px=sd>0?(.08-.36*Math.max(0,ee)):(-.28+.36*Math.max(0,ee));py=-.03;pz=-.08*Math.sin(kk*PI)}
+          else if(st==='iai'){// 칼집에서 뽑듯 빠른 수평 베기
+            const e5=1-Math.pow(1-kk,5);rX=-1.5;rZ=sd*.25;rY=sd*(1.15-2.3*e5);px=sd>0?(.04-.3*e5):(-.26+.3*e5);py=.07;pz=-.05*Math.sin(kk*PI)}
+          else if(st==='quick'||st==='flick'){// 손목만 짧게 튕기기
+            const e4=1-Math.pow(1-kk,4);rX=-1.1-.2*Math.sin(kk*PI);rY=.15;rZ=.9-1.6*e4;px=.02-.16*e4;py=.03*Math.sin(kk*PI);pz=-.12*Math.sin(kk*PI)}
+          else if(st==='twirl'){// 손안에서 한 바퀴 돌리고 베기
+            rY=.3;rX=-.7-.5*Math.sin(kk*PI);rZ=1.6-(3.2+PI*2)*e3;px=.05-.3*e3;py=.06*Math.sin(kk*PI);pz=-.06*Math.sin(kk*PI)}
+          else{rY=.3;rX=-.6-.6*Math.sin(kk*PI);rZ=sd>0?(1.6-3.2*e3):(-1.6+3.2*e3);px=sd>0?(.05-.3*e3):(-.25+.3*e3);py=.05*Math.sin(kk*PI);pz=-.05*Math.sin(kk*PI);if(st==='saber')act.tw=sd*e3*PI}}
+        else if(act.type==='thrust'){const f=kk<.45?Math.sin(kk/.45*PI/2):1-(kk-.45)/.55,lg=act.st==='lunge'?1.45:act.st==='stab'?.75:1;rX=-1.45;rY=0;rZ=act.st==='stab'?.25:0;px=-.08+(act.st==='stab'?.05:0);pz=-.25*f*lg;py=.05-(act.st==='lunge'?.03*f:0)}
         else if(act.type==='spin'){const e=easeIO(kk);rX=-1.2;rZ=0;rY=e*PI*2;px=-.1;py=.05}
         else if(act.type==='dash'){rX=-1.3;rZ=0;px=-.08;pz=-.1}}}
     if(w.dual&&!act&&!charging&&!blocking){rZ=.16;rX=-1.0;px+=.03}
-    let bsp=0;
+    let bsp=act&&act.tw?act.tw:0;
     if(insp!==null&&!w.spear&&!act&&!blocking&&!charging){const t=insp,e=easeIO,up=t<.4?e(t/.4):t>2.9?1-e((t-2.9)/.4):1;
       const dl=w.dual;let tX=dl?-.35:-.08,tY=dl?.15:.3,tZ=dl?.55:1.35,tx=dl?-.04:-.1,ty=dl?.1:.21,tz=dl?.02:.05;if(vm.scy){tx+=.24;tz-=.14}
       if(t>.4&&t<1.1){const k=(t-.4)/.7;tX+=.22*Math.sin(k*PI);tx+=.03*Math.sin(k*PI)}
@@ -4147,8 +4168,13 @@ function swordPose(){
   if(charging&&!act&&time-chargeStart>.15){const c=Math.min(1,(time-chargeStart)/.6);rot=.12-c*.55;px=W*(.74+c*.03);py=H*(1.03-c*.07)+(c>=1?Math.sin(time*40)*2:0)}
   if(act){const k=Math.min(1,act.t/act.dur),e=1-Math.pow(1-k,3);
     switch(act.type){
-      case 'slash':if(act.side<0){rot=.85-2.9*e;px=W*(.8-.42*e)}else{rot=-2.05+2.9*e;px=W*(.36+.42*e)}py=H*(1.0-.2*Math.sin(k*Math.PI));break;
-      case 'thrust':{const f=k<.45?Math.sin(k/.45*Math.PI/2):1-(k-.45)/.55;rot=-.78;px=W*(.68-.12*f);py=H*(1.03-.3*f);sc=1-.28*f;break}
+      case 'slash':{const st=act.st,sd=act.side<0?-1:1;
+        if(st==='chop'){const up=k<.3?Math.sin(k/.3*Math.PI/2):1,dn=k<.3?0:1-Math.pow(1-(k-.3)/.7,4);rot=-.4+.75*up-1.0*dn;px=W*(.66+.06*up-.12*dn);py=H*(1.0-.22*up+.3*dn);sc=1+.12*up-.1*dn;break}
+        if(st==='reap'||st==='iai'||st==='sweep'){const ee=st==='iai'?1-Math.pow(1-k,5):e;rot=sd<0?(1.25-3.6*ee):(-2.35+3.6*ee);px=W*(sd<0?(.92-.6*ee):(.3+.6*ee));py=H*(.96-.1*Math.sin(k*Math.PI));sc=st==='reap'?1.1:1;break}
+        if(st==='quick'||st==='flick'){rot=-1.3+.9*e;px=W*(.5+.22*e);py=H*(.98-.12*Math.sin(k*Math.PI));sc=.95;break}
+        if(st==='twirl'){rot=.85-e*Math.PI*2.6;px=W*(.62+.12*Math.cos(e*Math.PI*2));py=H*(1.0-.12*Math.sin(e*Math.PI));break}
+        if(act.side<0){rot=.85-2.9*e;px=W*(.8-.42*e)}else{rot=-2.05+2.9*e;px=W*(.36+.42*e)}py=H*(1.0-.2*Math.sin(k*Math.PI));break}
+      case 'thrust':{const f=k<.45?Math.sin(k/.45*Math.PI/2):1-(k-.45)/.55,lg=act.st==='lunge'?1.35:act.st==='stab'?.8:1;rot=-.78;px=W*(.68-.12*f*lg);py=H*(1.03-.3*f*lg);sc=1-.28*f*lg;break}
       case 'spin':rot=.85-e*Math.PI*2.35;px=W*(.5+.22*Math.cos(e*Math.PI*2));py=H*(1.0-.06*Math.sin(e*Math.PI*2));break;
       case 'dash':rot=-.78;px=W*.6;py=H*.86;sc=.82;break;
       case 'block':rot=-2.0;px=W*.7;py=H*.84;break;
@@ -4789,6 +4815,12 @@ function magEmpty(){const w=WEAP[cur];if(w.gen)return gmSt(cur).mag===0;if(w.rif
 function perkDmgMul(t,zone,w,o){if(!AUGON()||!(t.T||t.remote))return 1;let m=1+PS('dmg');
   if(zone==='head')m*=1+PS('head');if(zone==='legs')m*=1+PS('legs');if(w&&w.melee)m*=1+PS('melee');if(t.T&&t.T.boss)m*=1+PS('boss');if(o&&o.blast)m*=1+PS('blast');
   const ex=PS('exec');if(ex&&t.T&&t.hp<(t.max||t.T.hp)*.3)m*=1+ex;
+  if(w&&w.melee){if(M_HEAVY(w))m*=1+PS('mHeavy');if(M_PIERCE(w))m*=1+PS('mPierce');if(PS('mBack')&&t.T&&!t.alert)m*=1+PS('mBack');if(reapT>time)m*=1.4;
+    if(PS('mLeech')){hp=Math.min(MAXHP(),hp+PS('mLeech')*healMul())}}
+  if(w&&!w.melee){const sw=WEAP[secondary]===w,pw=WEAP[primary]===w;
+    if(sw){m*=1+PS('sDmg');if(PS('sExec')&&t.hp<(t.max||(t.T&&t.T.hp)||100)*.4)m*=1+PS('sExec')}
+    if(pw){if(aiming)m*=1+PS('pAds');if(zone==='head')m*=1+PS('pHead')}}
+  if(swapBuffT>time)m*=1+PS('swapBuff');
   const br=PS('bloodrage');if(br)m*=1+br*clamp(1-hp/MAXHP(),0,1);
   if(PS('still')&&!P.mv)m*=1+PS('still');if(PS('moving')&&P.mv)m*=1+PS('moving');if(PS('air')&&!grounded)m*=1+PS('air');
   if(PS('shakeDmg'))m*=1+PS('shakeDmg')*clamp(shake/.6,0,1);
@@ -4812,7 +4844,7 @@ function perkWallHit(x,y,dmg){if(!AUGON()||!PS('bounce'))return;let best=null,bd
   if(best){burst(x,y,.5,4,'튕',48,90,70,1,2,.25,.05,0,false);applyHit(best,dmg*.6,'body',bd,(best.x-x)/bd,(best.y-y)/bd,{z:.6,noFall:true})}}
 function boomAt(x,y,R,dm,g){RUN.blastKills=(RUN.blastKills|0)+.2;burst(x,y,.5,16,g||'폭',24,95,60,1,3.2,.5,.09,0,false);sfx('boom');shake=Math.max(shake,.25);
   for(const o of enemies){if(o.dead)continue;const d=Math.hypot(o.x-x,o.y-y);if(d<R){const dx=(o.x-x)/(d||1),dy=(o.y-y)/(d||1);damage(o,dm*(1-d/R*.5)*(1+.25*loop)*(1+PS('blast'))*(Math.max(.3,1-.15*HL('blast'))),dx,dy,true)}}}
-function perkOnKill(e,zone){if(!AUGON())return;RUN.kills++;if(e&&e.T&&SOLO()){const k=keyOf(e.T);RUN.typeKills=RUN.typeKills||{};RUN.typeKills[k]=(RUN.typeKills[k]|0)+1}if(zone==='head')RUN.hsKills++;if(WEAP[cur].melee)RUN.meleeKills++;if(e&&e.T&&e.T.boss)RUN.bosses++;
+function perkOnKill(e,zone){if(!AUGON())return;RUN.kills++;if(e&&e.T&&SOLO()){const k=keyOf(e.T);RUN.typeKills=RUN.typeKills||{};RUN.typeKills[k]=(RUN.typeKills[k]|0)+1}if(zone==='head')RUN.hsKills++;if(WEAP[cur].melee){RUN.meleeKills++;if(PS('mReap'))reapT=time+3}if(e&&e.T&&e.T.boss)RUN.bosses++;
   const v=PS('vamp')+(zone==='head'?PS('hsheal'):0)+(PS('underdog')&&hp<MAXHP()*.3?6:0);
   if(PS('predator')&&predatorN<60*pkN('predator'))predatorN++;
   if(v>0){hp=Math.min(MAXHP(),hp+v*healMul());heal=Math.max(heal,.3)}
@@ -4846,9 +4878,10 @@ function perkTick(dt){if(state==='play'&&ROUL.regen&&!AUGON()&&hp>0)hp=Math.min(
   if(SOLO())for(const e of enemies)if(!e.dead&&e.regenEl)e.hp=Math.min(e.max||e.T.hp,e.hp+(e.max||e.T.hp)*.02*dt);
   if(!quickOffer&&augQ>0)openQuick()}
 function perkJumpLand(fall){if(!AUGON()||!PS('quake')||fall<2.6)return;boomAt(P.x,P.y,2.4,1.4*PS('quake'),'충')}
-const perkSpd=()=>AUGON()?(1+PS('spd'))*(frenzyT>0?1.25:1)*(PS('back')&&keys.KeyS&&!keys.KeyW?2:1):1;
-const perkRof=()=>AUGON()?1/((1+PS('rof'))*(frenzyT>0?1.25:1)*(PS('underdog')&&hp<MAXHP()*.3?1.5:1)):1;
-const perkRld=()=>AUGON()?1+PS('rld'):1;
+const perkSpd=()=>AUGON()?(1+PS('spd'))*(frenzyT>0?1.25:1)*(PS('back')&&keys.KeyS&&!keys.KeyW?2:1)*(reapT>time?1.15:1):1;
+var reapT=0,swapBuffT=0;
+const perkRof=()=>AUGON()?1/((1+PS('rof')+(cur===secondary?PS('sRof'):0))*(frenzyT>0?1.25:1)*(PS('underdog')&&hp<MAXHP()*.3?1.5:1)):1;
+const perkRld=()=>AUGON()?1+PS('rld')+(cur===primary?PS('pRld'):0):1;
 
 // ================= 룰렛 이벤트 =================
 // good: 1 좋음, 0 중립, -1 나쁨. pvp: 대전에서도 나옴
@@ -4942,6 +4975,24 @@ function checkStaleRank(){if(!acct||!acct.rk||MODE==='pvp')return;if(Date.now()-
 
 // ================= 추가 증강 (등급별) =================
 PERKS.push(
+ // ---- 근접무기 특성 ----
+ {id:'w_heavy',n:'무게 실린 일격',g:'중',r:0,d:'도끼·망치·대검·몽둥이·낫 피해 +25%',s:{mHeavy:.25}},
+ {id:'w_light',n:'번개 칼놀림',g:'번',r:0,d:'검·단검·태도·쌍검·레이피어·광선검 휘두르기 속도 +12%',s:{mLight:.12}},
+ {id:'w_pierce',n:'급소 찌르기',g:'찌',r:1,d:'단검·레이피어 피해 +35%, 찌르기는 치명타 확률 +10%',s:{mPierce:.35,mPierceCrit:.1}},
+ {id:'w_back',n:'등 뒤 일격',g:'등',r:1,d:'나를 못 본 적에게 근접 피해 +60%',s:{mBack:.6}},
+ {id:'w_wide',n:'큰 휘두름',g:'휘',r:1,d:'무거운 근접무기 사거리 +20%',s:{mWide:.2}},
+ {id:'w_leech',n:'피의 칼날',g:'혈',r:2,d:'근접으로 맞힐 때마다 체력 +2',s:{mLeech:2}},
+ {id:'w_reaper',n:'수확자',g:'확',r:3,d:'근접으로 처치하면 3초 동안 근접 피해 +40%, 이동 +15%',s:{mReap:1},hint:'근접 증강을 여러 개 모으면…',cond:()=>(pkN('w_heavy')+pkN('w_light')+pkN('w_pierce')+pkN('w_back')+pkN('w_wide')+pkN('w_leech'))>=2},
+ // ---- 보조무기 (2번 칸) ----
+ {id:'w_sdmg',n:'빠른 뽑기',g:'뽑',r:0,d:'보조무기 피해 +20%, 보조무기로 바꾸는 시간 −50%',s:{sDmg:.2,sSwap:.5}},
+ {id:'w_srof',n:'방아쇠 연타',g:'타',r:1,d:'보조무기 연사 속도 +18%',s:{sRof:.18}},
+ {id:'w_sexec',n:'마무리 사격',g:'마',r:1,d:'보조무기로 체력 40% 이하인 적을 쏘면 피해 +50%',s:{sExec:.5}},
+ // ---- 주무기 (1번 칸) ----
+ {id:'w_pads',n:'견착 사격',g:'견',r:0,d:'주무기로 조준하고 쏘면 피해 +18%',s:{pAds:.18}},
+ {id:'w_phead',n:'정조준',g:'정',r:1,d:'주무기 머리 피해 +30%',s:{pHead:.3}},
+ {id:'w_prld',n:'탄창 관리',g:'탄',r:0,d:'주무기 장전 속도 +20%',s:{pRld:.2}},
+ // ---- 무기 바꾸기 ----
+ {id:'w_swap',n:'삼위일체',g:'삼',r:3,d:'무기를 바꾸면 2초 동안 피해 +30%',s:{swapBuff:.3},hint:'주무기·보조무기·근접 증강을 하나씩 가지면…',cond:()=>(pkN('w_sdmg')+pkN('w_srof')+pkN('w_sexec'))>0&&(pkN('w_pads')+pkN('w_phead')+pkN('w_prld'))>0&&(pkN('w_heavy')+pkN('w_light')+pkN('w_pierce')+pkN('w_back')+pkN('w_wide')+pkN('w_leech'))>0},
  {id:'calloused',n:'굳은살',g:'굳',r:0,d:'최대 체력 +8, 받는 피해 −4%',s:{hp:8,tough:.04}},
  {id:'instinct',n:'사냥 본능',g:'본',r:0,d:'피해 +5%, 이동 +3%',s:{dmg:.05,spd:.03}},
  {id:'quickhand',n:'빠른 손',g:'손',r:0,d:'장전 +8%, 연사 +4%',s:{rld:.08,rof:.04}},
@@ -4993,7 +5044,8 @@ const HARDS=[
  {id:'horde',n:'물량',g:'물',d:l=>`층마다 적 +${2*l}`,score:()=>(RUN.fastFloors|0)/2,th:[1,2,3]},
  {id:'elite',n:'정예화',g:'예',d:l=>`정예 적 확률 +${6*l}%`,score:()=>augPower(),th:[10,22,38]}];
 const HMAP={};for(const h of HARDS)HMAP[h.id]=h;
-const HMUL=()=>SOLO()?1+Math.min(.5,.025*Math.max(0,level-2)):1;
+// 적응 강도: 초반엔 거의 그대로, 깊어질수록 가파르게 (4층부터, 34층에서 최대 ×1.5)
+const HMUL=()=>SOLO()?1+.5*Math.pow(Math.min(1,Math.max(0,level-3)/30),1.6):1;
 const HMAX=20,HQ=4;
 const HL=id=>SOLO()&&RUN.hard?(RUN.hard[id]|0)/HQ*HMUL():0;
 const fmtD=t=>t.replace(/\d+\.\d+/g,x=>String(Math.round(+x*10)/10));
@@ -5001,8 +5053,14 @@ const hdTxt=(h,l)=>fmtD(h.d(l/HQ*HMUL()));
 const hardTotal=()=>Object.values(RUN.hard||{}).reduce((a,b)=>a+b,0);
 const healMul=()=>Math.max(.3,1-.2*HL('wound'));
 let HUP=[];
-function updateHards(){if(!SOLO())return [];RUN.hard=RUN.hard||{};const up=[];HUP=[];
-  for(const h of HARDS){let s=0;try{s=h.score()}catch(e){}let l=0;const th=h.th.length>=5?h.th:[...h.th,h.th[2]*1.6,h.th[2]*2.4],pts=[th[0]*.4,...th];for(let L=1;L<=HMAX;L++){const x=L/HQ,i=Math.min(4,Math.floor(x)),f=x-i,t=i>=5?pts[5]:pts[i]+(pts[i+1]-pts[i])*f;if(s>=t)l=L;else break}if(l>(RUN.hard[h.id]|0)){HUP.push([h.id,l,RUN.hard[h.id]|0]);RUN.hard[h.id]=l;up.push(`${h.n} ${'ⅠⅡⅢⅣⅤ'[l-1]}`)}}
+// 고난은 층마다 차근차근: 한 층에 오르는 단계 수와 고난별 최대 단계를 층 깊이에 맞춰 묶어 둔다
+function hardPace(){const L=level|0;return {cap:Math.min(HMAX,1+Math.floor(L*.7)),per:L<8?1:L<18?1:2,total:L<4?1:L<8?2:L<14?3:L<22?4:6}}
+function updateHards(){if(!SOLO())return [];RUN.hard=RUN.hard||{};const up=[];HUP=[];const pc=hardPace(),want=[];
+  for(const h of HARDS){let s=0;try{s=h.score()}catch(e){}let l=0;const th=h.th.length>=5?h.th:[...h.th,h.th[2]*1.6,h.th[2]*2.4],pts=[th[0]*.4,...th];for(let L=1;L<=HMAX;L++){const x=L/HQ,i=Math.min(4,Math.floor(x)),f=x-i,t=i>=5?pts[5]:pts[i]+(pts[i+1]-pts[i])*f;if(s>=t)l=L;else break}
+    const cur0=RUN.hard[h.id]|0,tgt=Math.min(l,pc.cap);if(tgt>cur0)want.push([h,tgt,cur0])}
+  // 많이 밀린 고난부터, 한 층에 정해진 만큼만 올린다
+  want.sort((a,b)=>(b[1]-b[2])-(a[1]-a[2]));let budget=pc.total;
+  for(const [h,tgt,cur0] of want){if(budget<=0)break;const step=Math.min(pc.per,tgt-cur0,budget);const l=cur0+step;budget-=step;HUP.push([h.id,l,cur0]);RUN.hard[h.id]=l;up.push(`${h.n} ${l}단계`)}
   return up}
 function hardsHtml(hd){hd=hd||RUN.hard||{};const ids=Object.keys(hd).filter(k=>hd[k]>0);if(!ids.length)return '<p class="pk-tip">아직 적이 적응하지 않았어요</p>';
   return `${HMUL()>1.001?`<p class="pk-tip">적응 강도 ×${HMUL().toFixed(2)} — 깊은 층일수록 모든 고난이 세져요</p>`:''}<div class="own-row">${ids.map(id=>{const h=HMAP[id];if(!h)return '';const l=hd[id];return `<div class="own-c tm" data-hterm="${id}" data-lv="${l}" style="--rc:${h.sp?'#c58cff':'#ff8a80'}"><span>${h.g}</span><div><b>${h.n} Lv${l}<span class="hbar"><i style="width:${l/HMAX*100}%"></i></span></b><small>${hdTxt(h,l)}</small></div></div>`}).join('')}</div>`}
@@ -5367,7 +5425,7 @@ const TERMS=[
  ['중첩','같은 증강을 또 얻으면 효과가 그만큼 더해져요 (×2, ×3 …).'],
  ['리롤','증강 선택지를 새로 뽑아요. 기본 3회, 리롤 증강으로 늘어나요.'],
  ['혼자하기 전용','대전(증강 모드)에서는 나오지 않는 증강이에요.'],
- ['고난','내가 고른 증강과 플레이 방식에 맞춰 적이 적응하는 것이에요. 층을 넘어갈 때 조건을 보고 1→20단계로 조금씩 올라가요. 깊은 층일수록 적응 강도(최대 ×1.5)가 곱해져 더 세져요.'],
+ ['고난','내가 고른 증강과 플레이 방식에 맞춰 적이 적응하는 것이에요. 층을 넘어갈 때 조건을 보고 1→20단계로 올라가는데, 초반엔 한 층에 한 단계씩 차근차근 오르고 깊은 층으로 갈수록 한 번에 더 많이 올라요. 층 깊이에 따라 고난마다 오를 수 있는 최대 단계도 정해져 있어요. 깊은 층일수록 적응 강도(최대 ×1.5)가 곱해져 더 세져요.'],
  ['적 종류 고난','특정 적을 많이 쓰러뜨리면 그 적 종류만 강해져요 (맷집·독기·민첩·방호·증원).'],
  ['정예','이름 옆에 특수 능력(방어막·신속·흡혈·분열·투명·자폭·재생)이 붙은 강한 적이에요.'],
  ['방어막','체력보다 먼저 깎이는 추가 체력이에요. 적에게 붙으면 받는 피해가 줄어요.'],
@@ -5391,7 +5449,7 @@ const TERMS=[
  ['칼 부위 피해','근접도 조준한 높이에 따라 부위가 갈려요. 머리 1.6배(보스 1.35배), 다리 0.75배 + 둔화. 방패병은 몸통 베기를 막으니 머리를 노리거나 회전베기를 쓰세요.'],
  ['심연','20층부터 5층마다 심연 단계가 올라가요. 적 체력 +25%·피해 +12%씩, 정예가 늘고 모든 층에 보스가 나와요 (보스 층엔 둘). 대신 매 층 증강을 하나 더 받아요.'],
  ['보스 러시','10층 도달 기록이 있으면 열리는 모드예요. 매 층이 보스 층이고 일반 적은 적어요. 13층부터는 보스가 둘이에요.'],
- ['적응 강도','깊은 층일수록 모든 고난 효과에 곱해지는 배율이에요 (3층부터 층마다 +2.5%, 최대 ×1.5).'],
+ ['적응 강도','깊은 층일수록 모든 고난 효과에 곱해지는 배율이에요. 초반엔 거의 오르지 않다가 깊어질수록 가파르게 올라요 (최대 ×1.5).'],
 ];
 // 고난 → 원인 풀이
 const HGLOSS={
@@ -5617,7 +5675,7 @@ function acctHTML(){
   const t=tierOf(acct.rating),on=onlineMap(),me=myUid;
   const lead=leaderDocs.map((p,i)=>{const tt=tierOf(p.rating);return `<li class="${p.uid===me?'me':''}"><span class="num">${i+1}</span><span class="grow">${esc(p.nick)}</span><span style="color:${tt[2]}">${tt[1]}</span><span class="num" style="width:3.2em;text-align:right">${p.rating|0}</span></li>`}).join('')||'<li class="off">아직 기록이 없어요</li>';
   const fr=(acct.friends||[]).map(uid=>{const p=friendDocs.find(d=>d.uid===uid),o=on[uid];const nm=p?p.nick:'…';const tt=tierOf(p?p.rating:0);
-    return `<li><span class="grow">${esc(nm)} <span style="color:${tt[2]};font-size:12px">${tt[1]}</span></span>${o?`<span class="on">● ${esc(o.st||'온라인')}${o.rc?` · 방 ${esc(o.rc)}${o.md==='rank'?' 랭크':''} · ${esc((GMS[o.gm]||GMS.tdm).n)}`:''}</span>`:'<span class="off">오프라인</span>'}${o&&o.rc?`<button class="mini" data-act="joinf" data-rc="${esc(o.rc)}" data-md="${o.md==='rank'?'rank':'friendly'}" data-gm="${GMS[o.gm]?o.gm:'tdm'}">같이 하기</button>`:''}${SITE()?`<button class="mini" data-act="dm" data-uid="${esc(uid)}">💬${COM.unread(uid)?`<span class="badge">${COM.unread(uid)}</span>`:''}</button><button class="mini" data-act="call" data-uid="${esc(uid)}" title="음성 통화">📞</button>`:''}<button class="mini" data-act="unf" data-uid="${esc(uid)}">삭제</button></li>`}).join('')||'<li class="off">친구가 없어요. 아이디로 요청을 보내 보세요</li>';
+    return `<li><span class="grow">${esc(nm)} <span style="color:${tt[2]};font-size:12px">${tt[1]}</span></span>${o?`<span class="on">● ${esc(o.st||'온라인')}${o.rc?` · 방 ${esc(o.rc)}${o.md==='rank'?' 랭크':''} · ${esc((GMS[o.gm]||GMS.tdm).n)}`:''}</span>`:'<span class="off">오프라인</span>'}${o&&o.rc?`<button class="mini" data-act="joinf" data-rc="${esc(o.rc)}" data-md="${o.md==='rank'?'rank':'friendly'}" data-gm="${GMS[o.gm]?o.gm:'tdm'}">같이 하기</button>`:''}${SITE()?`<button class="mini" data-act="dm" data-uid="${esc(uid)}">💬${COM.unread(uid)?`<span class="badge">새</span>`:''}</button><button class="mini" data-act="call" data-uid="${esc(uid)}" title="음성 통화">📞</button>`:''}<button class="mini" data-act="unf" data-uid="${esc(uid)}">삭제</button></li>`}).join('')||'<li class="off">친구가 없어요. 아이디로 요청을 보내 보세요</li>';
   const rin=reqIn.filter(r=>r.st==='p').map(r=>`<li><span class="grow">${esc(r.fromNick)} 님의 요청</span><button class="mini" data-act="acc" data-id="${esc(r.id)}" data-from="${esc(r.from)}">수락</button><button class="mini" data-act="dec" data-id="${esc(r.id)}">거절</button></li>`).join('');
   const rout=reqOut.filter(r=>r.st==='p').map(r=>`<li><span class="grow">${esc(r.toNick)} 님에게 보냄</span><button class="mini" data-act="dec" data-id="${esc(r.id)}">취소</button></li>`).join('');
   const kd=acct.d?(acct.k/acct.d).toFixed(2):(acct.k|0);
@@ -5796,9 +5854,16 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-10-31';
+const NOTICE_VER='2026-10-31b';
 const NOTICE=[
- {v:'2026-10-31',t:'근접무기 대개편 · 메시지 · 음성 대화',items:[
+ {v:'2026-10-31',t:'근접 동작 · 무기별 증강 · 고난 속도',items:[
+  '근접무기마다 휘두르는 동작이 달라짐: 도끼·망치·몽둥이·대검은 머리 위로 들어 내려찍기 → 가로 휘두르기, 낫은 크게 가로로 베다가 내려찍기, 단검은 찌르기 연타, 레이피어는 깊게 찌르고 손목 튕기기, 태도는 빠른 수평 베기, 광선검은 한 바퀴 돌려 베기',
+  '무기 칸별 새 증강 14종: 근접(무게 실린 일격, 번개 칼놀림, 급소 찌르기, 등 뒤 일격, 큰 휘두름, 피의 칼날, 전설 수확자), 보조무기(빠른 뽑기, 방아쇠 연타, 마무리 사격), 주무기(견착 사격, 정조준, 탄창 관리), 전설 삼위일체',
+  '고난이 차근차근 오르게 바뀜: 초반엔 한 층에 한 단계씩만, 깊은 층으로 갈수록 한 번에 더 많이. 층 깊이에 따라 고난마다 오를 수 있는 최대 단계가 정해짐',
+  '적응 강도는 초반엔 거의 그대로, 20층 넘어서부터 가파르게 올라감',
+  'PC에서 V 키는 조준이 아니라 음성 마이크 끄기·켜기 (조준은 우클릭, 모바일 조준 버튼은 그대로)',
+  '버그 수정: 고난이 6단계 이상 오를 때 알림 글자가 깨지던 문제']},
+ {v:'2026-10-31 오전',t:'근접무기 대개편 · 메시지 · 음성 대화',items:[
   '근접무기 전부 새 디자인: 검(푸른 룬 + 날개 가드), 단검(톱니 등날 + 독빛), 태도(붉은 날빛 + 끈 장식), 대검(불씨 룬 + 보석), 레이피어(금빛 + 보석), 광선검(새 손잡이), 몽둥이(가시철사 + 대못), 죽창(대나무 마디 + 쇠 창날 + 술)',
   '낫을 사신의 대낫으로: 해골 머리, 톱니 등날, 혼불 날빛, 사슬과 찢긴 천. 살펴보기(Y)에서 머리까지 보이게',
   '유탄발사기 보정: 탄속 2배, 낙차를 줄이고 조준선까지의 거리만큼 자동으로 띄워 쏴서 십자선에 떨어짐. 적 근처를 스쳐도 터짐',
@@ -5873,7 +5938,7 @@ const COM=(()=>{
   function closeDM(){box.hidden=true;if(dmRef&&dmCb)dmRef.off('value',dmCb);dmRef=dmCb=null;dm=null}
   let dmLast=0;
   box.querySelector('#dmForm').addEventListener('submit',async e=>{e.preventDefault();if(!dm)return;const t=dmIn.value.replace(/\s+/g,' ').trim().slice(0,200);if(!t)return;const now=Date.now();if(now-dmLast<600)return;dmLast=now;dmIn.value='';const u=me();
-    try{await fdb().ref('dm/'+pair(u,dm.uid)).push().set({f:u,x:t,t:TS()});const r=fdb().ref('dmIn/'+dm.uid+'/'+u);const o=(await r.once('value')).val();await r.set({n:Math.min(99,((o&&o.n)|0)+1),x:t.slice(0,40),t:TS()})}catch(err){dmErr.textContent=ruleErr}});
+    try{await fdb().ref('dm/'+pair(u,dm.uid)).push().set({f:u,x:t,t:TS()});fdb().ref('dmIn/'+dm.uid+'/'+u).set({n:1,x:t.slice(0,40),t:TS()}).catch(()=>{})}catch(err){dmErr.textContent=ruleErr}});
   box.querySelector('#dmClose').addEventListener('click',closeDM);
   box.querySelector('#dmCall').addEventListener('click',()=>{if(dm)call(dm.uid)});
   dmIn.addEventListener('keydown',e=>{if(e.code==='Escape'){e.preventDefault();e.stopPropagation();closeDM()}});
