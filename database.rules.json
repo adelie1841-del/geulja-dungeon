@@ -18,7 +18,9 @@
         ".read": true,
         ".indexOn": [
           "rating",
-          "uid"
+          "uid",
+          "created",
+          "bestFloor"
         ],
         "$uid": {
           ".write": "auth != null && auth.uid === $uid"
@@ -73,6 +75,28 @@
         "$from": {
           ".write": "auth != null && (auth.uid === $from || auth.uid === $to)"
         }
+      }
+    },
+    "matchLog": {
+      ".read": "auth != null && root.child('db').child('admins').child(auth.uid).val() === true",
+      ".indexOn": [
+        "t",
+        "u"
+      ],
+      "$m": {
+        ".write": "auth != null && !data.exists() && newData.child('u').val() === auth.uid",
+        ".validate": "newData.hasChildren(['u','t','k','d']) && newData.child('n').isString() && newData.child('n').val().length <= 20"
+      }
+    },
+    "suggest": {
+      ".read": "auth != null && root.child('db').child('admins').child(auth.uid).val() === true",
+      ".indexOn": [
+        "t"
+      ],
+      "$s": {
+        ".read": "auth != null && data.child('u').val() === auth.uid",
+        ".write": "auth != null && ((!data.exists() && newData.child('u').val() === auth.uid) || root.child('db').child('admins').child(auth.uid).val() === true)",
+        ".validate": "!newData.exists() || (newData.child('x').isString() && newData.child('x').val().length >= 2 && newData.child('x').val().length <= 600)"
       }
     },
     "sig": {
