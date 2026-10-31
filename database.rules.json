@@ -1,0 +1,88 @@
+{
+  "rules": {
+    "rooms": {
+      "$room": {
+        "peers": {
+          ".read": "auth != null",
+          "$peer": {
+            ".write": "auth != null && (!data.exists() || data.child('u').val() === auth.uid) && (!newData.exists() || newData.child('u').val() === auth.uid)"
+          }
+        }
+      }
+    },
+    "db": {
+      "admins": {
+        ".read": true
+      },
+      "players": {
+        ".read": true,
+        ".indexOn": [
+          "rating",
+          "uid"
+        ],
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      },
+      "nicks": {
+        ".read": true,
+        "$n": {
+          ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid)"
+        }
+      },
+      "reqs": {
+        ".read": "auth != null",
+        ".indexOn": [
+          "to",
+          "from"
+        ],
+        "$r": {
+          ".write": "auth != null && ((!data.exists() && newData.child('from').val() === auth.uid) || (data.exists() && (data.child('from').val() === auth.uid || data.child('to').val() === auth.uid)))"
+        }
+      },
+      "data": {
+        "users": {
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        }
+      }
+    },
+    "leases": {
+      ".read": "auth != null",
+      "$l": {
+        ".write": "auth != null"
+      }
+    },
+    "dm": {
+      "$pair": {
+        ".read": "auth != null && ($pair.beginsWith(auth.uid + '_') || $pair.endsWith('_' + auth.uid))",
+        ".indexOn": [
+          "t"
+        ],
+        "$m": {
+          ".write": "auth != null && !data.exists() && ($pair.beginsWith(auth.uid + '_') || $pair.endsWith('_' + auth.uid)) && newData.child('f').val() === auth.uid",
+          ".validate": "newData.child('x').isString() && newData.child('x').val().length <= 200"
+        }
+      }
+    },
+    "dmIn": {
+      "$to": {
+        ".read": "auth != null && auth.uid === $to",
+        "$from": {
+          ".write": "auth != null && (auth.uid === $from || auth.uid === $to)"
+        }
+      }
+    },
+    "sig": {
+      "$to": {
+        ".read": "auth != null && auth.uid === $to",
+        "$k": {
+          ".write": "auth != null && ((!data.exists() && newData.child('f').val() === auth.uid) || (auth.uid === $to && !newData.exists()))",
+          ".validate": "!newData.exists() || newData.child('d').val().length < 20000"
+        }
+      }
+    }
+  }
+}
