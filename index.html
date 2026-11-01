@@ -298,7 +298,9 @@ canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 #roul small{display:block;font-size:12px;color:var(--dim)}#roul .rl-g{display:block;font-family:var(--display);font-size:44px;color:#ffc857;line-height:1.1}#roul b{font-size:18px}#roul p{margin:6px 0 0;font-size:13px;color:#c9d1cc}
 #roul.done.good .rl-box{border-color:#7ee6a0}#roul.done.bad .rl-box{border-color:#ff6a5a}#roul.done.good .rl-g{color:#7ee6a0}#roul.done.bad .rl-g{color:#ff6a5a}
 .ov-opts{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:12px}.opt{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;background:#11161a;border:1px solid #2c3a35;border-radius:8px;padding:6px 10px;cursor:pointer}.opt small{color:var(--dim);font-size:11.5px}.opt input{accent-color:var(--amber)}
-.gmb.aug{border-color:#7fe6ff;color:#bff3ff}.lb-opts{margin-top:4px}
+.gmb.aug{border-color:#7fe6ff;color:#bff3ff}
+.ai-box{border:1px solid #3a2f22;background:linear-gradient(120deg,#16110b,#120d14);border-radius:10px;padding:10px 12px;margin:6px 0 10px}.ai-box h3{margin:0 0 6px;font-size:16px;color:var(--amber)}.ai-box h3 small{font-size:12px;color:var(--dim);font-weight:400;margin-left:6px}.ai-box .lb-row{flex-wrap:wrap;gap:6px}.ai-box #aiNote{margin:6px 0 0;font-size:13px}.ai-box #aiNote small{color:var(--dim)}.ai-sep{width:10px}
+.seg .aib,.seg .aif{font:inherit;font-size:14px;color:var(--ink);background:#11161a;border:1px solid #2c3a35;padding:6px 14px;cursor:pointer;border-radius:999px}.seg .aib[aria-pressed="true"],.seg .aif[aria-pressed="true"]{background:var(--amber);color:#1a1205;border-color:var(--amber)}.seg .aib.hard[aria-pressed="true"]{background:#ff6b6b;border-color:#ff6b6b;color:#1a0505}.lb-opts{margin-top:4px}
 .codex{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-width:720px;margin:10px auto}.cx{background:#11161a;border:1px dashed #3a2a40;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:3px;text-align:center}.cx span{font-family:var(--display);font-size:26px;color:#5a4a60}.cx b{font-size:13px}.cx small{font-size:11.5px;color:var(--dim)}.cx.on{border:1px solid #ff6ad5;background:linear-gradient(160deg,#2a1030,#11161a 60%)}.cx.on span{color:#ff6ad5}
 /* ---- 홈: 활자 블록 ---- */
 .overlay.home h1{display:flex;gap:clamp(6px,1.4vw,14px);align-items:flex-end;justify-content:center;font-size:clamp(40px,8.4vw,92px);text-shadow:none}
@@ -604,6 +606,10 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
     </div>
     <div class="lobby" id="lobby" hidden>
       <h2>대전 로비</h2>
+      <div class="ai-box"><h3>AI 대전 <small>혼자서 랭크 점수 올리기</small></h3>
+        <div class="lb-row seg" role="group" aria-label="AI 난이도"><button type="button" class="aib" data-d="mid" aria-pressed="true">중간</button><button type="button" class="aib hard" data-d="hard" aria-pressed="false">어려움</button><span class="ai-sep"></span><button type="button" class="aif" data-f="1" aria-pressed="true">1대1 · 10처치</button><button type="button" class="aif" data-f="3" aria-pressed="false">3대3 · 20처치</button><button class="btn sm" id="aiGo" type="button">AI 대전 시작</button></div>
+        <p class="lb-status" id="aiNote"></p>
+      </div>
       <div class="lb-row seg" role="group" aria-label="대전 종류"><button type="button" class="segb" data-md="friendly" aria-pressed="true">친선</button><button type="button" class="segb" data-md="rank" aria-pressed="false">랭크</button><span id="mdNote">점수에 반영되지 않는 연습 대전</span></div>
       <div class="lb-row seg gmrow" role="group" aria-label="게임 모드"><button type="button" class="gmb" data-gm="tdm">팀 데스매치</button><button type="button" class="gmb" data-gm="ffa">개인전</button><button type="button" class="gmb" data-gm="dark">어둠의 전장</button><button type="button" class="gmb" data-gm="r7">7판 선승</button><button type="button" class="gmb" data-gm="r3">3판 신속전</button><button type="button" class="gmb aug" data-gm="aug">무한 증강전</button></div>
       <div class="lb-row lb-opts"><label class="opt"><input type="checkbox" id="optRoulP"> 룰렛 이벤트 <small>(방장의 설정을 따라요)</small></label></div>
@@ -2210,7 +2216,7 @@ function throwSpear(c){
   arrowsW.push({kind:'spear',x:P.x+Math.cos(a)*.3,y:P.y+Math.sin(a)*.3,z:eyeZ+.05,vx:Math.cos(a)*hs,vy:Math.sin(a)*hs,vz:sl*hs+.6,dmg:(3+4*c)*(1+.25*loop),stuck:false,life:40});
   sfx('bowRel');GS.vy-=8;addEcho(P.x,P.y,5,.8);netEmit({t:'proj',k:'spear',ez:+eyeZ.toFixed(2),x:+P.x.toFixed(2),y:+P.y.toFixed(2),a:+a.toFixed(3),sp:+sp.toFixed(1),sl:+sl.toFixed(3)});
 }
-let MODE='solo',roomNS=null,R=null,myPeer=null,team=-1,netName='',evSeq=0,myEvents=[],seenEv=new Map(),remotes=new Map(),killFeed=[],lastAtk=null,netLast=0,sfxVol=1;
+let AI={on:false,bots:[]};let MODE='solo',roomNS=null,R=null,myPeer=null,team=-1,netName='',evSeq=0,myEvents=[],seenEv=new Map(),remotes=new Map(),killFeed=[],lastAtk=null,netLast=0,sfxVol=1;
 const pv={kb:{},round:0,k:0,d:0,alive:true,respT:0,inv:0,over:null,money:0,ms:[0,0],rover:null,rStart:0,lastRes:null,newMatch:true,died:false,rr:null,mi:0};
 const GMS={tdm:{n:'팀 데스매치',d:'먼저 20처치한 팀이 이겨요. 팀당 최대 3명',team:1,kills:20},
  ffa:{n:'개인전',d:'모두가 적이에요. 먼저 15처치한 사람이 우승 (최대 6명)',team:0,kills:15},
@@ -2432,7 +2438,7 @@ function pvpDie(killer){
   drawing=false;spCharging=false;charging=false;atkHeld=false;
 }
 function netTick(dt){
-  netRecv(dt);
+  if(AI.on)aiTick(dt);netRecv(dt);
   if(MODE==='pvp'){pv.k=killsOf(myPeer);pvpRoulTick();rankTick();
     if(GM==='aug'&&pv.k>=(pv.augK||3)){pv.augK=(pv.augK||3)+3;queueAug(1)}
     if(!isRound()&&OPT.roul&&leaderPeer()===myPeer&&time-(pv.rlT||0)>120){pv.rlT=time;leaderRoul()}
@@ -2443,7 +2449,7 @@ function netTick(dt){
     const T=G_().kills;
     if(!pv.over){if(isFfa()){let best=null,bk=0;for(const id of [myPeer,...remotes.keys()]){const k=killsOf(id);if(k>bk){bk=k;best=id}}if(bk>=T){pv.over={win:-1,who:best,whoN:nameOf(best),t:7};sfx('exit');onMatchEnd(-1,best===myPeer)}}
       else{const sc=teamScores();if(sc[0]>=T||sc[1]>=T){pv.over={win:sc[0]>=T?0:1,t:7};sfx('exit');onMatchEnd(pv.over.win,pv.over.win===team)}}}
-    if(pv.over){pv.over.t-=dt;if(pv.over.t<=0&&isLeader())newRound(pv.round+1)}}
+    if(pv.over){pv.over.t-=dt;if(pv.over.t<=0&&isLeader()&&!AI.on)newRound(pv.round+1)}}
   }
   netSend();
 }
@@ -4979,9 +4985,9 @@ function drawPvpHud(pad,small){
   if(rnd&&pv.alive&&!pv.rover&&state==='play'){const {n}=aliveCounts();if(!n[0]||!n[1]){ctx.textAlign='center';ctx.font=`13px ${FONT}`;ctx.fillStyle='rgba(228,236,230,.75)';ctx.fillText('상대 팀을 기다리는 중 — 양 팀에 사람이 있어야 라운드가 끝나요',cx,H*.66)}}
   if(pv.over){ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,H*.36,W,96);ctx.font=`40px ${DFONT}`;
     if(ffa){ctx.fillStyle='#ffc857';ctx.fillText(pv.over.who===myPeer?'우승!':`${pv.over.whoN} 우승`,cx,H*.36+38)}
-    else{ctx.fillStyle=pv.over.win===0?'#8ab8ff':'#ff8a80';ctx.fillText(`${teamName(pv.over.win)}팀 승리!`,cx,H*.36+38)}
-    ctx.font=`14px ${FONT}`;ctx.fillStyle='#e4ece6';ctx.fillText(`${Math.ceil(Math.max(0,pv.over.t))}초 뒤 ${rnd?'새 경기':'다음 라운드'}`,cx,H*.36+76);
-    if(lastResult){ctx.font=`16px ${DFONT}`;ctx.fillStyle=lastResult.delta>=0?'#7ee6a0':'#ff8a80';ctx.fillText(lastResult.ranked?`랭크 ${lastResult.delta>=0?'+':''}${lastResult.delta}점 → ${lastResult.rating}점 (${tierOf(lastResult.rating)[1]})${lastResult.bonus?` · ${lastResult.ws}연승 보너스 +${lastResult.bonus}`:''}`:lastResult.needOpp?'상대가 없어 랭크에 반영되지 않았어요':'친선 대전 · 전적만 기록됐어요',cx,H*.36+112)}}
+    else{ctx.fillStyle=AI.on?(pv.over.win===team?'#7ee6a0':'#ff8a80'):pv.over.win===0?'#8ab8ff':'#ff8a80';ctx.fillText(AI.on?(pv.over.win===team?'AI 대전 승리!':'AI 대전 패배'):`${teamName(pv.over.win)}팀 승리!`,cx,H*.36+38)}
+    ctx.font=`14px ${FONT}`;ctx.fillStyle='#e4ece6';ctx.fillText(`${Math.ceil(Math.max(0,pv.over.t))}초 뒤 ${AI.on?'메뉴로':rnd?'새 경기':'다음 라운드'}`,cx,H*.36+76);
+    if(lastResult){ctx.font=`16px ${DFONT}`;ctx.fillStyle=lastResult.delta>=0?'#7ee6a0':'#ff8a80';ctx.fillText(lastResult.msg?lastResult.msg:lastResult.ranked?`랭크 ${lastResult.delta>=0?'+':''}${lastResult.delta}점 → ${lastResult.rating}점 (${tierOf(lastResult.rating)[1]})${lastResult.bonus?` · ${lastResult.ws}연승 보너스 +${lastResult.bonus}`:''}`:lastResult.needOpp?'상대가 없어 랭크에 반영되지 않았어요':'친선 대전 · 전적만 기록됐어요',cx,H*.36+112)}}
   if(pv.inv>0&&pv.alive){ctx.textAlign='center';ctx.font=`12px ${FONT}`;ctx.fillStyle='#9fd8ff';ctx.fillText('부활 보호 중',cx,H*.62)}
   if(keys.Tab&&(state==='play'||state==='paused')){const me={n:netName+(acctState==='in'&&acct?' · '+tierOf(acct.rating)[1]:''),tm:ffa?0:team,k:pv.k,d:pv.d,me:1};
     const rows=[me,...[...remotes.values()].filter(r=>r.tm===0||r.tm===1).map(r=>({n:r.n+(r.rt?' · '+tierOf(r.rt)[1]:''),tm:ffa?0:r.tm,k:killsOf(r.peer),d:r.rd===pv.round?r.d:0}))];
@@ -5416,7 +5422,7 @@ function rollRoul(pvp){const list=ROULS.filter(r=>!pvp||r.pvp===1||(r.pvp===2&&i
 function pvpRoulTick(){if(MODE!=='pvp')return;const L=leaderPeer();
   if(L===myPeer){/* 방장이 roulNext 에서 정함 */}
   else{const r=remotes.get(L);if(r&&r.rl&&r.rl.s!==roulSeen&&r.rl.rd===pv.round){roulSeen=r.rl.s;applyRoul(r.rl.id,true)}}}
-function leaderRoul(){if(MODE!=='pvp'||leaderPeer()!==myPeer||!OPT.roul){if(leaderPeer()===myPeer)pv.rl=null;return}const id=rollRoul(true);const s=((pv.rl&&pv.rl.s)|0)+1;pv.rl={id,s,rd:pv.round};roulSeen=s;applyRoul(id,true)}
+function leaderRoul(){if(AI.on){pv.rl=null;return}if(MODE!=='pvp'||leaderPeer()!==myPeer||!OPT.roul){if(leaderPeer()===myPeer)pv.rl=null;return}const id=rollRoul(true);const s=((pv.rl&&pv.rl.s)|0)+1;pv.rl={id,s,rd:pv.round};roulSeen=s;applyRoul(id,true)}
 // ================= 적 적응 (혼자 하기) =================
 let ADAPT={dmg:1,note:''};
 const ELITE=[{id:'shield',n:'방어막',f:e=>{e.dr=.6}},{id:'fast',n:'신속',f:e=>{e.sm=(e.sm||1)*1.45}},{id:'vamp',n:'흡혈',f:e=>{e.vampEl=1}},{id:'split',n:'분열',f:e=>{e.split=1}},
@@ -5455,9 +5461,9 @@ const BAN_MIN=[5,15,60];
 function rankBanLeft(){return acct&&acct.rkBan?Math.max(0,acct.rkBan-Date.now()):0}
 function markRank(){if(rkActive||matchMode!=='rank'||!DB||!acct||acctState!=='in')return;rkActive=true;lastInputT=performance.now();try{DB.doc('players/'+myUid).update({rk:{t:Date.now(),room:roomCode}})}catch(e){}}
 function clearRank(){if(!rkActive)return;rkActive=false;try{DB.doc('players/'+myUid).update({rk:null})}catch(e){}}
-async function rankPenalty(reason){if(!DB||!acct)return;rkActive=false;const ab=(acct.ab|0)+1,mins=BAN_MIN[Math.min(ab,3)-1],rating=Math.max(0,(acct.rating|0)-25);
+async function rankPenalty(reason){if(!DB||!acct)return;rkActive=false;const ab=(acct.ab|0)+1,mins=BAN_MIN[Math.min(ab,3)-1],rating=Math.max(RANK_MIN,(acct.rating|0)-25),lost=Math.max(0,Math.max(RANK_MIN,acct.rating|0)-rating);
   const upd={rating,ab,rkBan:Date.now()+mins*60000,rk:null,ws:0};Object.assign(acct,upd);try{await DB.doc('players/'+myUid).update(upd)}catch(e){}
-  say(`${reason} — 랭크 점수 −25, ${mins}분 동안 랭크 금지`,4)}
+  say(`${reason} — 랭크 점수 −${lost}, ${mins}분 동안 랭크 금지`,4)}
 function rankTick(){if(MODE!=='pvp'||matchMode!=='rank'||!rkActive||pv.over||state==='title')return;const idle=performance.now()-lastInputT;
   if(idle>30000&&!afkWarned){afkWarned=true;say('잠수 경고 — 30초 안에 움직이지 않으면 퇴장돼요',3);sfx('alert')}
   if(idle>60000){rankPenalty('잠수로 퇴장');leavePvp(true)}}
@@ -6111,7 +6117,8 @@ ovP.dataset.home=ovP.innerHTML;
 btn.addEventListener('click',()=>{if(state==='paused')resume();else start()});
 // ================= 계정 =================
 let onSig='',frMsgText='',DB=null,USR=null,myUid=null,acct=null,acctState='init',matchMode='friendly',lastResult=null,acctSubs=[],friendSub=null,friendKey='',leaderDocs=[],friendDocs=[],reqIn=[],reqOut=[],acctOpen=false;
-const TIERS=[[0,'브론즈','#c69060'],[1100,'실버','#b8c4cc'],[1250,'골드','#f2c94c'],[1400,'플래티넘','#6fe0d0'],[1550,'다이아','#8ab8ff'],[1700,'마스터','#d58aff']];
+const RANK_MIN=500;// 아이언 500점 아래로는 내려가지 않음 · 500점마다 한 등급
+const TIERS=[[500,'아이언','#9aa0a8'],[1000,'브론즈','#c69060'],[1500,'실버','#b8c4cc'],[2000,'골드','#f2c94c'],[2500,'플래티넘','#6fe0d0'],[3000,'다이아','#8ab8ff'],[3500,'마스터','#d58aff'],[4000,'그랜드마스터','#ff7a7a'],[4500,'챌린저','#ffd36b']];
 function tierOf(r){let t=TIERS[0];for(const x of TIERS)if((r|0)>=x[0])t=x;return t}
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 function nickKey(n){return 'n_'+[...new TextEncoder().encode(n.toLowerCase())].map(b=>b.toString(16).padStart(2,'0')).join('')}
@@ -6159,9 +6166,9 @@ async function loginAcct(nick,pw){
 async function logoutAcct(){if(SITE()){try{await GD_AUTH.logout()}catch(e){}location.reload();return}
 try{localStorage.removeItem('gd-login')}catch(e){}acctSubs.forEach(f=>{try{f()}catch(e){}});acctSubs=[];if(friendSub){friendSub();friendSub=null}friendKey='';acctState='login';if(matchMode==='rank')setMode('friendly');syncNick();renderAcct()}
 function onLoggedIn(){
-  setTimeout(checkStaleRank,1500);
+  setTimeout(checkStaleRank,1500);setTimeout(checkStaleAi,1700);
   netName=acct.nick;syncNick();connectRoom().then(()=>{setLobbyPresence();if(roomNS&&typeof roomNS.onPeers==='function')roomNS.onPeers(()=>{if(!acctOpen||!acct)return;const m=onlineMap(),sig=(acct.friends||[]).map(u=>m[u]?u+m[u].st+m[u].rc+m[u].md:'').join('|');if(sig!==onSig){onSig=sig;renderAcct()}})});
-  acctSubs.push(DB.doc('players/'+myUid).onSnapshot(sn=>{if(sn.exists){acct=Object.assign({},sn.data());netName=acct.nick;resubFriends();if(acctOpen)renderAcct()}},()=>{}));
+  acctSubs.push(DB.doc('players/'+myUid).onSnapshot(sn=>{if(sn.exists){acct=Object.assign({},sn.data());if((acct.rating|0)<RANK_MIN){acct.rating=RANK_MIN;try{DB.doc('players/'+myUid).update({rating:RANK_MIN})}catch(e){}}try{renderAiBox()}catch(e){}netName=acct.nick;resubFriends();if(acctOpen)renderAcct()}},()=>{}));
   acctSubs.push(DB.collection('players').orderBy('rating','desc').limit(20).onSnapshot(q=>{leaderDocs=q.docs.map(d=>d.data());if(acctOpen)renderAcct()},()=>{}));
   acctSubs.push(DB.collection('reqs').where('to','==',myUid).onSnapshot(q=>{reqIn=q.docs.map(d=>Object.assign({id:d.id},d.data()));if(acctOpen)renderAcct()},()=>{}));
   acctSubs.push(DB.collection('reqs').where('from','==',myUid).onSnapshot(q=>{reqOut=q.docs.map(d=>Object.assign({id:d.id},d.data()));setTimeout(settleAccepted,0);if(acctOpen)renderAcct()},()=>{}));
@@ -6180,7 +6187,7 @@ async function sendFriendReq(nick){
 }
 async function acceptReq(id,from){try{await DB.doc('reqs/'+id).update({st:'ok'});if(!(acct.friends||[]).includes(from))await DB.doc('players/'+myUid).update({friends:[...(acct.friends||[]),from]})}catch(e){}}
 async function removeFriend(uid){try{await DB.doc('players/'+myUid).update({friends:(acct.friends||[]).filter(f=>f!==uid)})}catch(e){}}
-function setLobbyPresence(){if(!roomNS||typeof roomNS.presence!=='function'||!acct||acctState!=='in')return;roomNS.presence({v:2,uid:myUid,nick:acct.nick,st:MODE==='pvp'?'대전 중':(R?'대기실':'메뉴'),rc:R?String(roomCode).replace(/^r/,''):'',md:matchMode,gm:GM}).catch(()=>{})}
+function setLobbyPresence(){if(!roomNS||typeof roomNS.presence!=='function'||!acct||acctState!=='in')return;roomNS.presence({v:2,uid:myUid,nick:acct.nick,st:MODE==='pvp'?'대전 중':(R?'대기실':'메뉴'),rc:R&&!AI.on?String(roomCode).replace(/^r/,''):'',md:AI.on?'ai':matchMode,gm:AI.on?'tdm':GM,st2:AI.on?'AI 대전':''}).catch(()=>{})}
 function onlineMap(){const m={};if(roomNS&&typeof roomNS.peers==='function')for(const pe of roomNS.peers()){const pr=pe.presence;if(pr&&pr.v===2&&typeof pr.uid==='string')m[pr.uid]=pr}return m}
 function acctHTML(){
   switch(acctState){
@@ -6193,16 +6200,16 @@ function acctHTML(){
       ${pwGuardHtml()}<form class="ac-form" id="acForm" data-act="login"><label>아이디<input id="acId" maxlength="10" autocomplete="username" value="${esc(acct?acct.nick:'')}"></label><label>비밀번호<input id="acPw" type="password" maxlength="40" autocomplete="current-password"></label><button class="btn sm" type="submit">로그인</button><p class="ac-err" id="acErr" role="alert"></p></form>`;
   }
   const t=tierOf(acct.rating),on=onlineMap(),me=myUid;
-  const lead=leaderDocs.map((p,i)=>{const tt=tierOf(p.rating);return `<li class="${p.uid===me?'me':''}"><span class="num">${i+1}</span><span class="grow">${esc(p.nick)}</span><span style="color:${tt[2]}">${tt[1]}</span><span class="num" style="width:3.2em;text-align:right">${p.rating|0}</span></li>`}).join('')||'<li class="off">아직 기록이 없어요</li>';
+  const lead=leaderDocs.map((p,i)=>{const tt=tierOf(p.rating);return `<li class="${p.uid===me?'me':''}"><span class="num">${i+1}</span><span class="grow">${esc(p.nick)}</span><span style="color:${tt[2]}">${tt[1]}</span><span class="num" style="width:3.2em;text-align:right">${Math.max(RANK_MIN,p.rating|0)}</span></li>`}).join('')||'<li class="off">아직 기록이 없어요</li>';
   const fr=(acct.friends||[]).map(uid=>{const p=friendDocs.find(d=>d.uid===uid),o=on[uid];const nm=p?p.nick:'…';const tt=tierOf(p?p.rating:0);
     return `<li><span class="grow">${esc(nm)} <span style="color:${tt[2]};font-size:12px">${tt[1]}</span></span>${o?`<span class="on">● ${esc(o.st||'온라인')}${o.rc?` · 방 ${esc(o.rc)}${o.md==='rank'?' 랭크':''} · ${esc((GMS[o.gm]||GMS.tdm).n)}`:''}</span>`:'<span class="off">오프라인</span>'}${o&&o.rc?`<button class="mini" data-act="joinf" data-rc="${esc(o.rc)}" data-md="${o.md==='rank'?'rank':'friendly'}" data-gm="${GMS[o.gm]?o.gm:'tdm'}">같이 하기</button>`:''}${SITE()?`<button class="mini" data-act="dm" data-uid="${esc(uid)}">쪽지${COM.unread(uid)?`<span class="badge">새</span>`:''}</button><button class="mini" data-act="call" data-uid="${esc(uid)}" title="음성 통화">통화</button>`:''}<button class="mini" data-act="unf" data-uid="${esc(uid)}">삭제</button></li>`}).join('')||'<li class="off">친구가 없어요. 아이디로 요청을 보내 보세요</li>';
   const rin=reqIn.filter(r=>r.st==='p').map(r=>`<li><span class="grow">${esc(r.fromNick)} 님의 요청</span><button class="mini" data-act="acc" data-id="${esc(r.id)}" data-from="${esc(r.from)}">수락</button><button class="mini" data-act="dec" data-id="${esc(r.id)}">거절</button></li>`).join('');
   const rout=reqOut.filter(r=>r.st==='p').map(r=>`<li><span class="grow">${esc(r.toNick)} 님에게 보냄</span><button class="mini" data-act="dec" data-id="${esc(r.id)}">취소</button></li>`).join('');
   const kd=acct.d?(acct.k/acct.d).toFixed(2):(acct.k|0);
-  return `<div class="ac-prof"><span class="nm">${esc(acct.nick)}</span><span class="tier" style="color:${t[2]}">${t[1]} · ${acct.rating|0}점</span>
+  return `<div class="ac-prof"><span class="nm">${esc(acct.nick)}</span><span class="tier" style="color:${t[2]}">${t[1]} · ${Math.max(RANK_MIN,acct.rating|0)}점</span>
     <span class="st">랭크 ${acct.w|0}승 ${acct.l|0}패 · 대전 ${acct.games|0}판 · 처치 ${acct.k|0} / 죽음 ${acct.d|0} (K/D ${kd})</span>${(acct.ws|0)>=2?`<span class="streak">${acct.ws}연승 중</span>`:''}${acct.bestWs?`<span class="st">최고 ${acct.bestWs}연승</span>`:''}${(acct.ab|0)?`<span class="st warn">탈주 ${acct.ab}회</span>`:''}${rankBanLeft()>0?`<span class="st warn">랭크 금지 ${Math.ceil(rankBanLeft()/60000)}분 남음</span>`:''}<button class="mini" data-act="logout">로그아웃</button></div>
     <div class="ac-grid"><div class="ac-box"><h3>랭킹 TOP 20</h3><ol class="ac-list">${lead}</ol>
-      <p class="ac-note">랭크 대전에서 이기면 오르고 지면 내려가요. 브론즈 → 실버 1100 → 골드 1250 → 플래티넘 1400 → 다이아 1550 → 마스터 1700</p></div>
+      <p class="ac-note">랭크 대전에서 이기면 오르고 지면 내려가요. 500점마다 한 등급: 아이언 500 → 브론즈 1000 → 실버 1500 → 골드 2000 → 플래티넘 2500 → 다이아 3000 → 마스터 3500 → 그랜드마스터 4000 → 챌린저 4500. 아이언 500점 아래로는 내려가지 않아요. 로비의 AI 대전으로도 점수를 올릴 수 있어요</p></div>
     <div class="ac-box"><h3>친구</h3><form class="ac-row" id="frForm" data-act="freq"><input id="frId" maxlength="10" placeholder="친구 아이디" aria-label="친구 아이디"><button class="mini" type="submit">친구 요청</button></form><p class="ac-note" id="frMsg" role="status">${esc(frMsgText)}</p>
       ${rin?`<ul class="ac-list">${rin}</ul>`:''}<ul class="ac-list">${fr}</ul>${rout?`<ul class="ac-list">${rout}</ul>`:''}</div></div>`;
 }
@@ -6260,6 +6267,7 @@ function setGM(m){if(!GMS[m])m='tdm';if(R&&team>=0&&GM!==m)return;GM=m;try{local
 document.querySelectorAll('.gmb').forEach(b=>b.addEventListener('click',()=>{if(R&&MODE==='pvp')return;if(R&&GM!==b.dataset.gm){try{R.leave()}catch(e){}R=null;team=-1;teamsEl.hidden=true;lbStatus.textContent='모드를 바꿨어요. 입장을 다시 눌러 주세요.'}setGM(b.dataset.gm)}));
 setTimeout(()=>setGM(GM),0);
 async function onMatchEnd(win,iWon){
+  if(AI.on){aiMatchEnd(iWon);return}
   try{achPvpEnd(iWon)}catch(_){}
   lastResult=null;if(acctState!=='in'||!acct||!DB)return;
   const inR=[...remotes.values()].filter(r=>r.rd===pv.round&&(r.tm===0||r.tm===1)),opp=inR.filter(r=>isFfa()||r.tm!==team),mates=isFfa()?[]:inR.filter(r=>r.tm===team);
@@ -6267,7 +6275,7 @@ async function onMatchEnd(win,iWon){
   const upd={k:(acct.k|0)+pv.k,d:(acct.d|0)+pv.d,games:(acct.games|0)+1};let delta=0;
   let bonus=0;if(ranked){const oa=avg(opp.map(r=>r.rt||1000)),ma=avg([acct.rating|0,...mates.map(r=>r.rt||1000)]),exp=1/(1+Math.pow(10,(oa-ma)/400));delta=Math.round(32*(res-exp));
     if(res){upd.ws=(acct.ws|0)+1;bonus=upd.ws>=2?Math.min(12,2*upd.ws):0;delta+=bonus;upd.bestWs=Math.max(acct.bestWs|0,upd.ws)}else upd.ws=0;
-    upd.rating=Math.max(0,(acct.rating|0)+delta);upd[res?'w':'l']=(acct[res?'w':'l']|0)+1}
+    upd.rating=Math.max(RANK_MIN,(acct.rating|0)+delta);delta=upd.rating-Math.max(RANK_MIN,acct.rating|0);upd[res?'w':'l']=(acct[res?'w':'l']|0)+1}
   if(rkActive){upd.rk=null;rkActive=false}
   lastResult={ranked,delta,res,rating:upd.rating,needOpp:matchMode==='rank'&&!opp.length,ws:upd.ws|0,bonus};
   try{await DB.doc('players/'+myUid).update(upd)}catch(e){}
@@ -6318,6 +6326,7 @@ goBtn.addEventListener('click',()=>{
   cur=primary>=0?primary:secondary;state='play';openShop(true);setLobbyPresence();
 });
 async function leavePvp(force){
+  if(AI.on)await aiLeave();
   if(rkActive&&!pv.over&&force!==true)await rankPenalty('경기 도중 나감');else if(pv.over)clearRank();
   closeQuick();clearRoul();if(GM==='aug')resetPerks();
   try{if(R)await R.leave()}catch(e){}R=null;MODE='solo';setTimeout(setLobbyPresence,0);document.querySelector('.hud').classList.remove('pvp');team=-1;remotes=new Map();leaveBtn.hidden=true;
@@ -6325,6 +6334,148 @@ async function leavePvp(force){
   try{if(!shopEl.hidden){shopEl.hidden=true}lobbyEl.hidden=true}catch(e){}document.documentElement.classList.remove('inpvp');say('대전에서 나왔어요',1.6);
 }
 leaveBtn.addEventListener('click',()=>{if(MODE==='pvp')leavePvp();else quitSolo()});refreshSaveHint();
+// ================= AI 대전 (랭크 점수 반영) =================
+// 가짜 방(AI_ROOM)을 R 자리에 끼워 넣어, 봇이 진짜 상대처럼 기존 대전 코드(점수·킬피드·피격)를 그대로 탄다.
+const AI_DIFF={
+ mid:{n:'중간',hp:100,acc:.38,head:.08,react:.6,turn:4.2,cd:.15,burst:[3,5],rest:.45,speed:2.4,view:16,fov:1.15,hear:10,moveMul:.7,selfMul:.8,strafe:.5,strafeT:1.4,pref:6,regen:0,retreat:0,crouch:0,ar:[0,0],win:12,lose:8,col:'#ffc857'},
+ hard:{n:'어려움',hp:130,acc:.5,head:.28,react:.17,turn:11,cd:.11,burst:[8,14],rest:.15,speed:3.4,view:26,fov:1.9,hear:24,moveMul:.9,selfMul:.95,strafe:1,strafeT:.55,pref:7,regen:14,retreat:1,crouch:1,ar:[1,1],win:30,lose:10,col:'#ff6b6b'}};
+const AI_NAMES={mid:['AI 훈련병','AI 상병','AI 병장','AI 하사','AI 중사'],hard:['AI 사신','AI 망령','AI 처형자','AI 그림자','AI 독수리']};
+GMS.ai1={n:'AI 대전 1대1',d:'AI와 1대1 · 먼저 10처치',team:1,kills:10};
+GMS.ai3={n:'AI 대전 3대3',d:'AI 아군 둘과 함께 3대3 · 먼저 20처치',team:1,kills:20};
+const AI_ROOM={
+ peers(){const a=[{sameTab:true,peer:'!me'}];for(const b of AI.bots)if(b.pr)a.push({peer:b.id,presence:b.pr,by:null});return a},
+ presence(pr){try{aiOnMyPresence(pr)}catch(e){}return Promise.resolve()},
+ leave(){return Promise.resolve()},onPeers(){}};
+let aiSel={d:'mid',f:'1'};try{const s=JSON.parse(localStorage.getItem('gd-ai')||'null');if(s&&AI_DIFF[s.d])aiSel.d=s.d;if(s&&(s.f==='1'||s.f==='3'))aiSel.f=s.f}catch(e){}
+function aiEv(b,d){d.i=++b.seq;b.ev.push({ts:performance.now(),d});if(b.ev.length>26)b.ev.shift()}
+function aiBuildGrid(){const g=new Uint8Array(MW*MH);
+  for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){let bl=map[y][x]!=='.';if(!bl)for(const o of objs){if(o.dead||!o.O.solid)continue;if((o.x|0)===x&&(o.y|0)===y&&o.O.r>.25){bl=true;break}}g[y*MW+x]=bl?1:0}
+  AI.grid=g;AI.fields=new Map()}
+function aiField(tx,ty){const k=clamp(ty|0,0,MH-1)*MW+clamp(tx|0,0,MW-1),c=AI.fields.get(k);if(c&&time-c.t<.5)return c.d;
+  const d=new Int16Array(MW*MH).fill(-1),q=[k];d[k]=0;
+  for(let h=0;h<q.length;h++){const i=q[h],x=i%MW,y=(i/MW)|0;for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+dx,ny=y+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;const j=ny*MW+nx;if(d[j]>=0||AI.grid[j])continue;d[j]=d[i]+1;q.push(j)}}
+  AI.fields.set(k,{t:time,d});return d}
+// 목표 칸까지 다음으로 갈 칸의 중심 방향
+function aiStep(b,tx,ty){const d=aiField(tx,ty),bx=b.x|0,by=b.y|0,bi=by*MW+bx;
+  if(d[bi]<0||d[bi]===0)return [tx-b.x,ty-b.y];
+  let best=-1,bv=d[bi];
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]){const nx=bx+dx,ny=by+dy;if(nx<0||ny<0||nx>=MW||ny>=MH)continue;const j=ny*MW+nx;if(d[j]<0)continue;
+    if(dx&&dy&&(AI.grid[by*MW+nx]||AI.grid[ny*MW+bx]))continue;const v=d[j]+(dx&&dy?-.4:0);if(v<bv){bv=v;best=j}}
+  if(best<0)return [tx-b.x,ty-b.y];
+  return [(best%MW)+.5-b.x,((best/MW)|0)+.5-b.y]}
+function aiMove(b,vx,vy,dt,mul){const m=Math.hypot(vx,vy);if(m<1e-3){b.mv=false;return}
+  const sp=b.D.speed*(b.cr?.6:1)*(mul||1)*dt,nx=b.x+vx/m*sp,ny=b.y+vy/m*sp;let ok=false;
+  if(!blocked(nx,ny,.24,null)){b.x=nx;b.y=ny;ok=true}else if(!blocked(nx,b.y,.24,null)){b.x=nx;ok=true}else if(!blocked(b.x,ny,.24,null)){b.y=ny;ok=true}
+  b.mv=ok;if(!ok){b.stk=(b.stk||0)+dt;if(b.stk>.35){b.stk=0;b.jit={a:rand()*Math.PI*2,t:.45}}}else b.stk=0}
+function aiTurn(b,ta,rate,dt){const df=Math.atan2(Math.sin(ta-b.a),Math.cos(ta-b.a)),mx=rate*dt;b.a+=Math.abs(df)<=mx?df:Math.sign(df)*mx;return Math.abs(Math.atan2(Math.sin(ta-b.a),Math.cos(ta-b.a)))}
+function aiEnemiesOf(b){const out=[];
+  if(MODE==='pvp'&&pv.alive&&b.tm!==team)out.push({id:'!me',x:P.x,y:P.y,mv:!!P.mv,cr:crK>.5,me:1});
+  for(const o of AI.bots)if(o.al&&o.tm!==b.tm)out.push({id:o.id,x:o.x,y:o.y,mv:o.mv,cr:o.cr,bot:o});
+  return out}
+function aiSpawn(b){const list=spawns[b.tm===1?'b':'a'];let sp=list.length?list[(rand()*list.length)|0]:[MW/2,MH/2],bd=-1;
+  for(const s of list){let md=99;for(const e of aiEnemiesOf(b))md=Math.min(md,Math.hypot(e.x-s[0],e.y-s[1]));md+=rand()*2;if(md>bd){bd=md;sp=s}}
+  Object.assign(b,{x:sp[0]+(rand()-.5)*.3,y:sp[1]+(rand()-.5)*.3,a:b.tm===1?Math.PI:0,hp:b.max,al:true,inv:1.2,tgt:null,seenT:-99,lx:null,ly:null,cr:false,mv:false,shots:0,rest:0,fireCd:.4,jit:null,lastHurt:-99})}
+function aiNewBot(i,tm,D,name,w){return {id:'ai'+i,n:name,tm,D,w,max:D.hp,hp:D.hp,al:false,d:0,kb:{},ev:[],seq:0,respT:0,sd:rand()<.5?1:-1,sdT:0,x:0,y:0,a:0}}
+function aiDie(b,killer,w,hd){if(!b.al)return;b.al=false;b.hp=0;b.d++;b.respT=3.5;b.kb[killer]=(b.kb[killer]|0)+1;aiEv(b,{t:'kill',by:killer,w:w|0,hd:hd?1:0})}
+function aiHurtBot(b,dmg,by,w,hd,sx,sy){if(!b.al||b.inv>0)return;b.hp-=dmg;b.lastHurt=time;
+  if(by&&(!b.tgt||time-b.seenT>1)){b.lx=sx;b.ly=sy;b.seenT=time-.5}
+  if(b.hp<=0)aiDie(b,by,w,hd)}
+// 내 접속 정보(이벤트)를 받아 봇에게 적용 — 내가 맞힌 총알, 내 총소리
+function aiOnMyPresence(pr){if(!AI.on||!Array.isArray(pr.ev))return;let mx=AI.mySeen;
+  for(const e of pr.ev){if(!e||typeof e.i!=='number'||e.i<=AI.mySeen)continue;if(e.i>mx)mx=e.i;
+    if(e.t==='hit'&&(e.rd|0)===pv.round){const b=AI.bots.find(x=>x.id===e.to);if(b&&b.tm!==team)aiHurtBot(b,clamp(+e.d||0,0,30)*10,'!me',e.w,e.hd,P.x,P.y)}
+    else if(e.t==='shot'||e.t==='sw'||e.t==='nade'){for(const b of AI.bots){if(!b.al||b.tm===team)continue;if(Math.hypot(b.x-P.x,b.y-P.y)<b.D.hear&&!(b.tgt&&time-b.seenT<.3)){b.lx=P.x;b.ly=P.y;b.seenT=Math.max(b.seenT,time-1.2);b.heard=time}}}}
+  AI.mySeen=mx}
+function aiFire(b,c,d){const D=b.D,W_=WEAP[b.w]||WEAP[5];
+  b.fireCd=Math.max(D.cd,W_.cd||.1)*(.85+rand()*.3);b.shots--;if(b.shots<=0){b.shots=D.burst[0]+((rand()*(D.burst[1]-D.burst[0]+1))|0);b.fireCd+=D.rest*(.7+rand()*.6)}
+  aiEv(b,{t:'shot',w:b.w});if(!c.me&&Math.hypot(b.x-P.x,b.y-P.y)<26)netSound(b,W_.snd||'rifle');
+  let ch=D.acc*clamp(1.2-d/20,.4,1)*(c.mv?D.moveMul:1)*(c.cr?.9:1)*(b.mv?D.selfMul:1);if(b.w===11)ch*=1.25;
+  if(rand()>=ch)return;
+  const z=rand()<D.head*(c.cr?.8:1)?'h':rand()<.18?'l':'b',mul=z==='h'?2:z==='l'?.65:1,dmg=(W_.dmg||1.2)*10*mul*(b.w===11?.85:1);
+  if(c.me)aiEv(b,{t:'hit',to:'!me',rd:pv.round,d:+(dmg/10).toFixed(2),hd:z==='h'?1:0,z,w:b.w});
+  else if(c.bot){aiHurtBot(c.bot,dmg,b.id,b.w,z==='h',b.x,b.y);const rr=remotes.get(c.bot.id);if(rr)rr.hit=.12}}
+function aiBotTick(b,dt){const D=b.D;
+  while(b.ev.length&&performance.now()-b.ev[0].ts>4000)b.ev.shift();
+  if(!b.al){b.respT-=dt;if(b.respT<=0)aiSpawn(b);return}
+  b.inv=Math.max(0,b.inv-dt);b.fireCd-=dt;
+  if(D.regen&&time-b.lastHurt>3&&b.hp<b.max)b.hp=Math.min(b.max,b.hp+D.regen*dt);
+  // 보이는 적 고르기
+  let c=null,cd=1e9;
+  for(const e of aiEnemiesOf(b)){const d=Math.hypot(e.x-b.x,e.y-b.y);if(d>D.view)continue;
+    const fa=Math.abs(Math.atan2(Math.sin(Math.atan2(e.y-b.y,e.x-b.x)-b.a),Math.cos(Math.atan2(e.y-b.y,e.x-b.x)-b.a)));
+    const known=b.tgt===e.id&&time-b.seenT<1.2;
+    if(!(fa<D.fov||d<2.5||known||time-b.lastHurt<.8))continue;
+    if(!los(b.x,b.y,e.x,e.y))continue;
+    const sc=d*(e.id===b.tgt?.7:1)*(e.me?.9:1);if(sc<cd){cd=sc;c=e}}
+  let vx=0,vy=0,mul=1;
+  if(b.jit){b.jit.t-=dt;vx=Math.cos(b.jit.a);vy=Math.sin(b.jit.a);if(b.jit.t<=0)b.jit=null;aiMove(b,vx,vy,dt);return}
+  if(c){const d=Math.hypot(c.x-b.x,c.y-b.y);
+    if(b.tgt!==c.id){b.tgt=c.id;b.react=D.react*(.75+rand()*.5)}
+    b.seenT=time;b.lx=c.x;b.ly=c.y;b.react-=dt;
+    const err=aiTurn(b,Math.atan2(c.y-b.y,c.x-b.x),D.turn,dt);
+    if(b.react<=0&&err<.2&&b.fireCd<=0)aiFire(b,c,d);
+    // 움직임: 거리 유지 + 좌우 무빙
+    b.sdT-=dt;if(b.sdT<=0){b.sdT=D.strafeT*(.5+rand());b.sd=rand()<.5?1:-1;b.stand=rand()>D.strafe;if(D.crouch)b.cr=rand()<.3}
+    const ux=(c.x-b.x)/(d||1),uy=(c.y-b.y)/(d||1);
+    if(D.retreat&&b.hp<b.max*.35){const s=spawns[b.tm===1?'b':'a'][0]||[b.x,b.y];[vx,vy]=aiStep(b,s[0],s[1]);b.cr=false}
+    else if(d>D.pref+2){[vx,vy]=aiStep(b,c.x,c.y);const m=Math.hypot(vx,vy)||1;vx/=m;vy/=m}
+    else if(d<D.pref-2.5){vx=-ux;vy=-uy}
+    if(!b.stand){const sw=d>D.pref+2?.45:.9;vx+=-uy*b.sd*sw;vy+=ux*b.sd*sw}
+    mul=b.stand&&!vx&&!vy?0:1}
+  else{b.cr=false;let tx=null,ty=null;
+    if(b.lx!=null&&time-b.seenT<5){tx=b.lx;ty=b.ly;if(Math.hypot(tx-b.x,ty-b.y)<.8)b.lx=null}
+    if(tx==null){let best=null,bd=1e9;for(const e of aiEnemiesOf(b)){const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd){bd=d;best=e}}if(best){tx=best.x;ty=best.y}}
+    if(tx!=null){[vx,vy]=aiStep(b,tx,ty);const ta=b.heard&&time-b.heard<.8&&b.lx!=null?Math.atan2(b.ly-b.y,b.lx-b.x):Math.atan2(vy,vx);aiTurn(b,ta,D.turn*.7,dt)}}
+  if(mul)aiMove(b,vx,vy,dt,mul);else b.mv=false}
+function aiTick(dt){
+  if(!AI.on)return;const run=state==='play'&&!pv.over;
+  for(const b of AI.bots){if(run)aiBotTick(b,dt);
+    b.pr={v:1,n:b.n,tm:b.tm,rd:pv.round,k:0,d:b.d,hp:Math.max(0,Math.round(b.hp)),al:b.al?1:0,w:b.w,ar:b.D.ar,rt:0,kb:b.kb,x:+b.x.toFixed(2),y:+b.y.toFixed(2),a:+b.a.toFixed(2),mv:b.mv?1:0,z:0,cr:b.cr?1:0,ev:b.ev.map(e=>e.d)};
+    const r=remotes.get(b.id);if(r)r.max=b.max}
+  if(pv.over&&pv.over.t<=.05&&!AI.exiting){AI.exiting=true;setTimeout(()=>leavePvp(true),0)}}
+async function aiRankWrite(won,forfeit){const D=AI_DIFF[AI.diff];
+  if(!AI.ranked||!DB||!acct||acctState!=='in'){lastResult={ranked:false,delta:0,msg:'로그인하면 AI 대전 결과가 랭크 점수에 반영돼요'};return}
+  const old=Math.max(RANK_MIN,acct.rating|0),rating=Math.max(RANK_MIN,old+(won?D.win:-D.lose)),delta=rating-old;
+  const upd={rating,aiRk:null,games:(acct.games|0)+1,k:(acct.k|0)+pv.k,d:(acct.d|0)+pv.d};upd[won?'aiW':'aiL']=(acct[won?'aiW':'aiL']|0)+1;
+  const t0=tierOf(old),t1=tierOf(rating);Object.assign(acct,upd);
+  lastResult={ranked:true,delta,rating,res:won?1:0,msg:`AI ${D.n} ${forfeit?'기권패':won?'승리':'패배'} · 랭크 ${delta>=0?'+':''}${delta}점 → ${rating}점 (${t1[1]})${t1!==t0?(rating>old?' · 승급!':' · 강등'):''}`};
+  try{await DB.doc('players/'+myUid).update(upd)}catch(e){}
+  try{if(window.firebase&&firebase.apps&&firebase.apps.length&&firebase.auth().currentUser)firebase.database().ref('matchLog').push().set({u:firebase.auth().currentUser.uid,n:String(acct.nick||netName||'').slice(0,20),t:firebase.database.ServerValue.TIMESTAMP,m:'ai-'+AI.diff,g:GM,k:pv.k|0,d:pv.d|0,w:won?1:0,dr:delta|0,r:'AI',pl:AI.bots.length+1})}catch(e){}}
+function aiMatchEnd(iWon){if(AI.done)return;AI.done=true;aiRankWrite(!!iWon,false)}
+async function startAi(){
+  if(MODE==='pvp'||AI.on)return;initAudio&&initAudio();
+  if(R){try{await R.leave()}catch(e){}R=null;team=-1;teamsEl.hidden=true}
+  const D=AI_DIFF[aiSel.d],three=aiSel.f==='3',ranked=!!(acctState==='in'&&acct&&DB);
+  Object.assign(AI,{on:true,done:false,exiting:false,diff:aiSel.d,fmt:aiSel.f,ranked,prevMM:matchMode,prevGM:GM,prevRC:roomCode,mySeen:evSeq,bots:[]});
+  matchMode='friendly';GM=three?'ai3':'ai1';roomCode='ai'+((rand()*1e6)|0);myPeer='!me';team=0;remotes=new Map();seenEv=new Map();
+  const nm=AI_NAMES[aiSel.d].slice().sort(()=>rand()-.5);
+  const ws=aiSel.d==='hard'?[5,11,9]:[5,5,16];
+  for(let i=0;i<(three?3:1);i++)AI.bots.push(aiNewBot(i+1,1,D,nm[i],ws[i%3]));
+  if(three)for(let i=0;i<2;i++)AI.bots.push(aiNewBot(i+4,0,D,nm[3+i]||('AI 아군'+(i+1)),ws[i%3]));
+  R=AI_ROOM;MODE='pvp';lobbyEl.hidden=true;document.querySelector('.hud').classList.add('pvp');
+  hp=100;armor=0;resetAmmo();pv.k=0;pv.d=0;pv.kb={};pv.over=null;pv.rover=null;pv.rr=null;pv.round=0;pv.mi=0;pv.newMatch=true;pv.rl=null;killFeed=[];echoes=[];ghosts=[];lastResult=null;
+  loadLevel(0,genPvp(seedFor(0)));respawn();aiBuildGrid();for(const b of AI.bots)aiSpawn(b);
+  cur=primary>=0?primary:secondary;state='play';openShop(true);setLobbyPresence();
+  say(`AI 대전 · ${D.n} · ${three?'3대3':'1대1'}${ranked?' · 랭크 반영':''}`,2.4);
+  if(ranked){try{DB.doc('players/'+myUid).update({aiRk:{t:Date.now(),d:aiSel.d}})}catch(e){}}}
+// 경기 도중 나가면 기권패
+async function aiLeave(){if(!AI.on)return;const forfeit=!AI.done;AI.done=true;
+  if(forfeit)await aiRankWrite(false,true);
+  AI.on=false;matchMode=AI.prevMM||'friendly';GM=AI.prevGM||'tdm';roomCode=AI.prevRC||'1';AI.bots=[];myPeer=null;
+  if(lastResult&&lastResult.msg)setTimeout(()=>say(lastResult.msg,4),60)}
+function checkStaleAi(){if(!acct||!acct.aiRk||AI.on||!DB)return;const D=AI_DIFF[acct.aiRk.d]||AI_DIFF.mid,old=Math.max(RANK_MIN,acct.rating|0),rating=Math.max(RANK_MIN,old-D.lose);
+  const upd={rating,aiRk:null,aiL:(acct.aiL|0)+1};Object.assign(acct,upd);try{DB.doc('players/'+myUid).update(upd)}catch(e){}say(`지난 AI 대전을 끝내지 않고 나가서 기권패 — 랭크 −${old-rating}점`,4)}
+function renderAiBox(){document.querySelectorAll('.aib').forEach(b=>b.setAttribute('aria-pressed',b.dataset.d===aiSel.d?'true':'false'));
+  document.querySelectorAll('.aif').forEach(b=>b.setAttribute('aria-pressed',b.dataset.f===aiSel.f?'true':'false'));
+  const D=AI_DIFF[aiSel.d],li=acctState==='in'&&acct,el=document.getElementById('aiNote');if(!el)return;
+  el.innerHTML=`<b style="color:${D.col}">${D.n}</b> · 승리 <b style="color:#7ee6a0">+${D.win}</b> / 패배 <b style="color:#ff8a80">−${D.lose}</b> · `+
+    (li?`지금 ${tierOf(acct.rating)[1]} ${Math.max(RANK_MIN,acct.rating|0)}점`:'로그인하면 랭크 점수에 반영돼요 (지금은 연습)')+
+    `<br><small>${aiSel.d==='hard'?'어려움 AI는 반응이 빠르고 머리를 노리며, 좌우로 피하고 앉아 쏘고, 숨어서 체력을 회복해요.':'중간 AI는 조금 느리게 반응하고 짧게 끊어 쏴요.'} 경기 도중 나가면 기권패예요.</small>`}
+document.querySelectorAll('.aib').forEach(b=>b.addEventListener('click',()=>{aiSel.d=b.dataset.d;try{localStorage.setItem('gd-ai',JSON.stringify(aiSel))}catch(e){}renderAiBox()}));
+document.querySelectorAll('.aif').forEach(b=>b.addEventListener('click',()=>{aiSel.f=b.dataset.f;try{localStorage.setItem('gd-ai',JSON.stringify(aiSel))}catch(e){}renderAiBox()}));
+{const g=document.getElementById('aiGo');if(g)g.addEventListener('click',()=>startAi())}
+document.getElementById('pvpBtn').addEventListener('click',()=>setTimeout(renderAiBox,0));
+setTimeout(renderAiBox,0);
 {const bi=(id,k)=>{const el=document.getElementById(id);if(!el)return;el.checked=!!OPT[k];el.addEventListener('change',()=>{OPT[k]=el.checked;saveOpt();document.querySelectorAll('#optRoul,#optRoulP').forEach(x=>{if(x!==el&&k==='roul')x.checked=el.checked})})};bi('optInf','inf');bi('optRush','rush');{const best=(()=>{try{return JSON.parse(localStorage.getItem('gd-runs')||'[]').reduce((a,r)=>Math.max(a,r.floor|0),0)}catch(e){return 0}})(),cb=document.getElementById('optRush');if(cb&&best<10){cb.disabled=true;cb.checked=false;OPT.rush=false;document.getElementById('optRushL').style.opacity=.5}else if(cb)document.getElementById('optRushS').textContent='매 층 보스 · 13층부터 보스 둘'}bi('optRoul','roul');bi('optRoulP','roul');
  if(state==='title'){ov.classList.add('home');ovT.innerHTML=[...'글자 던전'].map((ch,i)=>ch===' '?'<i class=gap></i>':`<span class=sort style=--i:${i}>${ch}</span>`).join('');ovS.textContent='글자로 지은 실외 전장'}
  setInterval(()=>{const o=document.getElementById('ovOpts');if(o)o.hidden=!((state==='title'||state==='over')&&MODE!=='pvp')},300);
@@ -6402,8 +6553,15 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-01f';
+const NOTICE_VER='2026-11-01g';
 const NOTICE=[
+ {v:'2026-11-01 저녁',t:'AI 대전 · 랭크 등급 개편',items:[
+  '새 모드 「AI 대전」 (대전 로비 맨 위): 혼자서 AI와 싸워 랭크 점수를 올려요 — 1대1(10처치) 또는 AI 아군 둘과 3대3(20처치)',
+  'AI 난이도 중간: 승리 +12 / 패배 −8 · 어려움: 승리 +30 / 패배 −10 (로그인해야 반영)',
+  '어려움 AI: 반응 0.17초, 머리를 노리고, 좌우로 피하며 앉아 쏘고, 체력이 낮으면 숨어서 회복해요 · 체력 130 + 방어구',
+  'AI 대전 도중 나가면 기권패로 처리돼요',
+  '랭크 등급 개편: 500점마다 한 등급 — 아이언 500 · 브론즈 1000 · 실버 1500 · 골드 2000 · 플래티넘 2500 · 다이아 3000 · 마스터 3500 · 그랜드마스터 4000 · 챌린저 4500',
+  '아이언 500점 아래로는 더 이상 내려가지 않아요 (500점 아래였던 계정은 500점으로 맞춰요)']},
  {v:'2026-11-01 오전',t:'금단의 계약 · 육참골단 · 길 안내 · 여기서 그만하기',items:[
   '새 등급 「금단」: 큰 대가를 치르고 한 가지를 크게 올리는 계약 증강 6종 — 피의 서약(체력 −60% / 피해 ×2.5), 유리의 맹세(받는 피해 2배 / 연사·장전 +80%), 굶주린 계약(회복 불가 / 처치마다 피해 +1% 영구), 쇠사슬 낙인(이동 −40% / 받는 피해 −70%), 시간의 빚(층마다 90초 뒤 체력이 줄어듦 / 피해 ×2·이동 +30%), 영혼 저당(보스 강화 / 보스마다 신화 증강)',
   '「육참골단」 (초월): 받는 피해 +25%, 죽을 만큼 맞으면 체력 20%로 버티며 주변 적을 처형 — 층마다 한 번',
