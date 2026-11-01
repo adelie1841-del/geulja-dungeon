@@ -721,10 +721,18 @@ let QSET='auto',QL=0;try{const q=localStorage.getItem('gd-q');if(['auto','0','1'
  QL=QSET==='auto'?(coarse&&(cores<=4||mem<=3)?1:0):+QSET;}
 const QNAME=['높게','보통','낮게','매우 낮게'];
 function syncQ(){const b=document.getElementById('qBtn');if(b)b.textContent='화질 '+(QSET==='auto'?'자동 ('+QNAME[QL]+')':QNAME[QL])}
-function setQL(q){q=clamp(q,0,3);if(q===QL)return;QL=q;resize();syncQ()}
-let qAcc=0,qN=0,qT=0;
-function qWatch(dt){if(QSET!=='auto'||state!=='play'||QL>=3||document.hidden)return;qAcc+=dt;qN++;qT+=dt;
-  if(qT>=3){const avg=qAcc/qN;qAcc=0;qN=0;qT=0;if(avg>1/38){setQL(QL+1);say('기기가 느려서 화질을 낮췄어요 (메뉴에서 바꿀 수 있어요)',2)}}}
+function setQL(q){q=clamp(q,0,3);if(q===QL)return;QL=q;qWarm=Math.max(qWarm,1.5);resize();syncQ()}
+// 자동 화질: 2초마다 실제 FPS를 재서 느리면 내리고(아주 느리면 두 단계), 오래 넉넉하면 다시 올림.
+// 맵 로딩·탭 전환 같은 한 번의 끊김(0.25초 이상)은 무시하고, 화질을 바꾼 직후 1.5초는 재지 않음.
+let qAcc=0,qN=0,qT=0,qWarm=2,qGood=0,qUp=0,qUpT=-99,qBase=QL;
+function qReset(){qAcc=0;qN=0;qT=0}
+function qWatch(dt){if(QSET!=='auto'||document.hidden||state!=='play'){qReset();qWarm=Math.max(qWarm,.8);return}
+  if(qWarm>0){qWarm-=dt;qReset();return}
+  if(dt>.25)return;
+  qAcc+=dt;qN++;qT+=dt;if(qT<2)return;
+  const fps=qN/qAcc;qReset();
+  if(fps<40&&QL<3){if(time-qUpT<20)qUp=9;qGood=0;setQL(QL+(fps<24&&QL<2?2:1));say(`기기가 느려서 화질을 낮췄어요 → ${QNAME[QL]} (메뉴에서 바꿀 수 있어요)`,2);return}
+  if(fps>57&&QL>qBase&&qUp<3){qGood+=2;if(qGood>=10){qGood=0;qUp++;qUpT=time;setQL(QL-1);say(`여유가 생겨 화질을 올렸어요 → ${QNAME[QL]}`,1.6)}}else qGood=0}
 function resize(){
   try{applyUIS()}catch(e){}
   const r=stage.getBoundingClientRect();
@@ -1279,7 +1287,7 @@ function applySetting(k,v){
   if(k==='gm'){let g=+v;if(g>=4&&!R3.init()){g=0;say('이 기기에서는 3D를 쓸 수 없어요',2)}GMODE=g;try{localStorage.setItem('gd-gmode2',GMODE)}catch(e){}if(window.__gmSync)window.__gmSync()}
   else if(k==='ui'){UISET=v;try{localStorage.setItem('gd-ui',UISET)}catch(e){}resize()}
   else if(k==='fs'){const on=!!(document.fullscreenElement||document.webkitFullscreenElement||document.documentElement.classList.contains('pfs'));if((v==='1')!==on)document.getElementById('fsBtn').click();setTimeout(()=>{if(!setEl.hidden)renderSettings()},450)}
-  else if(k==='q'){QSET=v;try{localStorage.setItem('gd-q',QSET)}catch(e){}if(QSET==='auto'){const coarse=matchMedia('(pointer:coarse)').matches;setQL(coarse&&((navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3)?1:0)}else setQL(+QSET);syncQ()}
+  else if(k==='q'){QSET=v;try{localStorage.setItem('gd-q',QSET)}catch(e){}if(QSET==='auto'){const coarse=matchMedia('(pointer:coarse)').matches;setQL(coarse&&((navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3)?1:0);qBase=QL;qUp=0;qGood=0;qWarm=2}else setQL(+QSET);syncQ()}
   else if(k==='br'){brightIdx=+v;AMB=BRIGHT[brightIdx];brBtn.textContent='밝기 '+BRIGHT_NAME[brightIdx];try{localStorage.setItem('gd-bright',brightIdx)}catch(e){}}
   else if(k==='gz'){sizeIdx=+v;gzBtn.textContent='글자 '+SIZE_NAME[sizeIdx];try{localStorage.setItem('gd-size',sizeIdx)}catch(e){}resize()}
   else if(k==='ts'){lookSens=TSENS[+v][0];try{localStorage.setItem('gd-tsens',lookSens)}catch(e){}syncTs()}
@@ -1730,7 +1738,7 @@ function syncTs(){const b=document.getElementById('tsBtn');if(!b)return;let best
 setTimeout(()=>{const b=document.getElementById('gmBtn');if(!b)return;const sync=()=>b.textContent='그래픽 '+GMODE_NAME[GMODE];sync();
   b.addEventListener('click',()=>{GMODE=(GMODE+1)%6;if(GMODE>=4&&!R3.init()){GMODE=0;say('이 기기에서는 3D를 쓸 수 없어요',2)}try{localStorage.setItem('gd-gmode2',GMODE)}catch(e){}sync();say(['글자 그래픽','혼합 1 — 하늘·바닥만 블록','혼합 2 — 적과 총만 글자, 나머지는 블록','블록 그래픽 — 눈이 가장 편해요','3D 세미 리얼 — 밝고 선명한 입체 그래픽','3D 던전 리얼 — 어둡고 무거운 분위기'][GMODE],1.8)});window.__gmSync=sync},0);
 setTimeout(()=>{const b=document.getElementById('qBtn');if(!b)return;syncQ();b.addEventListener('click',()=>{const order=['auto','0','1','2','3'];QSET=order[(order.indexOf(QSET)+1)%5];try{localStorage.setItem('gd-q',QSET)}catch(e){}
-  if(QSET==='auto'){const coarse=matchMedia('(pointer:coarse)').matches;setQL(coarse&&((navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3)?1:0)}else setQL(+QSET);syncQ()})},0);
+  if(QSET==='auto'){const coarse=matchMedia('(pointer:coarse)').matches;setQL(coarse&&((navigator.hardwareConcurrency||4)<=4||(navigator.deviceMemory||4)<=3)?1:0);qBase=QL;qUp=0;qGood=0;qWarm=2}else setQL(+QSET);syncQ()})},0);
 setTimeout(()=>{const b=document.getElementById('tsBtn');if(!b)return;syncTs();b.addEventListener('click',()=>{let i=TSENS.findIndex(t=>Math.abs(t[0]-lookSens)<.01);i=(i+1)%TSENS.length;lookSens=TSENS[i][0];try{localStorage.setItem('gd-tsens',lookSens)}catch(e){}syncTs()})},0);
 function stageXY(e){const r=stage.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top,r]}
 function setJoy(dx,dy){const R0=50,m=Math.hypot(dx,dy),k=m>R0?R0/m:1;joyX=dx*k/R0;joyY=dy*k/R0;knobEl.style.transform=`translate(${dx*k}px,${dy*k}px)`}
@@ -2437,8 +2445,19 @@ function pvpDie(killer){
   slashText=0;say(by===myPeer?'스스로 쓰러졌다':`${nameOf(by)}에게 쓰러졌다`,2.5);
   drawing=false;spCharging=false;charging=false;atkHeld=false;
 }
+// 아군 시야 공유: 아군이 본 칸은 미니맵에 밝혀지고, 아군 눈에 보이는 적은 내 미니맵에도 찍힘
+let shareT=0;
+function shareVision(dt){shareT-=dt;if(shareT>0||!seen||!map)return;shareT=.2;if(isFfa())return;
+  const allies=[...remotes.values()].filter(r=>r.inRound&&r.al&&r.tm===team);if(!allies.length)return;
+  for(const r of allies){const N=36,fov=1.7;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=(r.x|0)+dx,y=(r.y|0)+dy;if(x>=0&&y>=0&&x<MW&&y<MH)seen[y*MW+x]=1}
+    for(let i=0;i<=N;i++){const a=r.a-fov/2+fov*i/N,cx=Math.cos(a),cy=Math.sin(a);let lx=-1,ly=-1;
+      for(let t=.2;t<24;t+=.3){const x=(r.x+cx*t)|0,y=(r.y+cy*t)|0;if(x<0||y<0||x>=MW||y>=MH)break;if(x===lx&&y===ly)continue;lx=x;ly=y;seen[y*MW+x]=1;if(tileSolid(x+.5,y+.5))break}}}
+  for(const e of remotes.values()){if(!e.inRound||!e.al||e.tm===team||e.iv)continue;
+    for(const r of allies){const d=Math.hypot(e.x-r.x,e.y-r.y);if(d>22)continue;let an=Math.atan2(e.y-r.y,e.x-r.x)-r.a;an=Math.atan2(Math.sin(an),Math.cos(an));
+      if((Math.abs(an)<1.1||d<4||e.fl>0)&&los(r.x,r.y,e.x,e.y)){e.spotT=time;break}}}}
 function netTick(dt){
-  if(AI.on)aiTick(dt);netRecv(dt);
+  if(AI.on)aiTick(dt);netRecv(dt);if(MODE==='pvp')shareVision(dt);
   if(MODE==='pvp'){pv.k=killsOf(myPeer);pvpRoulTick();rankTick();
     if(GM==='aug'&&pv.k>=(pv.augK||3)){pv.augK=(pv.augK||3)+3;queueAug(1)}
     if(!isRound()&&OPT.roul&&leaderPeer()===myPeer&&time-(pv.rlT||0)>120){pv.rlT=time;leaderRoul()}
@@ -5085,7 +5104,9 @@ function drawMinimap0(){
   const ds=big?5:3;
   for(const p of pickups){if(p.used||!seen[(p.y|0)*MW+(p.x|0)])continue;ctx.fillStyle=p.k==='K'?'#ffd84a':p.k==='H'?'#5fd08a':p.k==='V'?'#6aa8ff':'#c9a24a';const q=p.k==='K'?ds+2:ds-1;ctx.fillRect(ox+p.x*s-q/2,oy+p.y*s-q/2,q,q)}
   for(const e of enemies){if(e.dead||!seen[(e.y|0)*MW+(e.x|0)])continue;ctx.fillStyle=e.T.boss?'#f2c94c':'#ff5a4d';ctx.fillRect(ox+e.x*s-ds/2,oy+e.y*s-ds/2,ds,ds)}
-  if(MODE==='pvp')for(const r of remotes.values()){if(!r.inRound)continue;const ally=!isFfa()&&r.tm===team;if(!ally&&(r.iv||!(r.fl>0||los(P.x,P.y,r.x,r.y))))continue;ctx.fillStyle=r.tm===0?'#8ab8ff':'#ff8a80';ctx.fillRect(ox+r.x*s-ds/2,oy+r.y*s-ds/2,ds,ds)}
+  if(MODE==='pvp')for(const r of remotes.values()){if(!r.inRound)continue;const ally=!isFfa()&&r.tm===team,mine=r.fl>0||los(P.x,P.y,r.x,r.y),shared=!ally&&!mine&&time-(r.spotT||-9)<.45;if(!ally&&(r.iv||!(mine||shared)))continue;
+    const px=ox+r.x*s,py=oy+r.y*s;if(ally&&r.al){ctx.strokeStyle=team===1?'rgba(255,138,128,.6)':'rgba(138,184,255,.6)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+Math.cos(r.a)*1.6*s,py+Math.sin(r.a)*1.6*s);ctx.stroke()}
+    ctx.fillStyle=r.tm===0?'#8ab8ff':'#ff8a80';ctx.fillRect(px-ds/2,py-ds/2,ds,ds);if(shared){ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=1;ctx.strokeRect(px-ds/2-1.5,py-ds/2-1.5,ds+3,ds+3)}}
   ctx.fillStyle='#ffb347';ctx.fillRect(ox+P.x*s-2,oy+P.y*s-2,4,4);
   ctx.strokeStyle='#ffb347';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ox+P.x*s,oy+P.y*s);ctx.lineTo(ox+(P.x+Math.cos(P.a)*1.8)*s,oy+(P.y+Math.sin(P.a)*1.8)*s);ctx.stroke();
   if(GUIDE.path&&GUIDE.path.length){const t=time*6;ctx.fillStyle='rgba(126,230,160,.9)';GUIDE.path.forEach(([x,y],i)=>{if((i+(t|0))%3===0){const q=big?3:2;ctx.fillRect(ox+(x+.5)*s-q/2,oy+(y+.5)*s-q/2,q,q)}});const [ex,ey]=GUIDE.path[GUIDE.path.length-1];ctx.strokeStyle='#7ee6a0';ctx.lineWidth=1.5;ctx.strokeRect(ox+ex*s-1,oy+ey*s-1,s+2,s+2)}
@@ -6611,7 +6632,7 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-01g';
+const NOTICE_VER='2026-11-01i';
 const NOTICE=[
  {v:'2026-11-01 저녁',t:'AI 대전 · 랭크 등급 개편',items:[
   '새 모드 「AI 대전」 (대전 로비 맨 위): 혼자서 AI와 싸워 랭크 점수를 올려요 — 1대1(10처치) 또는 AI 아군 둘과 3대3(20처치)',
@@ -6621,6 +6642,8 @@ const NOTICE=[
   'AI가 숨은 적에게 수류탄·섬광탄을 던져요 · 내 섬광탄에 AI도 눈이 멀어요 · 앉아서 걸으면 AI가 발소리를 못 들어요',
   'AI 대전 도중 나가면 기권패로 처리돼요',
   '대전에서 근접 무기(칼·검·도끼 등) 강화: 몸 두 방, 머리 한 방이면 쓰러져요 (방어구 무시 · 혼자 하기는 그대로)',
+  '아군 시야 공유 (팀 대전·AI 대전 3대3): 아군이 본 곳은 미니맵에 밝혀지고, 아군 눈에 보이는 적이 내 미니맵에도 찍혀요 (흰 테두리) · 아군이 보는 방향도 미니맵에 선으로 보여요',
+  '자동 화질 개선: 실제 FPS를 2초마다 재서 느리면 바로 낮추고(아주 느리면 두 단계), 여유가 생기면 다시 올려요 · 맵 로딩 같은 한 번의 끊김에는 화질을 내리지 않아요',
   '대전에서 상대 이름 위에 들고 있는 무기가 보여요 (근접 무기는 주황, 저격용은 보라) · 조준하면 이름 옆에도 나와요',
   '랭크 등급 개편: 500점마다 한 등급 — 아이언 500 · 브론즈 1000 · 실버 1500 · 골드 2000 · 플래티넘 2500 · 다이아 3000 · 마스터 3500 · 그랜드마스터 4000 · 챌린저 4500',
   '아이언 500점 아래로는 더 이상 내려가지 않아요 (500점 아래였던 계정은 500점으로 맞춰요)']},
