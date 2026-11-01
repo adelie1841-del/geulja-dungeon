@@ -1969,7 +1969,7 @@ function swordSpin(){
   startAct('spin',.46,{});sfx('spin');shake=Math.max(shake,.35);
 }
 function dash(){
-  if(state!=='play'||dashCd>0)return;
+  if(state!=='play'||dashCd>0)return;if(AUGON()&&PS('pactNoDash')){say('쇠사슬 낙인 — 돌진할 수 없어요',.8);return}
   if(!WEAP[cur].sword){cur=melee;switchT=0}
   // 돌진은 지금 움직이는 방향으로 (가만히 있으면 보는 방향)
   let ddx=0,ddy=0;{const fwx=Math.cos(P.a),fwy=Math.sin(P.a);if(keys.KeyW||keys.ArrowUp){ddx+=fwx;ddy+=fwy}if(keys.KeyS||keys.ArrowDown){ddx-=fwx;ddy-=fwy}if(keys.KeyA){ddx+=fwy;ddy-=fwx}if(keys.KeyD){ddx-=fwy;ddy+=fwx}
@@ -2672,7 +2672,7 @@ function hurtPlayer(d,sx,sy,src,killer,zone){
   {const ah=ARMOR.h[armH],ab=ARMOR.b[armB];const before=d;
     if(zone==='head')d*=ah.mul||1;else if(zone==='legs')d*=ab.legs||1;else if(zone==='blast')d*=.5+.5*(ab.body||1);else d*=ab.body||1;
     if(zone==='head'&&ah.mul&&before>8){sfx('block');say('머리 보호구가 막아 줬다',.8)}}
-  if(armor>0){const ab=Math.min(armor,d*.5);armor-=ab;d-=ab}
+  if(armor>0&&!(AUGON()&&PS('pactNoArmor'))){const ab=Math.min(armor,d*.5);armor-=ab;d-=ab}
   hp-=d;hurt=1;shake=Math.max(shake,.5);sfx('hurt');
   if(hp<=0){hp=0;if(MODE==='pvp')pvpDie(killer);else gameOver()}
 }
@@ -5315,7 +5315,7 @@ function perkDmgMul(t,zone,w,o){if(!AUGON()||!(t.T||t.remote))return 1;let A=PS(
   if(PS('gamble')&&!(o&&o.crit))m*=.8;
   if(PS('lucky7')&&w&&!w.melee&&RUN.shots%7===0)m*=7;
   if(PS('uxScale')&&t.T)m*=50;
-  if(PS('pactDmg'))m*=1+PS('pactDmg');if(PS('pactHunger'))m*=1+Math.min(3,.01*(RUN.hunger|0));
+  if(PS('pactDmg'))m*=1+PS('pactDmg');if(PS('pactHunger'))m*=1+Math.min(8,.04*(RUN.hunger|0));
   if(PS('bone')&&NX.bone>0&&time<NX.boneT){m*=1+Math.min(6,NX.bone);NX.boneUse=1}
   return m}
 function perkShot(w){if(!AUGON())return;RUN.shots++;
@@ -5343,7 +5343,7 @@ function perkOnKill(e,zone){if(!AUGON())return;RUN.kills++;if(e&&e.T&&SOLO()){co
   if(!e||!e.T)return;const ex=e.x,ey=e.y;
   if(PS('mine'))setTimeout(()=>boomAt(ex,ey,1.8,1.6,'뢰'),1500);
   if(PS('chain')||(PS('bladestorm')&&WEAP[cur].melee)){const big=PS('chain')>0;setTimeout(()=>{if(big)boomAt(ex,ey,2.2,2.2);else{burst(ex,ey,.5,14,'검',200,90,60,1,3,.5,.08,0,false);for(const o of enemies){if(o.dead||o===e)continue;const d=Math.hypot(o.x-ex,o.y-ey);if(d<2.2)damage(o,1.6*(1+.25*loop),(o.x-ex)/(d||1),(o.y-ey)/(d||1),true)}}},90)}}
-function perkHurt(d,src){if(!AUGON())return d;{const ud=uxHurt(d);if(ud<0)return -1}if(PS('pactHurt'))d*=1+PS('pactHurt');if(PS('pactArmor'))d*=1-Math.min(.85,PS('pactArmor'));if(PS('pactBoss')&&src&&src.T&&src.T.boss)d*=1.5;if(PS('bone')){NX.bone=Math.min(6,(time<NX.boneT?NX.bone:0)+d*.2);NX.boneT=time+4}{const nd=nxHurt(d,src);if(nd<0)return -1;d=nd}try{d=rxHurt(d,src)}catch(_){}if(WEAP[cur]&&WEAP[cur].melee&&PS('meleeGuard'))d*=1-Math.min(.5,PS('meleeGuard'));
+function perkHurt(d,src){if(!AUGON())return d;{const ud=uxHurt(d);if(ud<0)return -1}{const bx=boneHurt(d);if(bx<0)return -1}if(PS('pactHurt'))d*=1+PS('pactHurt');if(PS('pactArmor'))d*=1-Math.min(.85,PS('pactArmor'));if(PS('pactReflect')&&src&&src.T&&!src.dead){const rd=d/(1-Math.min(.85,PS('pactArmor')||0))*PS('pactReflect');damage(src,rd*(src.T.boss?.4:1),0,0,false);burst(src.x,src.y,src.T.h*.6,6,'반',0,80,60,1,1.5,.4,.07,0,false)}if(PS('pactBoss')&&src&&src.T&&src.T.boss)d*=2;if(PS('bone')){NX.bone=Math.min(6,(time<NX.boneT?NX.bone:0)+d*.2);NX.boneT=time+4}{const nd=nxHurt(d,src);if(nd<0)return -1;d=nd}try{d=rxHurt(d,src)}catch(_){}if(WEAP[cur]&&WEAP[cur].melee&&PS('meleeGuard'))d*=1-Math.min(.5,PS('meleeGuard'));
   if(rand()<Math.min(.6,PS('dodge')+(hp<MAXHP()*.35?PS('lowDodge'):0))){slashText=.5;slashMsg='회피!';sfx('dash');return -1}
   if(shadowT>0)return -1;
   if(src&&src.vampEl&&!src.dead)src.hp=Math.min(src.max||src.T.hp,src.hp+d*.04);
@@ -5355,7 +5355,7 @@ function perkTick(dt){if(state==='play'&&ROUL.regen&&!AUGON()&&hp>0)hp=Math.min(
   if(PS('bleed')&&hp>1)hp=Math.max(1,hp-PS('bleed')*dt);perkTickExtra(dt);
   warpCd=Math.max(0,warpCd-dt);frenzyT=Math.max(0,frenzyT-dt);shadowT=Math.max(0,shadowT-dt);infT=Math.max(0,infT-dt);
   if(PS('warp')&&warpCd<=0&&hp>0&&hp<MAXHP()*.3){warpCd=25;fx[1]=Math.max(fx[1]||0,4);say('시간 왜곡!',1.4);sfx('exit')}
-  if(PS('djump'))fx[3]=Math.max(fx[3]||0,.15);
+  if(PS('djump')&&!PS('pactNoDash'))fx[3]=Math.max(fx[3]||0,.15);
   if(PS('crouchInv')&&crK>.5){fx[7]=Math.max(fx[7]||0,.15);RUN.hiddenT+=dt}
   if(PS('shieldGen')){shieldT-=dt;if(shieldT<=0){shieldT=12;armor=Math.min(100,armor+PS('shieldGen'))}}
   if(PS('blinkT')){blinkT-=dt;if(blinkT<=0){blinkT=8;for(let k=0;k<20;k++){const a=rand()*6.28,r=1.5+rand()*3,x=P.x+Math.cos(a)*r,y=P.y+Math.sin(a)*r;if(!blocked(x,y,.25,null)&&los(P.x,P.y,x,y)){burst(P.x,P.y,.6,10,'차',270,80,65,1,2,.4,.07,0,false);P.x=x;P.y=y;sfx('dash');break}}}}
@@ -5435,7 +5435,7 @@ function adaptFloor(resume){if(!SOLO())return;const pp=augPower();ADAPT.dmg=1+Ma
   {const bu=HL('bossUp'),ah=(1+.12*HL('sAmmo'))*(1+.15*HL('sGod')),eh=1+.2*HL('sHid');for(const e of enemies){let k=ah;if(e.T.boss)k*=(1+.15*bu)*(1+Math.min(3,.045*augPower()))*(1+.04*level);if(e.elite)k*=eh;if(k!==1){e.hp*=k;e.max=(e.max||e.T.hp)*k}}}
   const hl=HL('helm'),sk=HL('spike'),sw=HL('shieldwall');for(const e of enemies){if(!e.T.boss){if(HL('plate')&&rand()<.15*HL('plate'))e.plate=1;if(HL('reviveE')&&rand()<.08*HL('reviveE'))e.rvE=1;if(HL('splitE')&&!e.split&&rand()<.1*HL('splitE'))e.split=1}if(hl&&rand()<.25*hl)e.helm=1;if(sk&&rand()<.2*sk)e.spike=1;if(sw&&rand()<.15*sw)e.dr=Math.min(e.dr||1,.6)}
   {const sc=HL('scarce');if(sc)for(const p of pickups)if(p.k==='A'&&rand()<.25*sc)p.used=true}
-  if(PS('pactBoss'))for(const e of enemies)if(e.T.boss){e.hp*=2;e.max=(e.max||e.T.hp)*2}
+  if(PS('pactBoss')){for(const e of enemies)if(e.T.boss){e.hp*=3;e.max=(e.max||e.T.hp)*3}if(!bossFloor){const k=BOSS_SEQ[(level*7+3)%BOSS_SEQ.length],sp=freeSpot(10);if(sp){const e=spawnEnemy(k,sp[0],sp[1]);if(e){const m=3*(1+.04*level);e.hp*=m;e.max=e.hp;totalEnemies=enemies.length}}}}
   {const bd=HL('bombDeath'),bh=HL('bossHaste');RXF=[];for(const e of enemies){if(bd&&!e.T.boss&&rand()<.08*bd)e._bomb=1;if(bh&&e.T.boss){e.sm=(e.sm||1)*(1+.1*bh);e.atkCdM=Math.max(.5,(e.atkCdM||1)/(1+.1*bh))}}}
   typeAdapt();
   if(pp>0)notes.unshift(`체력·피해 +${Math.round((hpk-1)*100)}%`);
@@ -5542,7 +5542,7 @@ const HL=id=>SOLO()&&RUN.hard?(RUN.hard[id]|0)/HQ*HMUL():0;
 const fmtD=t=>t.replace(/\d+\.\d+/g,x=>String(Math.round(+x*10)/10));
 const hdTxt=(h,l)=>fmtD(h.d(l/HQ*HMUL()));
 const hardTotal=()=>Object.values(RUN.hard||{}).reduce((a,b)=>a+b,0);
-const healMul=()=>(AUGON()&&PS('pactNoHeal')?0:Math.max(.3,1-.2*HL('wound')));
+const healMul=()=>(AUGON()&&PS('pactNoHeal')?0:Math.max(.3,1-.2*HL('wound'))*(AUGON()&&PS('pactHealCut')?1-Math.min(.9,PS('pactHealCut')):1));
 let HUP=[];
 // 고난은 층마다 차근차근: 한 층에 오르는 단계 수와 고난별 최대 단계를 층 깊이에 맞춰 묶어 둔다
 function hardPace(){const L=level|0;return {cap:Math.min(HMAX,2+Math.floor(L*1.1)),per:L<5?1:L<14?2:3,total:L<3?2:L<6?3:L<10?5:L<16?7:L<24?9:12}}
@@ -6402,12 +6402,14 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-01e';
+const NOTICE_VER='2026-11-01f';
 const NOTICE=[
  {v:'2026-11-01 오전',t:'금단의 계약 · 육참골단 · 길 안내 · 여기서 그만하기',items:[
   '새 등급 「금단」: 큰 대가를 치르고 한 가지를 크게 올리는 계약 증강 6종 — 피의 서약(체력 −60% / 피해 ×2.5), 유리의 맹세(받는 피해 2배 / 연사·장전 +80%), 굶주린 계약(회복 불가 / 처치마다 피해 +1% 영구), 쇠사슬 낙인(이동 −40% / 받는 피해 −70%), 시간의 빚(층마다 90초 뒤 체력이 줄어듦 / 피해 ×2·이동 +30%), 영혼 저당(보스 강화 / 보스마다 신화 증강)',
-  '신화 증강 「육참골단」 추가: 받는 피해 +25%, 맞을수록 다음 일격이 강해져요 (최대 +600%)',
+  '「육참골단」 (초월): 받는 피해 +25%, 죽을 만큼 맞으면 체력 20%로 버티며 주변 적을 처형 — 층마다 한 번',
   '모든 증강에 한 줄 코멘트가 붙었어요 (카드·도감)',
+  '금단의 계약 보상 대폭 강화: 피의 서약 피해 ×4·치명타 +25%, 유리의 맹세 연사·장전 2배·피해 ×1.8, 굶주린 계약 처치마다 +4% (최대 +800%), 쇠사슬 낙인 받는 피해 −85%·피해 ×2.5·3배 반사, 시간의 빚 피해 ×3.5, 영혼 저당 보스마다 신화 2개·체력 회복',
+  '금단의 계약 대가 강화: 피의 서약 체력 −75%·회복 −50%, 유리의 맹세 받는 피해 3배·방탄판 무시, 굶주린 계약 최대 체력 −30%, 쇠사슬 낙인 이동 −55%·돌진 불가, 시간의 빚 60초·초당 −8, 영혼 저당 보스 체력 3배·피해 2배·모든 층에 보스 추가',
   '길 안내 (설정 → 화면, 기본 켬): 열쇠를 얻으면 출구까지 가는 길을 미니맵 점선과 화면 위 화살표로 알려 줘요',
   '「여기서 그만하기」: 메뉴에서 이번 판을 끝내고 기록을 남겨요 (저장은 지워져요, 두 번 눌러 확인)',
   '무한 증강: 처치 10번마다 증강 하나 (6번에서 바뀜) · 증강이 「대기」로 쌓여 연달아 바뀌던 것 없앰',
@@ -6791,7 +6793,7 @@ function nxHit(t,d,zone){if(!t||!t.T)return;t._nxH=(t._nxH|0)+1;
   if(PS('nxStatic')&&rand()<PS('nxStatic')){let b=null,bd=6;for(const o of enemies){if(o.dead||o===t)continue;const dd=Math.hypot(o.x-t.x,o.y-t.y);if(dd<bd&&los(t.x,t.y,o.x,o.y)){bd=dd;b=o}}if(b){nxBolt(b,Math.max(1,d*.5));sfx('hit')}}
   if(PS('nxEcho')&&zone==='head'&&rand()<PS('nxEcho')){const x=t;setTimeout(()=>{try{if(!x.dead){damage(x,Math.max(.5,d*.4),0,0,false);dmgNum(x,x.T.h,d*.4,'head',false)}}catch(e){}},120)}
   if(PS('nxFrost')&&time>NX.novaT){NX.novaT=time+8;for(const o of enemies){if(o.dead||Math.hypot(o.x-t.x,o.y-t.y)>3)continue;o.slow=Math.max(o.slow||0,2);o.stun=Math.max(o.stun||0,o.T.boss?.3:1.2);burst(o.x,o.y,.5,6,'얼',195,70,80,1,1.5,.5,.07,0,false)}sfx('crate')}}
-function nxKill(e,zone){if(!e||!e.T)return;if(PS('pactHunger'))RUN.hunger=Math.min(300,(RUN.hunger|0)+1);if(PS('pactBoss')&&e.T.boss){const pool=PERKS.filter(p=>p.r===5&&!PK[p.id]&&!p.sec);if(pool.length){const g=pool[(rand()*pool.length)|0];grantPerk(g);holoAnnounce({g:g.g,n:'영혼 저당 · '+g.n})}}if(PS('uxScale')&&SOLO())score+=(e.T.score|0)*2;
+function nxKill(e,zone){if(!e||!e.T)return;if(PS('pactHunger'))RUN.hunger=Math.min(200,(RUN.hunger|0)+1);if(PS('pactBoss')&&e.T.boss){const got=[];for(let k=0;k<2;k++){const pool=PERKS.filter(p=>p.r===5&&!PK[p.id]&&!p.sec);if(!pool.length)break;const g=pool[(rand()*pool.length)|0];grantPerk(g);got.push(g)}hp=MAXHP();if(got.length)holoAnnounce({g:got[0].g,n:'영혼 저당 · '+got.map(g=>g.n).join(' · ')})}if(PS('uxScale')&&SOLO())score+=(e.T.score|0)*2;
   if(PS('nxKheal'))hp=Math.min(MAXHP(),hp+PS('nxKheal')*healMul());
   if(PS('nxScrap')&&rand()<PS('nxScrap'))armor=Math.min(100,armor+5);
   if(PS('nxElite')&&(e.elite||e.T.boss)){hp=Math.min(MAXHP(),hp+15*healMul());NX.eliteT=time+5}
@@ -6809,13 +6811,13 @@ function nxTick(dt){if(!AUGON()||state!=='play'||hp<=0)return;
 // ================= 금단의 계약 (큰 대가, 큰 보상) · 육참골단 =================
 RAR[7]={n:'금단',c:'#e0314f'};TIERW[7]=9;
 PERKS.push(
- {id:'pkBlood',n:'피의 서약',g:'서',r:7,d:'대가: 최대 체력 −60%\n보상: 모든 피해 ×2.5',s:{pactHp:-.6,pactDmg:1.5},solo:1},
- {id:'pkGlass',n:'유리의 맹세',g:'유',r:7,d:'대가: 받는 피해 2배\n보상: 연사 +80%, 장전 +80%',s:{pactHurt:1,pactRof:.8,rld:.8},solo:1},
- {id:'pkHunger',n:'굶주린 계약',g:'굶',r:7,d:'대가: 어떤 방법으로도 체력이 회복되지 않음\n보상: 처치할 때마다 피해 +1% 영구 누적 (최대 +300%)',s:{pactNoHeal:1,pactHunger:1},solo:1},
- {id:'pkChain',n:'쇠사슬 낙인',g:'쇠',r:7,d:'대가: 이동 속도 −40%\n보상: 받는 피해 −70%',s:{pactSpd:-.4,pactArmor:.7},solo:1},
- {id:'pkDebt',n:'시간의 빚',g:'빚',r:7,d:'대가: 층마다 90초가 지나면 초당 체력 −5\n보상: 모든 피해 ×2, 이동 +30%',s:{pactTimer:1,pactDmg:1,spd:.3},solo:1},
- {id:'pkSoul',n:'영혼 저당',g:'혼',r:7,d:'대가: 보스 체력 2배, 보스 피해 +50%\n보상: 보스를 쓰러뜨릴 때마다 신화 증강 하나',s:{pactBoss:1},solo:1},
- {id:'bone',n:'육참골단',g:'골',r:5,d:'받는 피해 +25%. 맞을 때마다 받은 피해 1당 다음 일격 피해 +20% (최대 +600%, 4초 유지)',s:{pactHurt:.25,bone:1},solo:1});
+ {id:'pkBlood',n:'피의 서약',g:'서',r:7,d:'대가: 최대 체력 −75%, 회복량 −50%\n보상: 모든 피해 ×4, 치명타 확률 +25%',s:{pactHp:-.75,pactHealCut:.5,pactDmg:3,crit:.25},solo:1},
+ {id:'pkGlass',n:'유리의 맹세',g:'유',r:7,d:'대가: 받는 피해 3배, 방어막·방탄판이 막아 주지 못함\n보상: 연사 2배, 장전 2배, 모든 피해 ×1.8, 탄 퍼짐 −50%',s:{pactHurt:2,pactNoArmor:1,pactRof:1,rld:1,pactDmg:.8,acc:.5},solo:1},
+ {id:'pkHunger',n:'굶주린 계약',g:'굶',r:7,d:'대가: 어떤 방법으로도 체력이 회복되지 않음, 최대 체력 −30%\n보상: 처치할 때마다 피해 +4% 영구 누적 (최대 +800%), 이동 +20%',s:{pactNoHeal:1,pactHp:-.3,pactHunger:1,spd:.2},solo:1},
+ {id:'pkChain',n:'쇠사슬 낙인',g:'쇠',r:7,d:'대가: 이동 속도 −55%, 돌진·2단 점프 불가\n보상: 받는 피해 −85%, 모든 피해 ×2.5, 맞으면 때린 적에게 받은 피해의 3배 반사',s:{pactSpd:-.55,pactNoDash:1,pactArmor:.85,pactDmg:1.5,pactReflect:3},solo:1},
+ {id:'pkDebt',n:'시간의 빚',g:'빚',r:7,d:'대가: 층마다 60초가 지나면 초당 체력 −8 (회복으로 막을 수 없음)\n보상: 모든 피해 ×3.5, 이동 +50%, 연사 +50%',s:{pactTimer:1,pactDmg:2.5,spd:.5,pactRof:.5},solo:1},
+ {id:'pkSoul',n:'영혼 저당',g:'혼',r:7,d:'대가: 보스 체력 3배, 보스 피해 2배, 모든 층에 보스가 하나 더\n보상: 보스를 쓰러뜨릴 때마다 신화 증강 2개 + 체력 전부 회복',s:{pactBoss:1},solo:1},
+ {id:'bone',n:'육참골단',g:'골',r:6,d:'받는 피해 +25%. 죽을 만큼 맞으면 쓰러지는 대신 체력의 80%를 잃은 채(20%로) 버티고, 주변 4.5칸의 적을 처형해요 (보스는 최대 체력 25%) · 층마다 한 번',s:{pactHurt:.25,boneX:1},solo:1});
 for(const p of PERKS)PMAP[p.id]=p;
 // 한 줄 코멘트
 const PQ={"hp": "맞아도 버티는 놈이 끝까지 간다", "dmg": "손끝이 칼끝이다", "spd": "발이 가벼우면 마음도 가볍다", "rof": "생각보다 손가락이 먼저", "rld": "탄창 갈 시간에 한 발 더", "tough": "가죽 한 겹이 목숨 한 줄", "regen": "숨 쉬는 동안은 낫는다", "vamp": "사냥한 만큼 배부르다", "nade": "주머니가 무거울수록 든든하다", "med": "풀 한 포기도 약이 된다", "acc": "숨을 참으면 총알이 곧게 간다", "melee": "칼은 연습한 만큼 정직하다", "supply": "빈손으로 층을 내려가지 마라", "score": "이름을 남기고 싶다면", "kick": "총이 아니라 어깨가 쏜다", "still": "움직이지 않는 자가 가장 정확하다", "runner": "멈추면 죽는다", "ice": "뜨거운 머리, 차가운 탄", "magnet": "줍는 것도 실력이다", "head": "급소는 언제나 같은 곳에 있다", "crit": "가끔은 하늘이 돕는다", "dodge": "맞지 않으면 다치지 않는다", "dash": "바람은 기다리지 않는다", "boss": "큰 놈일수록 쓰러질 때 시끄럽다", "thorns": "나를 건드린 대가", "reach": "한 뼘이 생사를 가른다", "exec": "끝을 보는 자", "pierce": "방패도 결국 판자다", "legs": "못 걷게 하면 못 쫓아온다", "heal": "새 층, 새 숨", "nadeD": "불꽃은 예술이다", "fire": "타는 냄새가 나기 시작했다", "poison": "천천히, 그러나 확실하게", "spark": "번개는 같은 곳에 두 번 친다", "ricochet": "벽도 내 편이다", "air": "위에서 보면 다 보인다", "djump": "하늘을 한 번 더 밟는다", "shield": "보이지 않는 갑옷", "ammoKill": "쓰러진 자의 탄창을 빌린다", "nova": "다가오지 마라", "lucky7": "일곱은 언제나 행운의 숫자", "giant": "심장이 크면 겁도 작다", "glass": "깨지기 전에 다 부숴라", "swift": "질풍처럼 왔다 간다", "medic": "모두 일어나, 아직 안 끝났다", "frenzy": "피 냄새가 발을 재촉한다", "hunter": "짐승은 숨을 곳이 없다", "iron": "의지는 녹슬지 않는다", "lastshot": "마지막 한 발은 기도와 같다", "shake": "떨림마저 무기로", "backward": "물러서는 것도 기술이다", "crouchInv": "낮게, 더 낮게, 보이지 않게", "blink": "공간을 접어 한 발 더", "curse": "힘에는 늘 값이 붙는다", "gamble": "다 걸거나, 다 잃거나", "bleed": "피를 주고 힘을 산다", "predator": "먹을수록 커진다", "twin": "한 발은 외롭다", "quake": "땅도 나를 따라 화낸다", "mine": "떠난 자리에도 함정이 남는다", "timestop": "넷을 베면 시간이 숨을 죽인다", "god": "전장은 나의 신전", "storm": "탄환이 비처럼", "ghost": "있었는데, 없었다", "lord": "피는 왕의 포도주", "eagle": "하늘 위에서 내려다본다", "bighead": "크게 치고 크게 맞는다", "underdog": "벼랑 끝에서 가장 강하다", "infammo": "멈추지 않는 탄띠", "slot": "당겨라, 운명의 레버를", "phoenix": "재 속에서 다시 날아오른다", "leech": "네 피가 곧 내 피", "chain": "하나가 터지면 모두가 터진다", "warp": "죽음 앞에서 시간이 느려진다", "perfect": "흠 하나 없이", "rage": "상처가 깊을수록 분노도 깊다", "sniper": "한 발이면 충분하다", "blade": "칼날이 춤추면 피가 노래한다", "luck": "별이 나를 보고 있다", "shadow": "그림자는 베이지 않는다", "king": "왕관은 무겁다, 그래서 강하다", "chaos": "주사위는 던져졌다", "void": "심연을 들여다보는 자", "w_heavy": "무게가 곧 정의다", "w_light": "번개처럼 베고 바람처럼 빠진다", "w_pierce": "틈은 언제나 있다", "w_back": "등은 거짓말을 못 한다", "w_wide": "크게 휘두르면 다 걸린다", "w_leech": "칼날이 목마르다", "w_reaper": "거둘 때가 왔다", "w_sdmg": "두 번째 총이 먼저 말한다", "w_srof": "작은 총도 화가 난다", "w_sexec": "마무리는 깔끔하게", "w_pads": "어깨에 붙이고, 숨 쉬고, 당긴다", "w_phead": "이마 한가운데", "w_prld": "손이 기억한다", "w_swap": "셋이 하나처럼", "calloused": "굳은살은 거짓말을 안 한다", "instinct": "몸이 먼저 안다", "quickhand": "손이 눈보다 빠르다", "calm": "흔들리지 않는 손", "nimble": "날쌘 놈이 오래 산다", "dice": "한 번만 더", "mark": "표식이 붙은 자는 오래 못 간다", "apround": "쇠를 뚫는 쇠", "hedgehog": "안으면 찔린다", "alchemy": "풀과 피로 기적을 빚는다", "reroller": "운명은 다시 쓸 수 있다", "vest": "두꺼운 천 한 장", "hound": "냄새를 쫓아 달린다", "fate": "정해진 건 없다", "headsman": "목은 하나뿐이다", "undying": "쉽게 죽어 주지 않는다", "bstorm": "쏟아지는 탄환", "hydra": "세 개의 머리, 세 개의 독", "reaper": "조용히, 그리고 확실하게", "infdice": "굴리고 또 굴린다", "hermes": "신발에 날개가 돋았다", "bloodking": "피의 옥좌", "doom": "일곱 번째 탄환은 파멸", "invinc": "세상에 나를 막을 것은 없다", "gambler": "판을 엎는 자", "overcome": "고난이 나를 단련한다", "grit": "근성 하나로 버틴다", "focus": "한 점만 본다", "sprint": "짧고 빠르게", "trigfinger": "방아쇠와 하나가 된 손가락", "medkit": "붕대 한 롤의 여유", "frost": "손끝에 서리가 앉는다", "scav": "버려진 것도 쓸모가 있다", "firm": "흔들리지 않는다", "swing": "크게, 더 크게", "leap": "뛰어오른 자만이 볼 수 있는 것", "patience": "기다림도 공격이다", "firsts": "먼저 쏘는 자가 이긴다", "momentum": "한 번 굴러간 바위는 멈추지 않는다", "bigprey": "큰 사냥감일수록 첫 발이 중요하다", "spoils": "전리품은 방패가 된다", "bloodstrike": "피가 튀면 힘이 난다", "coldaura": "내 곁은 춥다", "powder": "화약 냄새가 그리워질 때쯤", "piercer": "뚫고 지나간다", "hsboom": "머리가 터지면 주변도 터진다", "ram": "몸이 곧 무기", "cells": "세포 하나하나가 싸운다", "thickshield": "두꺼울수록 안심된다", "clutch": "위기일수록 침착하게", "execkill": "숨이 붙어 있어도 끝난 것이다", "overkill": "남은 힘은 옆 놈에게", "engine": "멈출 수 없는 엔진", "tstorm": "하늘이 갈라진다", "inferno": "모든 것을 태운다", "plague": "역병은 사람을 가리지 않는다", "bulwark": "움직이는 성벽", "sniperseye": "백 걸음 밖의 눈동자", "berserkp": "붉은 안개 속으로", "phase": "맞았다고 생각했겠지", "vampblade": "칼이 피를 마신다", "gunsmith": "총도 사람 손을 탄다", "titan": "거인의 어깨 위에서", "deadeye": "눈빛만으로 쓰러뜨린다", "apocalypse": "세상의 끝은 시끄럽다", "warlord": "전장의 주인", "ember": "꺼지지 않는 불씨", "zeus": "번개를 쥔 손", "windgod": "바람이 되어라", "fortress": "무너지지 않는다", "laststand": "여기서 물러서지 않는다", "collector": "모으는 기쁨이 힘이 된다", "timelord": "시간은 나의 하인", "immortal": "죽음조차 나를 거절한다", "godhand": "신의 손이 닿은 곳에 남는 건 없다", "endless": "탄창의 바닥은 없다", "clone": "하나가 둘이 된다", "aegis": "창은 닿지 않는다", "vampgod": "피가 곧 생명", "judgment": "하늘이 대신 벌한다", "omni": "모든 것이 조금씩, 그래서 전부", "mSharp": "날을 세우는 밤", "mQuick": "손목이 가벼워야 칼도 가볍다", "mGuard": "칼은 방패도 된다", "mFinish": "세 번째가 진짜다", "mSpin": "회오리 한가운데는 고요하다", "mBlood": "칼끝에 맺힌 한 방울", "mStun": "머리가 울린다", "mCrit": "급소는 칼이 먼저 안다", "mParry": "받아친 칼이 더 아프다", "mBleed": "상처는 오래 남는다", "mWave": "칼바람이 길을 연다", "mDance": "춤추듯 베어라", "mRage": "피를 보면 칼이 운다", "mSaint": "칼과 하나가 된 자", "abyssCrown": "심연이 씌워 준 왕관", "mThousand": "천 개의 칼날이 비처럼", "nxCombo": "리듬을 타라", "nxFar": "멀수록 침착하게", "nxNear": "코앞이면 빗나갈 일도 없다", "nxFull": "온전할 때 가장 날카롭다", "nxKheal": "잠깐 숨 좀 돌리자", "nxScrap": "쇠붙이도 모으면 갑옷", "nxSteady": "숨을 고르고, 한 방", "nxMark": "네 번째는 피할 수 없다", "nxStatic": "찌릿, 하고 옆으로", "nxGrudge": "맞은 만큼 돌려준다", "nxSecond": "쓰러지기 직전에 바람이 분다", "nxHunter": "상처 입은 짐승을 쫓는다", "nxElite": "강한 놈을 쓰러뜨릴수록 강해진다", "nxEcho": "한 번 더, 메아리처럼", "nxPlate": "막을수록 단단해진다", "nxPull": "모두 이리로", "nxSoul": "영혼이 쌓일수록 칼이 무거워진다", "nxPhase": "잠깐, 다른 곳에 있었다", "nxFrost": "숨결마저 얼어붙는다", "nxBlood": "흘린 피만큼 강해진다", "nxMist": "피의 안개 속에서 숨 쉰다", "nxLuck": "오늘은 운이 좋다", "nxBoom": "불씨가 옮겨붙는다", "nxReaper": "검은 불꽃과의 거래", "nxTime": "시간에 금이 간다", "nxStorm": "폭풍은 나를 중심으로 돈다", "uxStar": "별이 내려와 심장이 되었다", "uxRewind": "아직 끝나지 않았다, 3초 전으로", "uxDoom": "하늘의 별이 모두 떨어지는 날", "uxEcho": "하나를 얻으면 둘이 된다", "uxScale": "저울이 기울면 세계가 무너진다", "wx0": "여섯 발이면 충분하다", "wx1": "코앞의 폭풍", "wx2": "검을 든 자의 약속", "wx3": "숨을 멈추고, 관통", "wx4": "화살촉에 발린 독", "wx5": "계획된 탄창", "wx6": "손이 눈보다 빠르다", "wx7": "대나무도 창이 된다", "wx8": "끈적하게 달라붙는다", "wx9": "탄막을 펼쳐라", "wx10": "고개를 들지 못하게", "wx11": "심장 박동 사이에 쏴라", "wx12": "더 크게, 더 멀리", "wx13": "쇠를 뚫는 한 발", "wx14": "멈추지 않는 손목", "wx15": "두 발이면 끝", "wx16": "세 발이 한 점에", "wx17": "산탄의 소나기", "wx18": "서부에서 온 사냥꾼", "wx19": "독은 조용히 스민다", "wx20": "반으로 쪼갠다", "wx21": "땅이 울린다", "wx22": "칼집에서 나오는 순간 끝난다", "wx23": "뼈가 부서지는 소리", "wx24": "두 자루의 춤", "wx25": "거인의 한 방", "wx26": "거둘 것을 거둔다", "wx27": "찌르고, 또 찌른다", "wx28": "빛으로 벤다", "wx29": "검은 물이 축복한다"};
@@ -6824,7 +6826,7 @@ PQ.bone='살을 내어주고 뼈를 취한다';
 for(const p of PERKS)if(PQ[p.id])p.q=PQ[p.id];
 const PACT={hunger:0};
 function pactRoll(out,pvp,lk){if(pvp||level<2||out.length>=4)return;const pool=PERKS.filter(p=>p.r===7&&!PK[p.id]);if(pool.length&&rand()<.035+.01*lk)out.push(pool[(rand()*pool.length)|0])}
-function pactTick(dt){if(!AUGON()||state!=='play'||hp<=0)return;if(PS('pactTimer')&&levelTime>90){hp-=5*dt;if(hp<=0){hp=0;gameOver()}}}
+function pactTick(dt){if(!AUGON()||state!=='play'||hp<=0)return;if(PS('pactTimer')&&levelTime>60){hp-=8*dt;if(hp<=0){hp=0;gameOver()}}}
 // ================= 초월 증강 (초초초희귀 · 홀로그램) =================
 RAR[6]={n:'초월',c:'#8fe8ff'};TIERW[6]=14;
 PERKS.push(
@@ -6841,6 +6843,11 @@ function uxRoll(out,pvp,lk){if(pvp)return;try{
 function uxTick(dt){if(!AUGON()||state!=='play'||hp<=0)return;
   if(PS('uxRewind')){UX.t+=dt;if(UX.t>.2){UX.t=0;UX.hist.push({tm:time,hp,x:P.x,y:P.y});while(UX.hist.length&&time-UX.hist[0].tm>3.2)UX.hist.shift()}}
   if(PS('uxDoom')){UX.doomT-=dt;if(UX.doomT<=0){UX.doomT=8;let n=0;for(const o of enemies){if(o.dead||Math.hypot(o.x-P.x,o.y-P.y)>18||!los(P.x,P.y,o.x,o.y))continue;n++;const v=(o.max||o.T.hp)*(o.T.boss?.08:.3);for(let z=3;z>.2;z-=.3)burst(o.x,o.y,z,1,'별',195,90,80,1,.3,.3,.08,0,false);burst(o.x,o.y,.3,10,'광',195,100,75,1,2.4,.5,.08,0,false);damage(o,v,0,0,false);try{dmgNum(o,o.T.h,v,'body',true)}catch(e){}}if(n){sfx('boom');flashW=Math.max(flashW||0,.15);slashText=.6;slashMsg='종말의 별'}}}}
+function boneHurt(d){if(!PS('boneX')||state!=='play')return d;const dd=d*(1+PS('pactHurt'));if(hp-dd>0||RUN.boneF===level+1)return d;RUN.boneF=level+1;
+  hp=Math.max(1,MAXHP()*.2);inv=Math.max(inv||0,1.2);let n=0;
+  for(const o of enemies){if(o.dead||Math.hypot(o.x-P.x,o.y-P.y)>4.5)continue;const v=o.T.boss?(o.max||o.T.hp)*.25:(o.hp+1)*4;if(!o.T.boss){o.revived=1;o.rvE=0;o.split=0}damage(o,v/Math.max(.05,o.dr||1),(o.x-P.x)/3,(o.y-P.y)/3,true);n++;burst(o.x,o.y,o.T.h*.6,10,'골',0,0,92,1,2.6,.5,.09,0,false)}
+  burst(P.x,P.y,.5,40,'골',0,0,95,1,5,.8,.1,0,false);flashW=Math.max(flashW||0,.5);shake=Math.max(shake,1);hitstop=.18;sfx('boom');sfx('exit');
+  holoFlash('육참골단',n?`${n}명 처형`:'뼈를 취한다');return -1}
 function uxHurt(d){if(!PS('uxRewind')||hp-d>0||(RUN.rwN|0)>=PS('uxRewind'))return d;const s0=UX.hist[0];RUN.rwN=(RUN.rwN|0)+1;
   hp=Math.max(s0?s0.hp:0,MAXHP()*.35);if(s0&&!blocked(s0.x,s0.y,.25,null)){P.x=s0.x;P.y=s0.y}inv=Math.max(inv||0,1.2);UX.hist=[];
   holoFlash('되감기',`${PS('uxRewind')-RUN.rwN}번 남음`);sfx('exit');return -1}
