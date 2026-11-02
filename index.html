@@ -302,6 +302,7 @@ canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
 ul.co-list{list-style:none;margin:6px 0 0;padding:0;display:flex;gap:6px;flex-wrap:wrap}ul.co-list li{background:#11161a;border:1px solid #2c3a35;border-radius:999px;padding:3px 10px;font-size:13px}.co-box{border-color:#2b4a36;background:linear-gradient(120deg,#0e1712,#10141a)}.co-box h3{color:#7ee6a0}
 li.bot{display:flex;align-items:center;justify-content:space-between;gap:6px;color:var(--dim)}.ai-add{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.ai-add .mini.hard{color:#ff8a80;border-color:#5a2a2a}
 .ai-box{border:1px solid #3a2f22;background:linear-gradient(120deg,#16110b,#120d14);border-radius:10px;padding:10px 12px;margin:6px 0 10px}.ai-box h3{margin:0 0 6px;font-size:16px;color:var(--amber)}.ai-box h3 small{font-size:12px;color:var(--dim);font-weight:400;margin-left:6px}.ai-box .lb-row{flex-wrap:wrap;gap:6px}.ai-box #aiNote{margin:6px 0 0;font-size:13px}.ai-box #aiNote small{color:var(--dim)}.ai-sep{width:10px}
+.seg .coa{font:inherit;font-size:14px;color:var(--ink);background:#11161a;border:1px solid #2c3a35;padding:6px 14px;cursor:pointer;border-radius:999px}.seg .coa[aria-pressed="true"]{background:#7ee6a0;color:#06140c;border-color:#7ee6a0}
 .seg .aib,.seg .aif{font:inherit;font-size:14px;color:var(--ink);background:#11161a;border:1px solid #2c3a35;padding:6px 14px;cursor:pointer;border-radius:999px}.seg .aib[aria-pressed="true"],.seg .aif[aria-pressed="true"]{background:var(--amber);color:#1a1205;border-color:var(--amber)}.seg .aib.hard[aria-pressed="true"]{background:#ff6b6b;border-color:#ff6b6b;color:#1a0505}.lb-opts{margin-top:4px}
 .codex{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-width:720px;margin:10px auto}.cx{background:#11161a;border:1px dashed #3a2a40;border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:3px;text-align:center}.cx span{font-family:var(--display);font-size:26px;color:#5a4a60}.cx b{font-size:13px}.cx small{font-size:11.5px;color:var(--dim)}.cx.on{border:1px solid #ff6ad5;background:linear-gradient(160deg,#2a1030,#11161a 60%)}.cx.on span{color:#ff6ad5}
 /* ---- 홈: 활자 블록 ---- */
@@ -625,6 +626,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
       <p class="lb-status">최대 4명이 같은 방 번호로 들어와 함께 던전을 내려가요. 지하실·동굴·지상 지도가 섞여 나오고, 가끔 <b>숨겨진 보물고</b>가 열려요. 적은 두 배 많고 사람 수만큼 강해져요.</p>
       <p class="lb-status">모두 같은 닫힌 방에서 시작해요 — 문을 열고 나가야 지도가 보여요. 열쇠는 한 명만 주워도 '잠' 문이 모두에게 열리고, <b>살아 있는 사람이 모두 출구에 모여야</b> 다음 층으로 내려가요. 증강 효과는 각자 따로지만, 적의 고난은 가장 센 증강을 가진 사람 기준이에요.</p>
       <div class="lb-row"><label for="coNick">이름</label><input id="coNick" maxlength="10" autocomplete="off"><label for="coCode">방 번호</label><input id="coCode" maxlength="12" value="1" autocomplete="off"><button class="btn sm" id="coJoin" type="button">입장</button></div>
+      <div class="lb-row seg" role="group" aria-label="증강"><button type="button" class="coa" data-na="0" aria-pressed="true">증강 있음</button><button type="button" class="coa" data-na="1" aria-pressed="false">증강 없음</button><span class="lb-status" id="coAugNote">층을 돌파할 때마다 증강을 골라요</span></div>
       <ul class="co-list" id="coList"></ul>
       <p class="lb-status" id="coNote">같은 방 번호로 들어온 친구와 함께 던전을 내려가요 (최대 4명).</p>
       <div class="lb-actions"><button class="btn" id="coGo" type="button" disabled>출발</button><button class="btn ghost" id="coBack" type="button">돌아가기</button></div>
@@ -2364,8 +2366,8 @@ function netSend(){
   if(!R)return;const now=performance.now();if(now-netLast<(SITE()?70:45))return;netLast=now;
   while(myEvents.length&&now-myEvents[0].ts>4000)myEvents.shift();
   const pr={v:1,n:netName,tm:team,rd:pv.round,k:pv.k,d:pv.d,hp:Math.max(0,Math.round(hp)),al:(MODE==='pvp'&&pv.alive&&state!=='title')?1:0,w:cur,ar:[armH,armB],rt:acctState==='in'&&acct?acct.rating|0:0,kb:pv.kb,ms:pv.ms,rr:pv.rr,mi:pv.mi|0,rl:pv.rl||null,ag:MODE==='pvp'&&GM==='aug'?Object.keys(PK).slice(0,24):null,vo:window.__vo?1:0,ev:myEvents.map(e=>e.d)};
-  if(CO.lobby||CO.on){pr.cm=1;pr.co=CO.on?1:0;pr.cf=CO.fl|0;pr.tm=0;pr.ky=CO.on&&hasKey?1:0;pr.tg=CO.on&&CO.alive&&state==='play'?1:0;pr.cst=String(state);pr.cj=CO.joinT||0;pr.ap=CO.on?augPower()|0:0;pr.hd=CO.on?(RUN.hard||{}):null;pr.ex=CO.atExit?1:0;pr.al=CO.on&&CO.alive?1:0;
-    if(CO.on&&CO.host){pr.csd=CO.seed;pr.cl=CO.cl==null?-1:CO.cl;pr.wp=CO.wipe|0;if(now-(CO.enT||0)>95){CO.enT=now;pr.en=coPackEnemies()}}else{pr.csd=null;pr.cl=null;pr.wp=null;pr.en=null}}else{pr.cm=null;pr.co=null}
+  if(CO.lobby||CO.on){pr.cm=1;pr.co=CO.on?1:0;pr.cf=CO.fl|0;pr.tm=0;pr.ky=CO.on&&hasKey?1:0;pr.tg=CO.on&&CO.alive&&state==='play'?1:0;pr.cst=String(state);pr.cj=CO.joinT||0;pr.crd=CO.ready&&state==='clear'?1:0;pr.ap=CO.on?augPower()|0:0;pr.hd=CO.on?(RUN.hard||{}):null;pr.ex=CO.atExit?1:0;pr.al=CO.on&&CO.alive?1:0;
+    if(CO.on&&CO.host){pr.na=CO.noAug?1:0;pr.csd=CO.seed;pr.cl=CO.cl==null?-1:CO.cl;pr.wp=CO.wipe|0;if(now-(CO.enT||0)>95){CO.enT=now;pr.en=coPackEnemies()}}else{pr.na=null;pr.csd=null;pr.cl=null;pr.wp=null;pr.en=null}}else{pr.cm=null;pr.co=null}
   if((MODE==='pvp'||MODE==='coop')&&P){pr.x=+P.x.toFixed(2);pr.y=+P.y.toFixed(2);pr.a=+P.a.toFixed(2);pr.mv=P.mv?1:0;pr.z=+(P.z||0).toFixed(2);pr.cr=crK>.5?1:0;pr.iv=fxOn(7)?1:0;pr.gd=fxOn(2)?1:0;pr.sd=fxOn(1)?1:0}
   if(amBotHost()&&!CO.lobby){pr.bc=AI.cfg;pr.bs=MODE==='pvp'?AI.bots.map(aiPack):[]}else{pr.bc=null;pr.bs=null}
   R.presence(pr).catch(()=>{});
@@ -2397,7 +2399,7 @@ function netRecv(dt){
     if(!r){r={peer:pe.peer,remote:true,T:{name:'',r:.27,h:.86},x:+pr.x||0,y:+pr.y||0,a:+pr.a||0,tx:undefined,hp:100,max:100,anim:0,hit:0,ph:rand()*6,deadAt:-9};remotes.set(pe.peer,r);seenEv.set(pe.peer,maxEv(pr.ev))}
     r.uid=pe.by||null;r.vo=pr.vo===1;r.n=String(pr.n||'???').replace(/[^\p{L}\p{N} _-]/gu,'').slice(0,10)||'???';r.T.name=r.n;r.tm=pr.tm===0||pr.tm===1?pr.tm:-1;r.rd=pr.rd|0;r.k=pr.k|0;r.d=pr.d|0;r.hp=+pr.hp||0;
     r.kb={};if(pr.kb&&typeof pr.kb==='object')for(const k of Object.keys(pr.kb).slice(0,8))r.kb[k]=clamp(pr.kb[k]|0,0,999);
-    r.iv=pr.iv===1;r.gd=pr.gd===1;r.sd=pr.sd===1;r.rt=pr.rt|0;r.ms=Array.isArray(pr.ms)?[pr.ms[0]|0,pr.ms[1]|0]:null;r.rr=pr.rr&&typeof pr.rr==='object'?{rd:pr.rr.rd|0,w:pr.rr.w|0}:null;r.mi=pr.mi|0;r.rl=pr.rl&&typeof pr.rl==='object'?{id:String(pr.rl.id||'none').slice(0,12),s:pr.rl.s|0,rd:pr.rl.rd|0}:null;r.ag=Array.isArray(pr.ag)?pr.ag.slice(0,24).map(x=>String(x).slice(0,12)):null;r.bs=Array.isArray(pr.bs)?pr.bs.slice(0,8):null;r.cm=pr.cm|0;r.co=pr.co|0;r.cf=pr.cf|0;r.cj=+pr.cj||0;r.ap=pr.ap|0;r.hd=pr.hd&&typeof pr.hd==='object'?pr.hd:null;r.ex=pr.ex===1;r.ky=pr.ky===1;r.tg=pr.tg===1;r.cst=String(pr.cst||'');r.cl=pr.cl==null?-1:pr.cl|0;r.csd=pr.csd>>>0;r.wp=pr.wp|0;r.en=pr.en&&typeof pr.en==='object'?pr.en:null;r.bc=Array.isArray(pr.bc)?pr.bc.slice(0,8):null;
+    r.iv=pr.iv===1;r.gd=pr.gd===1;r.sd=pr.sd===1;r.rt=pr.rt|0;r.ms=Array.isArray(pr.ms)?[pr.ms[0]|0,pr.ms[1]|0]:null;r.rr=pr.rr&&typeof pr.rr==='object'?{rd:pr.rr.rd|0,w:pr.rr.w|0}:null;r.mi=pr.mi|0;r.rl=pr.rl&&typeof pr.rl==='object'?{id:String(pr.rl.id||'none').slice(0,12),s:pr.rl.s|0,rd:pr.rl.rd|0}:null;r.ag=Array.isArray(pr.ag)?pr.ag.slice(0,24).map(x=>String(x).slice(0,12)):null;r.bs=Array.isArray(pr.bs)?pr.bs.slice(0,8):null;r.cm=pr.cm|0;r.co=pr.co|0;r.cf=pr.cf|0;r.na=pr.na===1;r.crd=pr.crd===1;r.cj=+pr.cj||0;r.ap=pr.ap|0;r.hd=pr.hd&&typeof pr.hd==='object'?pr.hd:null;r.ex=pr.ex===1;r.ky=pr.ky===1;r.tg=pr.tg===1;r.cst=String(pr.cst||'');r.cl=pr.cl==null?-1:pr.cl|0;r.csd=pr.csd>>>0;r.wp=pr.wp|0;r.en=pr.en&&typeof pr.en==='object'?pr.en:null;r.bc=Array.isArray(pr.bc)?pr.bc.slice(0,8):null;
     r.z=clamp(+pr.z||0,0,1.2);r.cr=pr.cr===1;r.ar=Array.isArray(pr.ar)?[clamp(pr.ar[0]|0,0,2),clamp(pr.ar[1]|0,0,2)]:[0,0];
     const al=pr.al===1;if(r.al&&!al)r.deadAt=time;r.al=al;r.w=pr.w|0;
     if(typeof pr.x==='number'&&typeof pr.y==='number'){if(r.tx===undefined){r.x=pr.x;r.y=pr.y;r.a=+pr.a||0}r.tx=pr.x;r.ty=pr.y;r.ta=+pr.a||0;r.mv=pr.mv===1;
@@ -2754,7 +2756,7 @@ function enemyBoom(x,y,src){
   burst(x,y,.35,22,'불',24,100,58,1,4.5,.6,.11,3,false);burst(x,y,.5,5,'펑',40,100,64,1,2,.5,.2,-1,false);addDecal(x,y,.55,'검');
   const Rr=2.8;for(const e of enemies){if(e===src||e.dead)continue;const dd=Math.hypot(e.x-x,e.y-y);if(dd<Rr)damage(e,6*(1-dd/Rr)+1,(e.x-x)/(dd||1),(e.y-y)/(dd||1),true)}
   for(const o of objs){if(o.dead||!o.O.hp)continue;if(Math.hypot(o.x-x,o.y-y)<Rr)damage(o,3,0,0)}
-  if(CO.on&&CO.host){const t0=CO_TGT,RP=CO_REALP||P;CO_TGT=null;const pd=Math.hypot(RP.x-x,RP.y-y);if(pd<Rr&&los(x,y,RP.x,RP.y)){const sv=P;P=RP;hurtPlayer(40*(1-pd/Rr)+5,x,y,null,null,'blast');P=sv}
+  if(CO.on&&CO.host){const t0=CO_TGT,RP=(P&&!P._px)?P:(CO_REALP||P);CO_TGT=null;const pd=Math.hypot(RP.x-x,RP.y-y);if(pd<Rr&&los(x,y,RP.x,RP.y)){const sv=P;P=RP;hurtPlayer(40*(1-pd/Rr)+5,x,y,null,null,'blast');P=sv}
     for(const r of remotes.values())if(!r.isBot&&r.co===1&&r.cf===CO.fl&&r.al){const d2=Math.hypot(r.x-x,r.y-y);if(d2<Rr&&los(x,y,r.x,r.y))coHurtRemote(r.peer,(40*(1-d2/Rr)+5)*1.25,x,y,'blast')}CO_TGT=t0;return}
   const pd=Math.hypot(P.x-x,P.y-y);if(pd<Rr&&los(x,y,P.x,P.y))hurtPlayer(40*(1-pd/Rr)+5,x,y,null,null,'blast');
 }
@@ -2794,7 +2796,7 @@ function addDecal(x,y,r,g,hue){
 // ================= 업데이트 =================
 let time=0,last=performance.now();
 function update(dt){
-  if(CO.on&&CO_REALP&&P!==CO_REALP)P=CO_REALP;
+  if(CO.on&&CO_REALP&&P&&P._px)P=CO_REALP;
   pKnockTick(dt);unstuckP(dt);
   levelTime+=dt;
   for(const k in fx){if(fx[k]>0){fx[k]-=dt;if(fx[k]<=0){fx[k]=0;if(k==='1')sfx('sandeEnd');say(ITEMS[k].n+' 끝',.8)}}}
@@ -5314,7 +5316,7 @@ let HID_FOUND={};try{HID_FOUND=JSON.parse(localStorage.getItem('gd-hidden')||'{}
 let OPT={inf:false,roul:false,rush:false};try{Object.assign(OPT,JSON.parse(localStorage.getItem('gd-opt')||'{}'))}catch(e){}
 const saveOpt=()=>{try{localStorage.setItem('gd-opt',JSON.stringify(OPT))}catch(e){}};
 const SOLO=()=>MODE!=='pvp';
-const AUGON=()=>SOLO()||(MODE==='pvp'&&GM==='aug');
+const AUGON=()=>(SOLO()&&!(CO.on&&CO.noAug))||(MODE==='pvp'&&GM==='aug');
 const pkN=id=>PK[id]|0;
 const perkCount=()=>Object.values(PK).reduce((a,b)=>a+b,0);
 const PMAP={};for(const p of PERKS)PMAP[p.id]=p;
@@ -6195,7 +6197,7 @@ function start(){
   initAudio();if(AC&&AC.state==='suspended')AC.resume();
   if(state==='title'&&!freshStart){const d=soloLoadData();if(d){spEl.innerHTML=savePickHtml(d);spEl.hidden=false;return}}
   if(state==='over'){score=0;resetPerks();clearRoul();hp=100;armor=0;resetAmmo();loadLevel(0);adaptFloor();if(OPT.inf)augQ=1}
-  else if(state==='clear'){if(perkOffer&&!perkPicked){let p=perkOffer[perkSel];if(!p&&CO.on&&CO.go)p=perkOffer[0];if(!p)return;grantPerk(p,true);perkPicked=true;perkSel=-1;sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}if(CO.on&&!CO.host&&!CO.go){CO.ready=true;say('방장이 「다음 층」을 누르면 함께 내려가요',2);return}loadLevel(level+1);if(CO.on){CO.fl=level;coResetFloor();if(CO.host)coScale()}clearRoul();perkFloorStart();if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor()}
+  else if(state==='clear'){if(perkOffer&&!perkPicked){let p=perkOffer[perkSel];if(!p&&CO.on&&CO.go)p=perkOffer[0];if(!p)return;grantPerk(p,true);perkPicked=true;perkSel=-1;sfx(p.r>=2?'exit':'pick');say(`${RAR[p.r].n} 증강 · ${p.n}`,1.6)}if(CO.on&&!CO.go){CO.ready=true;try{netLast=0;netSend()}catch(e){}if(!CO.host||!coAllReady()){say('모두 증강을 고르면 함께 내려가요',2);coReadyBtn();return}}loadLevel(level+1);if(CO.on){CO.fl=level;coResetFloor();if(CO.host)coScale()}clearRoul();perkFloorStart();if(OPT.roul)applyRoul(rollRoul(false),true);adaptFloor()}
   else if(state==='title'){resetPerks();clearRoul();hp=100;resetAmmo();cur=primary>=0?primary:secondary;loadLevel(0);adaptFloor();if(OPT.inf)augQ=1}
   act=null;charging=false;trail=[];
   ov.hidden=true;leaveBtn.hidden=true;state='play';atkCd=.2;
@@ -6221,7 +6223,8 @@ function levelClear(){
   const nb=(level+1)%2===1;
   showOverlay(`${level+1}층 돌파`,levelName,
     `처치 ${kills}/${totalEnemies} · 시간 ${m}:${String(s).padStart(2,'0')} · 보너스 +${bonus}<br>다음: ${level+2}층${nb?' — 보스가 기다린다':''} · 지도는 매번 새로 만들어져요<br>다음 층 시작 전에 무기를 고를 수 있어요.<div id="pkBox"></div>`,'다음 층',false,true);
-  if(SOLO()){perkOffer=CO.on&&CO.hiddenFl===level?rollPerks(4,2):rollPerks();perkPicked=false;perkSel=-1;btn.disabled=true;const bx=document.getElementById('pkBox');if(bx){bx.innerHTML=perkCardsHtml();bindPerkCards()}leaveBtn.textContent='저장하고 나가기';leaveBtn.hidden=false}
+  if(CO.on&&CO.noAug){perkOffer=null;perkPicked=true}
+  else if(SOLO()){perkOffer=CO.on&&CO.hiddenFl===level?rollPerks(4,2):rollPerks();perkPicked=false;perkSel=-1;btn.disabled=true;const bx=document.getElementById('pkBox');if(bx){bx.innerHTML=perkCardsHtml();bindPerkCards()}leaveBtn.textContent='저장하고 나가기';leaveBtn.hidden=false}
 }
 
 ovP.dataset.home=ovP.innerHTML;
@@ -6723,6 +6726,7 @@ function coHurtMul(){if(!CO.on||!AUGON())return 1;let m=1;if(PS('coGuard')&&coNe
 function coAllyKill(e){if(!CO.on||!AUGON())return;const f=PS('coFeed');if(f&&CO.alive&&hp>0){hp=Math.min(MAXHP(),hp+f);burst(P.x+Math.cos(P.a)*.4,P.y+Math.sin(P.a)*.4,eyeZ-.2,3,'나',120,70,60,1,.8,.4,.05,-1,false)}}
 // 고난: 같이 하는 사람 중 증강이 가장 강한 사람 기준으로 (방장이 적에게 적용 → 모두 같은 적)
 function coAdaptFloor(resume){
+  if(CO.noAug)return;
   if(!resume)try{updateHards()}catch(e){}
   if(!CO.host)return;
   let best=null,bp=augPower();for(const r of remotes.values())if(!r.isBot&&r.co===1&&(r.ap|0)>bp){bp=r.ap|0;best=r}
@@ -6732,6 +6736,9 @@ function coAdaptFloor(resume){
 // ================= 협동 던전 (멀티) =================
 // 최대 4명이 같은 지도(방장 시드)에서 함께 내려간다. 방장(게임 중인 사람 중 가장 앞 순번)이 적을 움직이고,
 // 적 상태는 방장 접속 정보(en)로 나눠 준다. 다른 사람이 적을 때리면 방장에게 보내 방장이 피해를 준다.
+let coNoAug=false;try{coNoAug=localStorage.getItem('gd-co-na')==='1'}catch(e){}
+function syncCoAug(){document.querySelectorAll('.coa').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.na==='1')===coNoAug)));const n=document.getElementById('coAugNote');if(n)n.textContent=coNoAug?'증강 없이 실력만으로 — 고난도 없어요':'층을 돌파할 때마다 증강을 골라요'}
+setTimeout(()=>{document.querySelectorAll('.coa').forEach(b=>b.addEventListener('click',()=>{coNoAug=b.dataset.na==='1';try{localStorage.setItem('gd-co-na',coNoAug?'1':'0')}catch(e){}syncCoAug()}));syncCoAug()},0);
 const CO_MAX=4;const coLobbyEl=document.getElementById('coLobby');
 function coPlayers(){const out=[];if(CO.on)out.push({peer:myPeer,me:1,cj:CO.joinT});for(const r of remotes.values())if(!r.isBot&&r.co===1)out.push({peer:r.peer,r,cj:r.cj});return out}
 // 방장 = 가장 먼저 던전에 들어온 사람 (같으면 아이디 순)
@@ -6741,17 +6748,17 @@ function genCoop(n){return genSolo(n,{seed:(CO.seed+n*7919)>>>0,big:1,more:1})}
 // 방장: 이번 층 적을 사람 수에 맞춰 강하게
 function coScale(){const np=Math.max(1,coPlayers().filter(p=>p.me||(p.r&&p.r.cf===CO.fl)).length),m=1.45+.35*(np-1);
   for(const e of enemies){e.max=Math.round((e.max||e.T.hp)*m);e.hp=e.max}}
-function coResetFloor(){CO.key=false;CO.exT=0;CO.pkN=pickups.length;CO.alive=true;CO.downT=0;CO.clearSent=-1;CO.atExit=false;CO.exitPos=null;CO.medUsed=false;
+function coResetFloor(){CO.ready=false;btn.disabled=false;CO.key=false;CO.exT=0;CO.pkN=pickups.length;CO.alive=true;CO.downT=0;CO.clearSent=-1;CO.atExit=false;CO.exitPos=null;CO.medUsed=false;
   for(let y=0;y<MH&&!CO.exitPos;y++)for(let x=0;x<MW;x++)if(map[y][x]==='O'){CO.exitPos=[x+.5,y+.5];break}
   {const f=nearFree(P.x+(rand()-.5)*.9,P.y+(rand()-.5)*.9,.22,null,0);if(f&&Math.hypot(f[0]-P.x,f[1]-P.y)<1.5){P.x=f[0];P.y=f[1]}}CO.spawn=[P.x,P.y];
   CO.hiddenFl=CO.theme==='hidden'?level:-1;setTimeout(()=>{if(CO.on)say(CO.theme==='hidden'?'히든 맵 — 숨겨진 보물고! 정예 둘이 지키고 있어요 · 돌파하면 좋은 증강':`${level+1}층 · ${levelName} — 다 같이 출구에 들어가야 끝나요`,2.4)},400)}
-function coBegin(asHost,seed,fl){
+function coBegin(asHost,seed,fl,noAug){
   if(!R)return;initAudio();try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}
-  MODE='coop';CO.on=true;CO.host=!!asHost;CO.joinT=Date.now();CO.seed=seed>>>0;CO.fl=fl|0;CO.wipe=0;CO.wipeT=0;CO.go=false;CO.ready=false;team=0;
+  MODE='coop';CO.on=true;CO.host=!!asHost;CO.noAug=asHost?!!coNoAug:!!noAug;CO.joinT=Date.now();CO.seed=seed>>>0;CO.fl=fl|0;CO.wipe=0;CO.wipeT=0;CO.go=false;CO.ready=false;team=0;
   score=0;resetPerks();clearRoul();hp=100;armor=0;resetAmmo();cur=primary>=0?primary:secondary;
-  loadLevel(CO.fl);adaptFloor();if(OPT.inf)augQ=1;coResetFloor();if(asHost)coScale();
+  loadLevel(CO.fl);adaptFloor();if(OPT.inf&&!CO.noAug)augQ=1;if(CO.noAug)augQ=0;coResetFloor();if(asHost)coScale();
   lobbyEl.hidden=true;coLobbyEl.hidden=true;ov.hidden=true;leaveBtn.hidden=true;act=null;charging=false;trail=[];state='play';atkCd=.2;netLast=0;
-  say(`협동 던전 · ${CO.fl+1}층${asHost?' · 내가 방장':''}`,2);openShop(true)}
+  say(`협동 던전 · ${CO.fl+1}층${CO.noAug?' · 증강 없음':''}${asHost?' · 내가 방장':''}`,2);openShop(true)}
 function coLeave(){CO.on=false;CO.lobby=false;coLobbyEl.hidden=true;MODE='solo';try{if(R)R.leave()}catch(e){}R=null;remotes=new Map();team=-1;leaveBtn.hidden=true;closeQuick();clearRoul();
   state='title';loadLevel(0);showOverlay('글자 던전','',ovP.dataset.home||'','혼자 하기',true);document.getElementById('pvpBtn').hidden=false;document.getElementById('startBtn').hidden=false;say('협동 던전에서 나왔어요',1.8)}
 // 쓰러짐 — 동료가 살아 있으면 12초 뒤 층 입구에서 일어남
@@ -6762,10 +6769,10 @@ let CO_TGT=null,CO_REALP=null;
 function coTarget(e){const cands=[];
   if(CO.alive&&state!=='title')cands.push({peer:'me',x:CO_REALP.x,y:CO_REALP.y,p:CO_REALP});
   for(const r of remotes.values())if(!r.isBot&&r.co===1&&r.cf===CO.fl&&r.al&&r.tg&&r.tx!==undefined)cands.push({peer:r.peer,x:r.x,y:r.y,r});
-  if(!cands.length)return {peer:'me',p:{x:-99,y:-99,z:0,a:0,r:.22,vz:0}};
+  if(!cands.length)return {peer:'me',p:{_px:1,x:-99,y:-99,z:0,a:0,r:.22,vz:0}};
   let best=null,bd=1e9;for(const c of cands){let d=Math.hypot(c.x-e.x,c.y-e.y);if(c.peer===e.coT)d*=.75;if(d<bd){bd=d;best=c}}
   e.coT=best.peer;if(best.peer==='me')return best;
-  const r=best.r;r.coP=r.coP||{};Object.assign(r.coP,{x:r.x,y:r.y,z:r.z||0,a:r.a,r:.22,vz:0,mv:r.mv});return {peer:r.peer,p:r.coP}}
+  const r=best.r;r.coP=r.coP||{};Object.assign(r.coP,{_px:1,x:r.x,y:r.y,z:r.z||0,a:r.a,r:.22,vz:0,mv:r.mv});return {peer:r.peer,p:r.coP}}
 function coHurtRemote(peer,d,sx,sy,zone){netEmit({t:'eh',to:peer,d:+(+d).toFixed(1),x:+(+sx||0).toFixed(2),y:+(+sy||0).toFixed(2),z:zone==='head'?'h':zone==='legs'?'l':zone==='blast'?'x':'b'})}
 // 방장: 이번 프레임에 새로 생긴 적 투사체·충격파를 모두에게
 function coEmitNew(p0,w0){for(let i=p0;i<projs.length;i++){const p=projs[i];if(p.friendly)continue;netEmit({t:'ep',fl:CO.fl,p:[p.kind||'',+p.x.toFixed(2),+p.y.toFixed(2),+(p.z||.55).toFixed(2),+p.dx.toFixed(3),+p.dy.toFixed(3),+p.spd.toFixed(2),+(+p.dmg).toFixed(1),+(+p.life).toFixed(1)]})}
@@ -6804,9 +6811,14 @@ function coOnNet(r,e){
 // 출구에 닿음
 function coExit(){if(CO.host)coFloorClear();else if(time-(CO.exT||0)>1){CO.exT=time;netEmit({t:'ex',fl:CO.fl});say('출구 도착 — 다 같이 다음 층으로!',1.4)}}
 function coFloorClear(){if(CO.clearSent===CO.fl)return;CO.clearSent=CO.fl;CO.cl=CO.fl;if(state!=='clear'){if(!CO.alive){CO.alive=true;hp=Math.max(hp,MAXHP()*.4)}levelClear();leaveBtn.textContent='협동 나가기'}}
+// 다음 층: 같은 층에서 돌파 화면에 있는 사람이 모두 증강을 고르고 「다음 층」을 눌러야 내려감
+function coClearMates(){return [...remotes.values()].filter(r=>!r.isBot&&r.co===1&&r.cf===CO.fl&&r.cst==='clear')}
+function coAllReady(){return coClearMates().every(r=>r.crd)}
+function coReadyBtn(){if(state!=='clear'||!CO.ready)return;const m=coClearMates(),k=m.filter(r=>r.crd).length+1;btn.disabled=true;btn.textContent=`동료 기다리는 중 (${k}/${m.length+1})`}
 // 매 프레임 (방장·다른 사람 모두)
 function coopTick(dt){
   if(!CO.on||!R)return;
+  if(state==='clear'&&CO.ready){coReadyBtn();if(CO.host&&coAllReady()){CO.go=true;try{start()}finally{CO.go=false}}}
   const hp_=coHostPeer();CO.host=hp_===myPeer;
   for(const r of remotes.values()){if(r.isBot)continue;const same=r.co===1&&r.cf===CO.fl;r.tm=0;r.rd=same?pv.round:-1;r.inRound=same&&r.al&&r.tx!==undefined}
   // 열쇠 같이 쓰기
@@ -6823,7 +6835,7 @@ function coopTick(dt){
     if(state==='play'||state==='paused'||state==='shop'){const pl=coPlayers().filter(p=>p.me||(p.r&&p.r.cf===CO.fl));const any=pl.some(p=>p.me?CO.alive:p.r.al);
       if(!any){CO.wipeT+=dt;if(CO.wipeT>1.2&&!CO.wipe){CO.wipe=CO.fl+1;coWipe()}}else CO.wipeT=0}}
   else{const H=coHostR();
-    if(H){if(H.csd&&H.csd!==CO.seed&&H.cf===0&&H.co===1&&state!=='clear'){coBegin(false,H.csd,0);return}
+    if(H){if(H.csd&&H.csd!==CO.seed&&H.cf===0&&H.co===1&&state!=='clear'){coBegin(false,H.csd,0,H.na);return}
       if(state!=='clear'&&state!=='over')coApplyEnemies(H.en);
       if(H.cl===CO.fl&&CO.clearSent!==CO.fl&&H.cf===CO.fl)coFloorClear();
       if(H.cf>CO.fl&&H.cst!=='clear'&&H.cst!=='over'){CO.go=true;if(state==='clear')start();else{CO.fl=H.cf;loadLevel(CO.fl);adaptFloor();coResetFloor();state='play'}CO.go=false;CO.ready=false}
@@ -6843,15 +6855,15 @@ function drawCoopHud(pad,small){ctx.save();ctx.textAlign='right';ctx.textBaselin
   if(!CO.alive&&state==='play'){ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`24px ${DFONT}`;ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(0,H*.42,W,60);ctx.fillStyle='#ffd0c8';
     ctx.fillText(`쓰러졌어요 — ${Math.max(0,Math.ceil(CO.downT))}초 뒤 입구에서 일어나요 (동료가 살아 있어야 해요)`,W/2,H*.42+30)}
   if(CO.atExit&&state==='play'){const pl=[...remotes.values()].filter(r=>!r.isBot&&r.co===1&&r.cf===CO.fl&&r.al),inN=pl.filter(r=>r.ex).length+1;ctx.textAlign='center';ctx.font=`15px ${DFONT}`;ctx.fillStyle='rgba(0,0,0,.55)';ctx.fillRect(W/2-190,H*.24-16,380,32);ctx.fillStyle='#7ee6a0';ctx.fillText(`출구 도착 — 동료를 기다려요 (${inN}/${pl.length+1})`,W/2,H*.24)}
-  if(CO.ready&&state==='clear'){ctx.textAlign='center';ctx.font=`14px ${FONT}`;ctx.fillStyle='#9fd8ff';ctx.fillText('방장이 「다음 층」을 누르면 함께 내려가요',W/2,H*.2)}
+
   ctx.restore()}
 // ---- 로비: 협동 던전 칸 ----
 function renderCoop(){const L=document.getElementById('coList'),go=document.getElementById('coGo'),nt=document.getElementById('coNote');if(!L)return;
   if(!CO.lobby||!R){L.innerHTML='';go.disabled=true;nt.textContent='같은 방 번호로 들어온 친구와 함께 던전을 내려가요 (최대 4명).';return}
-  const mem=[{n:netName+' (나)',co:CO.on}];for(const pe of R.peers()){if(pe.sameTab)continue;const pr=pe.presence;if(pr&&pr.v===1&&pr.cm===1)mem.push({n:String(pr.n||'???').slice(0,10),co:pr.co===1,fl:pr.cf|0})}
-  L.innerHTML=mem.map(m=>`<li>${esc(m.n)}${m.co?` <b style="color:#7ee6a0">· ${(m.fl|0)+1}층 진행 중</b>`:''}</li>`).join('');
+  const mem=[{n:netName+' (나)',co:CO.on}];for(const pe of R.peers()){if(pe.sameTab)continue;const pr=pe.presence;if(pr&&pr.v===1&&pr.cm===1)mem.push({n:String(pr.n||'???').slice(0,10),co:pr.co===1,fl:pr.cf|0,na:pr.na===1})}
+  L.innerHTML=mem.map(m=>`<li>${esc(m.n)}${m.co?` <b style="color:#7ee6a0">· ${(m.fl|0)+1}층 진행 중${m.na?' · 증강 없음':''}</b>`:''}</li>`).join('');
   const playing=mem.find(m=>!m.n.endsWith('(나)')&&m.co);go.disabled=mem.length>CO_MAX;go.textContent=playing?'함께 들어가기':'출발';
-  nt.textContent=mem.length>CO_MAX?'협동 던전은 4명까지예요':playing?'이미 진행 중인 던전에 합류해요.':'모두 모이면 출발을 누르세요. 먼저 누른 사람이 방장이 돼요.'}
+  nt.textContent=mem.length>CO_MAX?'협동 던전은 4명까지예요':playing?`이미 진행 중인 던전에 합류해요 (${playing.na?'증강 없음':'증강 있음'} — 방장 설정을 따라요).`:'모두 모이면 출발을 누르세요. 먼저 누른 사람이 방장이 되고, 증강 있음/없음도 방장 설정을 따라요.'}
 document.getElementById('coJoin').addEventListener('click',async()=>{
   const cn=document.getElementById('coNick'),cc=document.getElementById('coCode');if(acctState==='in'&&acct)cn.value=acct.nick;
   netName=(cn.value||'').replace(/[^\p{L}\p{N} _-]/gu,'').trim().slice(0,10)||netName;cn.value=netName;try{localStorage.setItem('gd-nick',netName)}catch(e){}
@@ -6862,7 +6874,7 @@ document.getElementById('coJoin').addEventListener('click',async()=>{
   remotes=new Map();seenEv=new Map();team=0;CO.lobby=true;R.onPeers(()=>renderCoop());netLast=0;netSend();renderCoop();setTimeout(renderCoop,1200);
   if(!rm)nt.textContent='인터넷 대전에 연결하지 못해 혼자 협동 던전을 열었어요.'});
 document.getElementById('coGo').addEventListener('click',()=>{if(!CO.lobby||!R)return;const H=[...remotes.values()].filter(r=>!r.isBot&&r.co===1).sort((a,b)=>a.cj-b.cj||(a.peer<b.peer?-1:1))[0];
-  if(H&&H.csd)coBegin(false,H.csd,H.cf|0);else coBegin(true,(Math.random()*4294967295)>>>0,0)});
+  if(H&&H.csd)coBegin(false,H.csd,H.cf|0,H.na);else coBegin(true,(Math.random()*4294967295)>>>0,0)});
 setInterval(()=>{try{if(CO.lobby&&!CO.on&&!coLobbyEl.hidden)renderCoop()}catch(e){}},1000);
 document.getElementById('coBtn').addEventListener('click',()=>{initAudio();ov.hidden=true;coLobbyEl.hidden=false;state='lobby';const cn=document.getElementById('coNick');cn.value=acctState==='in'&&acct?acct.nick:netName;cn.disabled=acctState==='in'&&!!acct;renderCoop()});
 document.getElementById('coBack').addEventListener('click',()=>{coLobbyEl.hidden=true;if(R&&CO.lobby&&!CO.on){try{R.leave()}catch(e){}R=null;remotes=new Map();CO.lobby=false}if(MODE!=='pvp'&&!CO.on){state='title';showOverlay('글자 던전','모든 것이 글자로 된 실외 전장',ovP.dataset.home||ovP.innerHTML,'혼자 하기',true)}});
@@ -6945,7 +6957,7 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-02c';
+const NOTICE_VER='2026-11-02e';
 const NOTICE=[
  {v:'2026-11-02 오후',t:'협동 던전 개편 · 새 지도 · 협동 증강',items:[
   '협동 던전이 처음 화면의 따로 된 칸(「협동 던전」)으로 옮겨졌어요',
@@ -6954,6 +6966,8 @@ const NOTICE=[
   '열쇠는 한 명만 주워도 \'잠\' 문이 모두에게 바로 열려요 · 살아 있는 사람이 모두 출구에 모여야 다음 층으로 (화면에 n/m 표시)',
   '동료가 문 앞에 가면 내 화면에서도 문이 열려요 — 적이 닫힌 문에 끼던 문제 해결',
   '끼임 방지: 벽·상자·문 속에 끼면 가장 가까운 빈자리로 빼 줘요 (적도)',
+  '협동 던전: 돌파 화면에서 모두 증강을 고르고 「다음 층」을 눌러야 함께 내려가요 (버튼에 n/m 표시) · 다음 층에서 출구나 엉뚱한 곳에 태어나던 버그 수정',
+  '협동 던전에 「증강 있음 / 증강 없음」 선택 추가 — 방장이 고른 대로 모두 같이 (증강 없음이면 층 돌파 때 증강을 안 고르고 고난도 없어요)',
   '협동 증강 8종(협동 던전에서만): 전우애 · 등 맞대기 · 집결 신호 · 질긴 목숨 · 전리품 나누기 · 최후의 생존자 · 열쇠 사냥꾼 · 야전 위생병 — 효과는 고른 사람에게만',
   '고난: 함께하는 사람 중 증강이 가장 강한 사람 기준으로 적이 적응해요 · 적 체력·수는 모두에게 같아요']},
  {v:'2026-11-02 오후',t:'총 강화 · 보스 근접 기술',items:[
@@ -7210,7 +7224,10 @@ setTimeout(()=>{try{if(sugMine.some(m=>m.k))sugFetchRe(false)}catch(e){}},6000);
  const bs=document.createElement('button');bs.type='button';bs.id='sugBtn';bs.textContent='건의함';bs.addEventListener('click',e=>{e.currentTarget.blur();openNotice('sug')});
  const tl=document.getElementById('tools');tl.prepend(bs);tl.prepend(b);const sb=document.getElementById('setBtn');if(sb)tl.prepend(sb);
 }
-setTimeout(()=>{let seen='';try{seen=localStorage.getItem('gd-notice')||''}catch(e){}if(seen!==NOTICE_VER){const b=document.getElementById('ntBtn');if(b){b.classList.add('has-new');b.title='새 공지가 있어요'}}},300);
+setTimeout(()=>{let seen='';try{seen=localStorage.getItem('gd-notice')||''}catch(e){}if(seen!==NOTICE_VER){const b=document.getElementById('ntBtn');if(b){b.classList.add('has-new');b.title='새 공지가 있어요'}
+  // 상단 바 아래 작은 알림 (화면 가운데는 가리지 않음)
+  const t=document.createElement('div');t.className='ach-toast nt-toast';t.innerHTML=`<span class="g">새</span><div><small>패치노트 · ${esc(NOTICE[0].v)}</small><b>${esc(NOTICE[0].t)}</b><small>눌러서 자세히 보기</small></div>`;
+  t.addEventListener('click',()=>{t.remove();openNotice('news')});document.body.appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),450)},9000)}},600);
 
 // ================= 대전 채팅 =================
 const chatLog=document.createElement('div');chatLog.className='chatlog';chatLog.id='chatLog';chatLog.setAttribute('aria-live','polite');
