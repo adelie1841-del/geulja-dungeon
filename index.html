@@ -6972,9 +6972,9 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-02l';
+const NOTICE_VER='2026-11-02m';
 const NOTICE=[
- {v:'2026-11-02 오후',t:'협동 던전 보이스톡',items:['협동 던전에 보이스톡 — 협동 방에 들어간 뒤 「음성 대화 켜기」를 누르면 같은 방에서 음성을 켠 동료와 바로 이어져요 (멤버 이름 옆 🎤)','게임 중 K 키로 음성 켜기/끄기 · V 키로 마이크 끄기/켜기 · 메뉴(P)에도 버튼이 있어요 · 협동에서는 거리와 상관없이 또렷하게 들려요','음성은 사이트(로그인)에서만 돼요 · 처음 켤 때 브라우저가 마이크 권한을 물어봐요']},
+ {v:'2026-11-02 오후',t:'협동 던전 보이스톡',items:['협동 던전에 보이스톡 — 협동 방에 들어간 뒤 「음성 대화 켜기」를 누르면 같은 방에서 음성을 켠 동료와 바로 이어져요 (멤버 이름 옆 🎤)','게임 중 K 키로 음성 켜기/끄기 · V 키로 마이크 끄기/켜기 · 메뉴(P)에도 버튼이 있어요 · 협동에서는 거리와 상관없이 또렷하게 들려요','음성은 사이트(로그인)에서만 돼요 · 처음 켤 때 브라우저가 마이크 권한을 물어봐요','음성 연결 개선: 휴대폰 데이터·막힌 망에서도 중계 서버로 이어지고, 15초 안에 안 이어지면 다시 시도해요 · 0명일 때 이유(동료가 음성을 안 켬, 같은 계정 등)를 보여 줘요']},
  {v:'2026-11-02 낮',t:'금단의 계약 보상 대폭 강화 (초월보다 세게)',items:['피의 서약: 피해 ×6 · 치명 +40% · 흡혈 10% · 회피 +25% · 이동 +20%','유리의 맹세: 피해 ×3 · 연사·장전 3배 · 회피 +35% · 탄 퍼짐 −70%','굶주린 계약: 처음부터 피해 ×2 · 처치마다 +6% (최대 +1500%) · 받는 피해 −30% · 이동 +35%','쇠사슬 낙인: 피해 ×4 · 최대 체력 +100 · 초당 체력 +3 · 반사 5배','시간의 빚: 피해 ×5 · 연사 2배 · 이동 +60% · 받는 피해 −20% · 흡혈 6%','영혼 저당: 피해 +60% · 최대 체력 +50 · 보스마다 신화 증강 3개']},
  {v:'2026-11-02 낮',t:'달리기',items:['달리기: Shift를 누른 채 이동하면 훨씬 빨라져요 (2.7 → 4.2) · 모바일은 이동 조이스틱을 끝까지 밀면 달려요','기력: 최대 5초 달릴 수 있고, 멈추면 다시 차요 (왼쪽 아래 파란 막대) · 기력이 바닥나면 조금 쉬어야 해요 · 조준·앉기 중에는 못 달려요','달리면 발소리가 커져서 AI가 더 잘 들어요']},
  {v:'2026-11-02 낮',t:'협동 던전 난이도 조정',items:['협동 던전에 난이도 선택 추가 — 쉬움(적 1.2배·받는 피해 ×0.85) · 보통(적 1.5배, 기본) · 어려움(지금까지의 난이도: 적 2배·받는 피해 ×1.25) · 방장 설정을 따라요','보통·쉬움에서는 센 적이 덜 일찍 나오고, 사람이 늘 때 적 체력이 덜 올라가요']},
@@ -7298,15 +7298,19 @@ const COM=(()=>{
   box.querySelector('#dmCall').addEventListener('click',()=>{if(dm)call(dm.uid)});
   dmIn.addEventListener('keydown',e=>{if(e.code==='Escape'){e.preventDefault();e.stopPropagation();closeDM()}});
   // ---- 음성 ----
-  const ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']}]};
+  // STUN만으로는 휴대폰 데이터·회사/학교 망에서 연결이 안 될 때가 많아 공개 TURN 중계도 함께 씀
+  const ICE={iceServers:[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},{urls:['turn:openrelay.metered.ca:80','turn:openrelay.metered.ca:443','turn:openrelay.metered.ca:443?transport=tcp'],username:'openrelayproject',credential:'openrelayproject'}]};
   const V={stream:null,muted:false,pcs:new Map(),room:false,call:null};
   const hud=document.createElement('div');hud.className='vchud';hud.hidden=true;document.getElementById('stage').appendChild(hud);
   const pop=document.createElement('div');pop.className='callpop';pop.hidden=true;document.getElementById('stage').appendChild(pop);
   async function mic(){if(V.stream)return V.stream;if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw new Error('nomic');V.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});applyMute();return V.stream}
   function applyMute(){if(V.stream)for(const t of V.stream.getAudioTracks())t.enabled=!V.muted;renderHud()}
   function dropMic(){if(V.pcs.size||V.room||V.call)return;if(V.stream){for(const t of V.stream.getTracks())t.stop();V.stream=null}}
+  // 왜 0명인지 알려 주기
+  function vcWhy(){if(!V.room)return '';let on=0,same=0,peers=0;const mine=me();for(const r of remotes.values()){if(r.isBot)continue;peers++;if(r.vo){if(r.uid&&r.uid===mine)same++;else on++}}
+    const n=[...V.pcs.values()].filter(p=>p.on).length;if(n>=on&&on>0)return '';if(!peers)return ' · 같은 방에 아무도 없어요';if(same&&!on)return ' · 같은 계정끼리는 연결이 안 돼요 (다른 계정으로 들어오세요)';if(!on)return ` · 동료 ${peers}명이 아직 음성을 안 켰어요`;return ` · ${on-n}명 연결 중…`}
   function renderHud(){const n=[...V.pcs.values()].filter(p=>p.on).length;const on=V.room||V.call;hud.hidden=!on;if(!on)return;
-    hud.innerHTML=`<span>${V.muted?'마이크 꺼짐':'● 말하는 중'}${V.call&&V.call.st==='on'?` · ${esc(V.call.nick)} 님과 통화`:V.call?` · ${esc(V.call.nick)} 님 ${V.call.st==='out'?'부르는 중…':''}`:` · 음성 ${n}명 연결`}</span><button type="button" class="mini" data-v="mute">${V.muted?'마이크 켜기':'마이크 끄기'} (V)</button>${V.call?'<button type="button" class="mini" data-v="hang">끊기</button>':'<button type="button" class="mini" data-v="roomoff">음성 끄기</button>'}`}
+    hud.innerHTML=`<span>${V.muted?'마이크 꺼짐':'● 말하는 중'}${V.call&&V.call.st==='on'?` · ${esc(V.call.nick)} 님과 통화`:V.call?` · ${esc(V.call.nick)} 님 ${V.call.st==='out'?'부르는 중…':''}`:` · 음성 ${n}명 연결${vcWhy()}`}</span><button type="button" class="mini" data-v="mute">${V.muted?'마이크 켜기':'마이크 끄기'} (V)</button>${V.call?'<button type="button" class="mini" data-v="hang">끊기</button>':'<button type="button" class="mini" data-v="roomoff">음성 끄기</button>'}`}
   hud.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const a=b.dataset.v;if(a==='mute'){V.muted=!V.muted;applyMute()}else if(a==='hang')hangup(true);else if(a==='roomoff')setRoom(false)});
   addEventListener('keydown',e=>{if(e.code!=='KeyV'||e.repeat)return;if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;if(!V.room&&!V.call)return;V.muted=!V.muted;applyMute();say(V.muted?'마이크 꺼짐':'마이크 켜짐',.9)});
   let sigRef=null,sigUid=null;const done=new Set();
@@ -7315,7 +7319,7 @@ const COM=(()=>{
     sigRef.on('value',s=>{const v=s.val()||{};const arr=Object.keys(v).map(k=>Object.assign({key:k},v[k])).sort((a,b)=>(+a.t||0)-(+b.t||0));
       for(const m of arr){if(done.has(m.key))continue;done.add(m.key);fdb().ref('sig/'+u+'/'+m.key).remove().catch(()=>{});if(Date.now()-(+m.t||0)>60000)continue;try{handle(m)}catch(err){console.warn(err)}}},()=>{})}
   function closePc(uid){const p=V.pcs.get(uid);if(!p)return;try{p.pc.close()}catch(e){}if(p.au){p.au.srcObject=null;p.au.remove()}V.pcs.delete(uid);renderHud()}
-  async function pcFor(uid,ctx,init){closePc(uid);const st=await mic();const pc=new RTCPeerConnection(ICE),p={pc,ctx,on:false,q:[],au:null};V.pcs.set(uid,p);
+  async function pcFor(uid,ctx,init){closePc(uid);const st=await mic();const pc=new RTCPeerConnection(ICE),p={pc,ctx,on:false,q:[],au:null,t0:performance.now()};V.pcs.set(uid,p);
     for(const t of st.getTracks())pc.addTrack(t,st);
     pc.ontrack=ev=>{if(!p.au){p.au=document.createElement('audio');p.au.autoplay=true;p.au.playsInline=true;document.body.appendChild(p.au)}p.au.srcObject=ev.streams[0];p.au.volume=Math.min(1,sfxVol||1)*VVOL;p.au.play().catch(()=>{})};
     pc.onicecandidate=ev=>{if(ev.candidate)send(uid,'ice',ev.candidate.toJSON(),ctx).catch(()=>{})};
@@ -7352,7 +7356,7 @@ const COM=(()=>{
     if(V.room){if(!R){setRoom(false);return}const mine=me(),want=new Set();
       for(const r of remotes.values()){if(!r.vo||!r.uid||r.uid===mine)continue;want.add(r.uid);if(!V.pcs.has(r.uid)&&mine<r.uid&&!(r.vcT>performance.now())){r.vcT=performance.now()+8000;pcFor(r.uid,'room',true).catch(()=>{})}
         const p=V.pcs.get(r.uid);if(p&&p.au){const d=Math.hypot((r.x||0)-P.x,(r.y||0)-P.y);p.au.volume=(MODE==='coop'||CO.lobby?1:Math.max(.25,Math.min(1,1.15-d*.04)))*Math.min(1,sfxVol||1)*VVOL}}
-      for(const [u,p] of [...V.pcs])if(p.ctx==='room'&&!want.has(u))closePc(u)}
+      for(const [u,p] of [...V.pcs])if(p.ctx==='room'&&(!want.has(u)||(!p.on&&performance.now()-p.t0>15000)))closePc(u)}
     renderHud()}
   setInterval(tick,1000);
   return {openDM,call,setRoom,syncVcBtn,isRoom:()=>V.room,unread:u=>unread[u]?unread[u].n|0:0,ok,me,hangup};
