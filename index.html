@@ -1422,6 +1422,13 @@ function genSolo(n,o){o=o||{};
   if(isBoss)ents.push({k:bossK,x:px,y:py,key:1});
   if(abyss>=1||(rush&&n>=13)){const k2=BOSS_SEQ[(BOSS_SEQ.indexOf(bossK||'Q')+5+n)%BOSS_SEQ.length];for(let t=0;t<200;t++){const [x,y]=cells[Math.floor(rnd()*cells.length)];if(g[y][x]==='.'&&d[y*W+x]>=10&&!nearGate(x,y)){ents.push({k:k2,x,y});break}}}
   fixConnectivity(g,W,H);
+  // 협동: 지상 층도 문 하나 달린 닫힌 시작 방에서 출발
+  if(cq){const y0=Math.max(1,sy-3),y1=Math.min(H-2,sy+3);
+    for(let y=y0;y<=y1;y++)for(let x=1;x<=6;x++){const edge=y===y0||y===y1||x===6;g[y][x]=edge?'S':'.'}
+    g[sy][2]='P';g[sy][6]='D';g[y0+1][1]='L';
+    const SOL='SCBLTIYMOW#X',main=new Uint8Array(W*H),q=[cy*W+(W-8)];main[q[0]]=1;
+    for(let h=0;h<q.length;h++){const i=q[h],x=i%W,y=(i/W)|0;for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){const nx=x+a,ny=y+b;if(nx<1||ny<1||nx>=W-1||ny>=H-1)continue;const j=ny*W+nx;if(main[j]||SOL.includes(g[ny][nx])||g[ny][nx]==='D'&&nx===6)continue;main[j]=1;q.push(j)}}
+    for(let x=7;x<W-8&&!main[sy*W+x];x++){if(SOL.includes(g[sy][x])||g[sy][x]==='D')g[sy][x]=','}}
   return {name:(abyss?`심연 ${abyss}단계 · `:rush?'보스 러시 · ':'')+AREA_NAMES[n%AREA_NAMES.length],map:g.map(r=>r.join('')),ents,boss:bossK,tod:abyss?2:n%3};
 }
 function genPvp(seed){
@@ -6943,7 +6950,7 @@ const NOTICE=[
  {v:'2026-11-02 오후',t:'협동 던전 개편 · 새 지도 · 협동 증강',items:[
   '협동 던전이 처음 화면의 따로 된 칸(「협동 던전」)으로 옮겨졌어요',
   '새 지도: 지하실(방과 복도) · 어둠 동굴 · 숨겨진 보물고(가끔, 정예 둘이 지키고 돌파하면 증강 4장 중 좋은 게 잘 나와요) — 지상 지도와 섞여 나와요',
-  '모두 같은 닫힌 방에서 시작해요 — 문을 열고 나가야 지도가 보여요',
+  '모두 같은 닫힌 방에서 시작해요 (지상 층 포함) — 문을 열고 나가야 지도가 보여요',
   '열쇠는 한 명만 주워도 \'잠\' 문이 모두에게 바로 열려요 · 살아 있는 사람이 모두 출구에 모여야 다음 층으로 (화면에 n/m 표시)',
   '동료가 문 앞에 가면 내 화면에서도 문이 열려요 — 적이 닫힌 문에 끼던 문제 해결',
   '끼임 방지: 벽·상자·문 속에 끼면 가장 가까운 빈자리로 빼 줘요 (적도)',
