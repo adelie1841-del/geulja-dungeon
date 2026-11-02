@@ -631,6 +631,7 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
       <div class="lb-row seg" role="group" aria-label="증강"><button type="button" class="coa" data-na="0" aria-pressed="true">증강 있음</button><button type="button" class="coa" data-na="1" aria-pressed="false">증강 없음</button><span class="lb-status" id="coAugNote">층을 돌파할 때마다 증강을 골라요</span></div>
       <ul class="co-list" id="coList"></ul>
       <p class="lb-status" id="coNote">같은 방 번호로 들어온 친구와 함께 던전을 내려가요 (최대 4명).</p>
+      <div class="lb-row"><button class="btn sm ghost" id="coVcBtn" type="button" aria-pressed="false">음성 대화 켜기</button><span class="lb-status">보이스톡: 방에 들어간 뒤 켜면 같은 방에서 음성을 켠 동료와 바로 이어져요 · 게임 중 <kbd>V</kbd> 마이크 끄기/켜기 · <kbd>K</kbd> 음성 켜기/끄기</span></div>
       <div class="lb-actions"><button class="btn" id="coGo" type="button" disabled>출발</button><button class="btn ghost" id="coBack" type="button">돌아가기</button></div>
     </div>
     <div class="shop" id="shop" hidden>
@@ -6219,7 +6220,7 @@ spEl.addEventListener('click',e=>{const b=e.target.closest('button');if(e.target
   if(b.id==='spCont'){const d=soloLoadData();if(d)soloContinue(d);else start()}
   else if(b.id==='spNew'){soloClear();freshStart=true;try{start()}finally{freshStart=false}}});
 addEventListener('keydown',e=>{if(!spEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();spEl.hidden=true}},true);
-function pause(){if(state!=='play')return;state='paused';setTimeout(()=>{if(state==='paused'&&AUGON()&&perkCount()){const pl=document.createElement('details');pl.className='pz-own';pl.innerHTML=`<summary>보유 증강 ${perkCount()}개${SOLO()&&hardTotal()?` · 고난 ${hardTotal()}단계`:''} 보기</summary>`+ownedHtml()+(SOLO()&&hardTotal()?`<div class="own"><div class="own-h">고난</div>${hardsHtml()}</div>`:'');ovP.appendChild(pl)}},0);if(MODE==='pvp'||MODE==='coop'){showOverlay('메뉴',MODE==='coop'?'협동 던전 — 게임은 계속 진행돼요':'대전 중 — 게임은 계속 진행돼요','계속하거나 대전에서 나갈 수 있어요.<br><button type="button" class="btn ghost sm" id="pzShop">무기 바꾸기 (B)</button>','계속',false);leaveBtn.textContent=MODE==='coop'?'협동 나가기':'대전 나가기';leaveBtn.hidden=false;document.getElementById('pvpBtn').hidden=true}else{showOverlay('일시정지',levelName+` · ${level+1}층`,'클릭하거나 Enter를 누르면 계속합니다.<br><button type="button" class="btn ghost sm" id="pzShop">무기 바꾸기 (B)</button> <button type="button" class="btn ghost sm" id="pzEnd">여기서 그만하기</button><br><small>층을 시작할 때마다 자동 저장돼요 — 나가도 이 층 처음부터 이어할 수 있어요.</small>','계속',false);leaveBtn.textContent='저장하고 나가기';leaveBtn.hidden=false;document.getElementById('pvpBtn').hidden=true}}
+function pause(){if(state!=='play')return;state='paused';setTimeout(()=>{if(state==='paused'&&AUGON()&&perkCount()){const pl=document.createElement('details');pl.className='pz-own';pl.innerHTML=`<summary>보유 증강 ${perkCount()}개${SOLO()&&hardTotal()?` · 고난 ${hardTotal()}단계`:''} 보기</summary>`+ownedHtml()+(SOLO()&&hardTotal()?`<div class="own"><div class="own-h">고난</div>${hardsHtml()}</div>`:'');ovP.appendChild(pl)}},0);if(MODE==='pvp'||MODE==='coop'){showOverlay('메뉴',MODE==='coop'?'협동 던전 — 게임은 계속 진행돼요':'대전 중 — 게임은 계속 진행돼요','계속하거나 나갈 수 있어요.<br><button type="button" class="btn ghost sm" id="pzShop">무기 바꾸기 (B)</button> <button type="button" class="btn ghost sm" id="pzVcBtn">'+(COM&&COM.isRoom()?'음성 대화 끄기':'음성 대화 켜기')+'</button>','계속',false);leaveBtn.textContent=MODE==='coop'?'협동 나가기':'대전 나가기';leaveBtn.hidden=false;document.getElementById('pvpBtn').hidden=true}else{showOverlay('일시정지',levelName+` · ${level+1}층`,'클릭하거나 Enter를 누르면 계속합니다.<br><button type="button" class="btn ghost sm" id="pzShop">무기 바꾸기 (B)</button> <button type="button" class="btn ghost sm" id="pzEnd">여기서 그만하기</button><br><small>층을 시작할 때마다 자동 저장돼요 — 나가도 이 층 처음부터 이어할 수 있어요.</small>','계속',false);leaveBtn.textContent='저장하고 나가기';leaveBtn.hidden=false;document.getElementById('pvpBtn').hidden=true}}
 addEventListener('keydown',e=>{if((e.code==='KeyP'||e.code==='Escape')&&state==='aug'&&quickOffer&&augPaused&&augListEl.hidden&&admAugEl.hidden){e.preventDefault();closeQuick();augQ++;augPaused=false;state='play';pause()}});
 function resume(){ov.hidden=true;leaveBtn.hidden=true;document.getElementById('pvpBtn').hidden=false;state='play';if(matchMedia('(pointer:fine)').matches)lockPointer()}
 let endByChoice=false;
@@ -6873,7 +6874,7 @@ function drawCoopHud(pad,small){ctx.save();ctx.textAlign='right';ctx.textBaselin
 // ---- 로비: 협동 던전 칸 ----
 function renderCoop(){const L=document.getElementById('coList'),go=document.getElementById('coGo'),nt=document.getElementById('coNote');if(!L)return;
   if(!CO.lobby||!R){L.innerHTML='';go.disabled=true;nt.textContent='같은 방 번호로 들어온 친구와 함께 던전을 내려가요 (최대 4명).';return}
-  const mem=[{n:netName+' (나)',co:CO.on}];for(const pe of R.peers()){if(pe.sameTab)continue;const pr=pe.presence;if(pr&&pr.v===1&&pr.cm===1)mem.push({n:String(pr.n||'???').slice(0,10),co:pr.co===1,fl:pr.cf|0,na:pr.na===1,df:pr.df==null?1:pr.df|0})}
+  const mem=[{n:netName+' (나)',co:CO.on}];for(const pe of R.peers()){if(pe.sameTab)continue;const pr=pe.presence;if(pr&&pr.v===1&&pr.cm===1)mem.push({n:String(pr.n||'???').slice(0,10)+(pr.vo?' 🎤':''),co:pr.co===1,fl:pr.cf|0,na:pr.na===1,df:pr.df==null?1:pr.df|0})}
   L.innerHTML=mem.map(m=>`<li>${esc(m.n)}${m.co?` <b style="color:#7ee6a0">· ${(m.fl|0)+1}층 진행 중 · ${(CO_DF[m.df]||CO_DF[1]).n}${m.na?' · 증강 없음':''}</b>`:''}</li>`).join('');
   const playing=mem.find(m=>!m.n.endsWith('(나)')&&m.co);go.disabled=mem.length>CO_MAX;go.textContent=playing?'함께 들어가기':'출발';
   nt.textContent=mem.length>CO_MAX?'협동 던전은 4명까지예요':playing?`이미 진행 중인 던전에 합류해요 (${playing.na?'증강 없음':'증강 있음'} — 방장 설정을 따라요).`:'모두 모이면 출발을 누르세요. 먼저 누른 사람이 방장이 되고, 증강 있음/없음도 방장 설정을 따라요.'}
@@ -6889,6 +6890,7 @@ document.getElementById('coJoin').addEventListener('click',async()=>{
 document.getElementById('coGo').addEventListener('click',()=>{if(!CO.lobby||!R)return;const H=[...remotes.values()].filter(r=>!r.isBot&&r.co===1).sort((a,b)=>a.cj-b.cj||(a.peer<b.peer?-1:1))[0];
   if(H&&H.csd)coBegin(false,H.csd,H.cf|0,H.na,H.df);else coBegin(true,(Math.random()*4294967295)>>>0,0)});
 setInterval(()=>{try{if(CO.lobby&&!CO.on&&!coLobbyEl.hidden)renderCoop()}catch(e){}},1000);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#pzVcBtn');if(b){e.preventDefault();e.stopPropagation();Promise.resolve(COM.setRoom(!COM.isRoom())).then(()=>{b.textContent=COM.isRoom()?'음성 대화 끄기':'음성 대화 켜기'})}},true);
 document.getElementById('coBtn').addEventListener('click',()=>{initAudio();ov.hidden=true;coLobbyEl.hidden=false;state='lobby';const cn=document.getElementById('coNick');cn.value=acctState==='in'&&acct?acct.nick:netName;cn.disabled=acctState==='in'&&!!acct;renderCoop()});
 document.getElementById('coBack').addEventListener('click',()=>{coLobbyEl.hidden=true;if(R&&CO.lobby&&!CO.on){try{R.leave()}catch(e){}R=null;remotes=new Map();CO.lobby=false}if(MODE!=='pvp'&&!CO.on){state='title';showOverlay('글자 던전','모든 것이 글자로 된 실외 전장',ovP.dataset.home||ovP.innerHTML,'혼자 하기',true)}});
 {const bi=(id,k)=>{const el=document.getElementById(id);if(!el)return;el.checked=!!OPT[k];el.addEventListener('change',()=>{OPT[k]=el.checked;saveOpt();document.querySelectorAll('#optRoul,#optRoulP').forEach(x=>{if(x!==el&&k==='roul')x.checked=el.checked})})};bi('optInf','inf');bi('optRush','rush');{const best=(()=>{try{return JSON.parse(localStorage.getItem('gd-runs')||'[]').reduce((a,r)=>Math.max(a,r.floor|0),0)}catch(e){return 0}})(),cb=document.getElementById('optRush');if(cb&&best<10){cb.disabled=true;cb.checked=false;OPT.rush=false;document.getElementById('optRushL').style.opacity=.5}else if(cb)document.getElementById('optRushS').textContent='매 층 보스 · 13층부터 보스 둘'}bi('optRoul','roul');bi('optRoulP','roul');
@@ -6970,8 +6972,9 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-02k';
+const NOTICE_VER='2026-11-02l';
 const NOTICE=[
+ {v:'2026-11-02 오후',t:'협동 던전 보이스톡',items:['협동 던전에 보이스톡 — 협동 방에 들어간 뒤 「음성 대화 켜기」를 누르면 같은 방에서 음성을 켠 동료와 바로 이어져요 (멤버 이름 옆 🎤)','게임 중 K 키로 음성 켜기/끄기 · V 키로 마이크 끄기/켜기 · 메뉴(P)에도 버튼이 있어요 · 협동에서는 거리와 상관없이 또렷하게 들려요','음성은 사이트(로그인)에서만 돼요 · 처음 켤 때 브라우저가 마이크 권한을 물어봐요']},
  {v:'2026-11-02 낮',t:'금단의 계약 보상 대폭 강화 (초월보다 세게)',items:['피의 서약: 피해 ×6 · 치명 +40% · 흡혈 10% · 회피 +25% · 이동 +20%','유리의 맹세: 피해 ×3 · 연사·장전 3배 · 회피 +35% · 탄 퍼짐 −70%','굶주린 계약: 처음부터 피해 ×2 · 처치마다 +6% (최대 +1500%) · 받는 피해 −30% · 이동 +35%','쇠사슬 낙인: 피해 ×4 · 최대 체력 +100 · 초당 체력 +3 · 반사 5배','시간의 빚: 피해 ×5 · 연사 2배 · 이동 +60% · 받는 피해 −20% · 흡혈 6%','영혼 저당: 피해 +60% · 최대 체력 +50 · 보스마다 신화 증강 3개']},
  {v:'2026-11-02 낮',t:'달리기',items:['달리기: Shift를 누른 채 이동하면 훨씬 빨라져요 (2.7 → 4.2) · 모바일은 이동 조이스틱을 끝까지 밀면 달려요','기력: 최대 5초 달릴 수 있고, 멈추면 다시 차요 (왼쪽 아래 파란 막대) · 기력이 바닥나면 조금 쉬어야 해요 · 조준·앉기 중에는 못 달려요','달리면 발소리가 커져서 AI가 더 잘 들어요']},
  {v:'2026-11-02 낮',t:'협동 던전 난이도 조정',items:['협동 던전에 난이도 선택 추가 — 쉬움(적 1.2배·받는 피해 ×0.85) · 보통(적 1.5배, 기본) · 어려움(지금까지의 난이도: 적 2배·받는 피해 ×1.25) · 방장 설정을 따라요','보통·쉬움에서는 센 적이 덜 일찍 나오고, 사람이 늘 때 적 체력이 덜 올라가요']},
@@ -7344,17 +7347,19 @@ const COM=(()=>{
   async function setRoom(on){if(on){if(!ok()||!me()){say('음성 대화는 사이트에서만 쓸 수 있어요',1.8);return false}try{await mic()}catch(err){say('마이크를 쓸 수 없어요. 브라우저 마이크 권한을 허용해 주세요',2.6);return false}V.room=true;window.__vo=1;listen();say('음성 대화 켬 · V 키로 마이크 끄기',1.8)}
     else{V.room=false;window.__vo=0;for(const [u,p] of [...V.pcs])if(p.ctx==='room')closePc(u);dropMic()}
     netLast=0;try{netSend()}catch(_){}renderHud();syncVcBtn();return true}
-  function syncVcBtn(){const b=document.getElementById('vcBtn');if(b){b.textContent=V.room?'음성 대화 끄기':'음성 대화 켜기';b.setAttribute('aria-pressed',V.room?'true':'false')}}
+  function syncVcBtn(){for(const id of ['vcBtn','coVcBtn','pzVcBtn']){const b=document.getElementById(id);if(b){b.textContent=V.room?'음성 대화 끄기':'음성 대화 켜기';b.setAttribute('aria-pressed',V.room?'true':'false')}}}
   function tick(){listen();watchInbox();
     if(V.room){if(!R){setRoom(false);return}const mine=me(),want=new Set();
       for(const r of remotes.values()){if(!r.vo||!r.uid||r.uid===mine)continue;want.add(r.uid);if(!V.pcs.has(r.uid)&&mine<r.uid&&!(r.vcT>performance.now())){r.vcT=performance.now()+8000;pcFor(r.uid,'room',true).catch(()=>{})}
-        const p=V.pcs.get(r.uid);if(p&&p.au){const d=Math.hypot((r.x||0)-P.x,(r.y||0)-P.y);p.au.volume=Math.max(.25,Math.min(1,1.15-d*.04))*Math.min(1,sfxVol||1)*VVOL}}
+        const p=V.pcs.get(r.uid);if(p&&p.au){const d=Math.hypot((r.x||0)-P.x,(r.y||0)-P.y);p.au.volume=(MODE==='coop'||CO.lobby?1:Math.max(.25,Math.min(1,1.15-d*.04)))*Math.min(1,sfxVol||1)*VVOL}}
       for(const [u,p] of [...V.pcs])if(p.ctx==='room'&&!want.has(u))closePc(u)}
     renderHud()}
   setInterval(tick,1000);
-  return {openDM,call,setRoom,isRoom:()=>V.room,unread:u=>unread[u]?unread[u].n|0:0,ok,me,hangup};
+  return {openDM,call,setRoom,syncVcBtn,isRoom:()=>V.room,unread:u=>unread[u]?unread[u].n|0:0,ok,me,hangup};
 })();
 // 대기실 음성 버튼
+{const b=document.getElementById('coVcBtn');if(b)b.addEventListener('click',()=>{if(!R||!CO.lobby){say('먼저 협동 방에 입장해 주세요',1.6);return}COM.setRoom(!COM.isRoom())})}
+addEventListener('keydown',e=>{if(e.code!=='KeyK'||e.repeat)return;if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;if(!R||(MODE!=='coop'&&MODE!=='pvp'))return;COM.setRoom(!COM.isRoom())});
 {const lb=document.getElementById('teams')||document.getElementById('lbStatus');const b=document.createElement('button');b.type='button';b.id='vcBtn';b.className='btn sm ghost';b.textContent='음성 대화 켜기';b.setAttribute('aria-pressed','false');
  b.addEventListener('click',()=>COM.setRoom(!COM.isRoom()));if(lb&&lb.parentNode)lb.parentNode.insertBefore(b,lb.nextSibling);
  const hint=document.createElement('p');hint.className='lb-status';hint.style.opacity='.75';hint.textContent='채팅: / 키 · 음성: 사이트에서 같은 방 사람끼리, V 키로 마이크 끄기';if(lb&&lb.parentNode)lb.parentNode.insertBefore(hint,b.nextSibling)}
