@@ -516,6 +516,11 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
 .callpop{position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:41;background:#15171c;border:1px solid #ffb347;border-radius:10px;padding:12px 16px;color:#fff;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:0 8px 30px rgba(0,0,0,.5)}.callpop[hidden]{display:none}.callpop div{display:flex;gap:8px}
 .badge{display:inline-block;background:#ff5a3c;color:#fff;border-radius:8px;font-size:10px;padding:0 5px;margin-left:3px}
 #vcBtn{margin-top:8px}
+.cm-card{max-width:720px}.cm-list{height:min(52vh,460px);overflow:auto;display:flex;flex-direction:column;gap:4px;padding:6px 2px}.cm-m{display:flex;gap:8px;align-items:baseline;font-size:14px;line-height:1.45;padding:3px 6px;border-radius:6px}.cm-m b{color:#9fd8ff;flex:none}.cm-m span{flex:1;word-break:break-all;color:#e8e8e8}.cm-m small{color:#777;font-size:11px;flex:none}.cm-m.me b{color:#7ee6a0}.cm-m.adm{background:rgba(255,215,94,.08)}.cm-m.adm b{color:#ffd75e}.cm-m .mini{font-size:11px;padding:1px 6px}
+.cm-form{display:flex;gap:6px;margin-top:8px}.cm-form input{flex:1;font:inherit;font-size:14px;background:#0e1114;color:#eee;border:1px solid #2c3a35;padding:8px;border-radius:6px}.cm-warn{background:rgba(255,90,77,.12);border:1px solid rgba(255,90,77,.4);color:#ffb0a8;padding:8px 10px;border-radius:6px;font-size:13px}
+.mb-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}.mb-it{border:1px solid #2c3a35;border-radius:8px;padding:8px 10px;cursor:pointer;background:#11161a}.mb-it.new{border-color:#ffb347}.mb-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.mb-h b{font-size:14px}.mb-h small{color:#888;font-size:11px}.mb-x{margin-top:8px;font-size:14px;line-height:1.6;color:#ddd;white-space:normal}.mb-a{margin-top:8px;text-align:right}
+.ua-body h3{font-size:15px;margin:14px 0 6px;color:#fff}.ua-body input,.ua-body textarea,.ua-body select{width:100%;box-sizing:border-box;font:inherit;font-size:14px;background:#0e1114;color:#eee;border:1px solid #2c3a35;padding:8px;border-radius:6px;margin-bottom:6px}.ua-row{display:flex;gap:6px}.ua-row>*{flex:1}
+#cmBtn.has-new::after,#mbBtn.has-new::after{content:'';display:inline-block;width:6px;height:6px;background:#ff5a3c;margin-left:5px;vertical-align:2px}
 .ach-toast{position:fixed;top:46px;right:14px;left:auto;transform:none;cursor:pointer;z-index:42;display:flex;gap:8px;align-items:center;background:#15171c;border:1px solid #ffc857;border-radius:8px;padding:6px 10px;font-size:13px;color:#eee;box-shadow:0 8px 30px rgba(0,0,0,.5);transition:opacity .4s,transform .4s;max-width:min(420px,90%)}.ach-toast[hidden]{display:none}.ach-toast.out{opacity:0;transform:translateY(-8px)}
 .ach-toast .g,.ach .g{flex:none;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;background:#2a2410;color:#ffc857;font-weight:700;font-size:18px}.ach-toast b{display:block;font-size:15px}.ach-toast small{display:block;font-size:12px;color:#aaa}.ach-toast small.un{color:#ff8a7a;margin-top:3px}
 .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;padding:10px 0}.ach{display:flex;gap:10px;align-items:center;background:#1b1e24;border:1px solid #2a2f38;border-radius:8px;padding:8px;opacity:.6}.ach.got{opacity:1;border-color:#6b5a22}.ach:not(.got) .g{background:#222;color:#777}.ach b{display:block;font-size:13px}.ach small{display:block;font-size:11px;color:#9a9a9a}.ach .bar{display:block;height:4px;background:#333;border-radius:2px;margin-top:4px;overflow:hidden}.ach .bar b{display:block;height:100%;background:#ffc857}
@@ -5582,7 +5587,7 @@ function showHardToast(list){if(!list.length)return;document.getElementById('sta
 let rkActive=false,lastInputT=performance.now(),afkWarned=false;
 ['keydown','mousedown','mousemove','touchstart','wheel'].forEach(t=>addEventListener(t,()=>{lastInputT=performance.now();afkWarned=false},{passive:true}));
 const BAN_MIN=[5,15,60];
-function rankBanLeft(){return acct&&acct.rkBan?Math.max(0,acct.rkBan-Date.now()):0}
+function rankBanLeft(){let a=acct&&acct.rkBan?Math.max(0,acct.rkBan-Date.now()):0;try{const b=Math.max(banLeft('rank'),banLeft('ban'));if(b>a)a=b===Infinity?99999*60000:b}catch(e){}return a}
 function markRank(){if(rkActive||matchMode!=='rank'||!DB||!acct||acctState!=='in')return;rkActive=true;lastInputT=performance.now();try{DB.doc('players/'+myUid).update({rk:{t:Date.now(),room:roomCode}})}catch(e){}}
 function clearRank(){if(!rkActive)return;rkActive=false;try{DB.doc('players/'+myUid).update({rk:null})}catch(e){}}
 async function rankPenalty(reason){if(!DB||!acct)return;rkActive=false;const ab=(acct.ab|0)+1,mins=BAN_MIN[Math.min(ab,3)-1],rating=Math.max(RANK_MIN,(acct.rating|0)-25),lost=Math.max(0,Math.max(RANK_MIN,acct.rating|0)-rating);
@@ -6433,7 +6438,7 @@ async function connectRoom(){
   try{const cl=window.claude;roomNS=cl&&cl.use?await cl.use('room'):null}catch(e){roomNS=null}
   return roomNS;
 }
-document.getElementById('pvpBtn').addEventListener('click',()=>{initAudio();ov.hidden=true;lobbyEl.hidden=false;state='lobby';setTimeout(()=>nickEl.focus(),50)});
+document.getElementById('pvpBtn').addEventListener('click',()=>{if(!cmGate('대전'))return;initAudio();ov.hidden=true;lobbyEl.hidden=false;state='lobby';setTimeout(()=>nickEl.focus(),50)});
 document.getElementById('lbBack').addEventListener('click',()=>{lobbyEl.hidden=true;if(MODE!=='pvp'){state='title';showOverlay('글자 던전','모든 것이 글자로 된 실외 전장',ovP.dataset.home||ovP.innerHTML,'혼자 하기',true)}});
 document.getElementById('joinBtn').addEventListener('click',async()=>{
   CO.lobby=false;
@@ -6891,7 +6896,7 @@ document.getElementById('coGo').addEventListener('click',()=>{if(!CO.lobby||!R)r
   if(H&&H.csd)coBegin(false,H.csd,H.cf|0,H.na,H.df);else coBegin(true,(Math.random()*4294967295)>>>0,0)});
 setInterval(()=>{try{if(CO.lobby&&!CO.on&&!coLobbyEl.hidden)renderCoop()}catch(e){}},1000);
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#pzVcBtn');if(b){e.preventDefault();e.stopPropagation();Promise.resolve(COM.setRoom(!COM.isRoom())).then(()=>{b.textContent=COM.isRoom()?'음성 대화 끄기':'음성 대화 켜기'})}},true);
-document.getElementById('coBtn').addEventListener('click',()=>{initAudio();ov.hidden=true;coLobbyEl.hidden=false;state='lobby';const cn=document.getElementById('coNick');cn.value=acctState==='in'&&acct?acct.nick:netName;cn.disabled=acctState==='in'&&!!acct;renderCoop()});
+document.getElementById('coBtn').addEventListener('click',()=>{if(!cmGate('협동 던전'))return;initAudio();ov.hidden=true;coLobbyEl.hidden=false;state='lobby';const cn=document.getElementById('coNick');cn.value=acctState==='in'&&acct?acct.nick:netName;cn.disabled=acctState==='in'&&!!acct;renderCoop()});
 document.getElementById('coBack').addEventListener('click',()=>{coLobbyEl.hidden=true;if(R&&CO.lobby&&!CO.on){try{R.leave()}catch(e){}R=null;remotes=new Map();CO.lobby=false}if(MODE!=='pvp'&&!CO.on){state='title';showOverlay('글자 던전','모든 것이 글자로 된 실외 전장',ovP.dataset.home||ovP.innerHTML,'혼자 하기',true)}});
 {const bi=(id,k)=>{const el=document.getElementById(id);if(!el)return;el.checked=!!OPT[k];el.addEventListener('change',()=>{OPT[k]=el.checked;saveOpt();document.querySelectorAll('#optRoul,#optRoulP').forEach(x=>{if(x!==el&&k==='roul')x.checked=el.checked})})};bi('optInf','inf');bi('optRush','rush');{const best=(()=>{try{return JSON.parse(localStorage.getItem('gd-runs')||'[]').reduce((a,r)=>Math.max(a,r.floor|0),0)}catch(e){return 0}})(),cb=document.getElementById('optRush');if(cb&&best<10){cb.disabled=true;cb.checked=false;OPT.rush=false;document.getElementById('optRushL').style.opacity=.5}else if(cb)document.getElementById('optRushS').textContent='매 층 보스 · 13층부터 보스 둘'}bi('optRoul','roul');bi('optRoulP','roul');
  if(state==='title'){ov.classList.add('home');ovT.innerHTML=[...'글자 던전'].map((ch,i)=>ch===' '?'<i class=gap></i>':`<span class=sort style=--i:${i}>${ch}</span>`).join('');ovS.textContent='글자로 지은 실외 전장'}
@@ -6972,8 +6977,9 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-02m';
+const NOTICE_VER='2026-11-03a';
 const NOTICE=[
+ {v:'2026-11-03',t:'커뮤니티 · 메시지함',items:['상단 바 「커뮤니티」: 플레이하는 모두가 함께 쓰는 전체 채팅 (사이트 로그인 필요 · 2초에 한 번 · 200자)','상단 바 「메시지함」: 운영자가 보낸 메일과 안내가 와요 — 새 메일이 오면 숫자와 알림으로 알려 줘요','욕설·도배 등은 운영자가 채팅 금지 · 랭크 금지 · 이용 정지를 걸 수 있어요 (기간과 사유는 메시지함으로 안내)']},
  {v:'2026-11-02 오후',t:'협동 던전 보이스톡',items:['협동 던전에 보이스톡 — 협동 방에 들어간 뒤 「음성 대화 켜기」를 누르면 같은 방에서 음성을 켠 동료와 바로 이어져요 (멤버 이름 옆 🎤)','게임 중 K 키로 음성 켜기/끄기 · V 키로 마이크 끄기/켜기 · 메뉴(P)에도 버튼이 있어요 · 협동에서는 거리와 상관없이 또렷하게 들려요','음성은 사이트(로그인)에서만 돼요 · 처음 켤 때 브라우저가 마이크 권한을 물어봐요','음성 연결 개선: 휴대폰 데이터·막힌 망에서도 중계 서버로 이어지고, 15초 안에 안 이어지면 다시 시도해요 · 0명일 때 이유(동료가 음성을 안 켬, 같은 계정 등)를 보여 줘요']},
  {v:'2026-11-02 낮',t:'금단의 계약 보상 대폭 강화 (초월보다 세게)',items:['피의 서약: 피해 ×6 · 치명 +40% · 흡혈 10% · 회피 +25% · 이동 +20%','유리의 맹세: 피해 ×3 · 연사·장전 3배 · 회피 +35% · 탄 퍼짐 −70%','굶주린 계약: 처음부터 피해 ×2 · 처치마다 +6% (최대 +1500%) · 받는 피해 −30% · 이동 +35%','쇠사슬 낙인: 피해 ×4 · 최대 체력 +100 · 초당 체력 +3 · 반사 5배','시간의 빚: 피해 ×5 · 연사 2배 · 이동 +60% · 받는 피해 −20% · 흡혈 6%','영혼 저당: 피해 +60% · 최대 체력 +50 · 보스마다 신화 증강 3개']},
  {v:'2026-11-02 낮',t:'달리기',items:['달리기: Shift를 누른 채 이동하면 훨씬 빨라져요 (2.7 → 4.2) · 모바일은 이동 조이스틱을 끝까지 밀면 달려요','기력: 최대 5초 달릴 수 있고, 멈추면 다시 차요 (왼쪽 아래 파란 막대) · 기력이 바닥나면 조금 쉬어야 해요 · 조준·앉기 중에는 못 달려요','달리면 발소리가 커져서 AI가 더 잘 들어요']},
@@ -7185,7 +7191,7 @@ function renderOps(){const q=opsQ.trim().toLowerCase(),GN=k=>(GMS[k]||{}).n||k||
     body=sugAll?`<div class="ops-f">${F.map(([k,n])=>`<button type="button" data-opsf="${k}" aria-pressed="${k===opsSugF}">${n}</button>`).join('')}</div>
     <div class="sug-list adm">${L.map(m=>`<div class="sug-it${m.d?' done':''}"><b>${CAT[m.c]||''}</b><span>${esc(m.x)}</span><small>${m.a?'익명':esc(m.n||'익명')} · ${fmtT(m.t)} (${agoT(m.t)}) · ${esc(m.v||'')}${m.m?' · 모바일':''}${m.d?' · 처리함':''}</small>${m.re?`<div class="sug-re"><b>보낸 답변</b><span>${esc(m.re.x)}</span><small>${fmtT(m.re.t)}</small></div>`:''}<div class="sug-reply"><input data-sugin="${esc(m.k)}" maxlength="300" placeholder="${m.re?'답변 고치기':'답변 쓰기 (Enter로 보내기)'}" autocomplete="off"><button type="button" class="mini" data-sugre="${esc(m.k)}">답변 보내기</button></div><div class="sug-act"><button type="button" class="mini" data-sugd="${esc(m.k)}">${m.d?'안 읽음으로':'처리함'}</button><button type="button" class="mini" data-sugx="${esc(m.k)}">삭제</button></div></div>`).join('')||'<p class="pk-tip">해당하는 건의가 없어요</p>'}</div>`:'<p class="pk-tip">불러오는 중…</p>'}
   opsEl.innerHTML=`<div class="nt-card wide"><div class="nt-head"><b>운영 <small>운영자만 보여요</small></b><button type="button" class="mini" data-opsx>닫기</button></div>
-  <div class="nt-tabs">${[['users','신규 유저'],['log','대전 전적'],['sug','건의함']].map(([k,n])=>`<button type="button" data-opst="${k}" aria-selected="${k===opsTab}">${n}</button>`).join('')}<span style="flex:1"></span><button type="button" data-opsaug>증강 고르기 (\\)</button><button type="button" data-opsr>새로고침</button></div>
+  <div class="nt-tabs">${[['users','신규 유저'],['log','대전 전적'],['sug','건의함']].map(([k,n])=>`<button type="button" data-opst="${k}" aria-selected="${k===opsTab}">${n}</button>`).join('')}<span style="flex:1"></span><button type="button" data-opsfind title="검색 칸에 쓴 아이디로 메일·제재">아이디로 유저 관리</button><button type="button" data-opsaug>증강 고르기 (\\)</button><button type="button" data-opsr>새로고침</button></div>
   <div class="nt-body"><div class="nt-search"><input id="opsQ" type="search" placeholder="${opsTab==='sug'?'내용 · 아이디로 찾기':'아이디'+(opsTab==='log'?' · 방 번호':'')+'로 찾기'}" value="${esc(opsQ)}" autocomplete="off"></div>${body}</div></div>`;
   const qi=opsEl.querySelector('#opsQ');qi.addEventListener('input',()=>{opsQ=qi.value;const pos=qi.selectionStart;renderOps();const q2=opsEl.querySelector('#opsQ');q2.focus();try{q2.setSelectionRange(pos,pos)}catch(e){}});qi.addEventListener('keydown',e=>e.stopPropagation());opsEl.querySelectorAll('[data-sugin]').forEach(i=>i.addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'){const b=opsEl.querySelector(`[data-sugre="${i.dataset.sugin}"]`);if(b)b.click()}}))}
 function openOps(tab){if(!ADMV()){say('운영자만 쓸 수 있어요',1.4);return}if(tab)opsTab=tab;opsEl.hidden=false;renderOps();opsLoad();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
@@ -7196,7 +7202,8 @@ opsEl.addEventListener('click',e=>{if(e.target===opsEl){opsEl.hidden=true;return
   if(b.dataset.opsf){opsSugF=b.dataset.opsf;renderOps();return}
   if(b.dataset.sugre||b.dataset.sugd||b.dataset.sugx)return opsSugAct(b);
   if(b.dataset.opsr!==undefined){if(opsTab==='users')opsUsers=null;else if(opsTab==='log')opsLog=null;else sugAll=null;renderOps();opsLoad();return}
-  if(b.dataset.ouid){opsTab='log';opsQ=(b.querySelector('b')||{}).textContent||'';opsLog=null;renderOps();opsLoad()}});
+  if(b.dataset.opsfind!==undefined){if(!opsQ.trim()){say('위 검색 칸에 아이디를 쓰고 눌러 주세요',1.6);return}uaFindNick(opsQ);return}
+  if(b.dataset.ouid){openUserAdmin(b.dataset.ouid,(b.querySelector('b')||{}).textContent||'')}});
 addEventListener('keydown',e=>{if(!opsEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();opsEl.hidden=true}},true);
 {const b=document.createElement('button');b.type='button';b.id='opsBtn';b.textContent='운영';b.hidden=true;b.addEventListener('click',e=>{e.currentTarget.blur();openOps()});document.getElementById('tools').appendChild(b);
  setInterval(()=>{const on=ADMV();if(b.hidden===on)b.hidden=!on},1500)}
@@ -7248,6 +7255,96 @@ setTimeout(()=>{let seen='';try{seen=localStorage.getItem('gd-notice')||''}catch
   // 상단 바 아래 작은 알림 (화면 가운데는 가리지 않음)
   const t=document.createElement('div');t.className='ach-toast nt-toast';t.innerHTML=`<span class="g">새</span><div><small>패치노트 · ${esc(NOTICE[0].v)}</small><b>${esc(NOTICE[0].t)}</b><small>눌러서 자세히 보기</small></div>`;
   t.addEventListener('click',()=>{t.remove();openNotice('news')});document.body.appendChild(t);setTimeout(()=>{t.classList.add('out');setTimeout(()=>t.remove(),450)},9000)}},600);
+// ================= 커뮤니티 채팅 · 메시지함 · 운영자 메일·제재 =================
+// 저장 위치 (Realtime DB): chat/g/<키> 전체 채팅 · mail/<uid>/<키> 메시지함 · bans/<uid> 제재 {mute,rank,ban: 끝나는 시각(ms, 0=없음, -1=영구), r 사유}
+const CM={ban:{},banSub:null,banUid:null,mail:[],mailSub:null,mailUid:null,chat:[],chatSub:null,lastSend:0,adminTarget:null};
+const fbOk=()=>{try{return SITE()&&window.firebase&&firebase.apps&&firebase.apps.length>0&&!!firebase.auth().currentUser}catch(e){return false}};
+const fbUid=()=>{try{return firebase.auth().currentUser.uid}catch(e){return null}};
+const fbTS=()=>firebase.database.ServerValue.TIMESTAMP;
+const banLeft=k=>{const v=+((CM.ban||{})[k])||0;if(v===-1)return Infinity;return Math.max(0,v-Date.now())};
+const banTxt=ms=>ms===Infinity?'영구':ms>864e5?`${Math.ceil(ms/864e5)}일`:ms>36e5?`${Math.ceil(ms/36e5)}시간`:`${Math.max(1,Math.ceil(ms/6e4))}분`;
+const isMuted=()=>banLeft('mute')>0||banLeft('ban')>0,isBanned=()=>banLeft('ban')>0;
+// 내 제재·메시지함 구독 (로그인하면)
+function cmSync(){if(!fbOk())return;const u=fbUid();const db=firebase.database();
+  if(CM.banUid!==u){if(CM.banSub)CM.banSub();CM.banUid=u;const ref=db.ref('bans/'+u),cb=s=>{const was=isBanned();CM.ban=s.val()||{};cmBadge();if(isBanned()&&!was)cmBanNotice()};ref.on('value',cb,()=>{});CM.banSub=()=>ref.off('value',cb)}
+  if(CM.mailUid!==u){if(CM.mailSub)CM.mailSub();CM.mailUid=u;const ref=db.ref('mail/'+u).orderByChild('t').limitToLast(60),cb=s=>{const v=s.val()||{};const prev=CM.mail.length;CM.mail=Object.keys(v).map(k=>Object.assign({k},v[k])).sort((a,b)=>(b.t||0)-(a.t||0));const un=CM.mail.filter(m=>!m.rd).length;
+      if(CM.mail.length>prev&&prev>0&&un)cmToast(`새 메일: ${CM.mail[0].s||'운영자 메일'}`);cmBadge();if(!mbEl.hidden)renderMail()};ref.on('value',cb,()=>{});CM.mailSub=()=>ref.off('value',cb)}}
+setInterval(()=>{try{cmSync()}catch(e){}},2000);
+function cmBadge(){const n=CM.mail.filter(m=>!m.rd).length,b=document.getElementById('mbBtn');if(b){b.textContent=n?`메시지함 ${n}`:'메시지함';b.classList.toggle('has-new',n>0)}}
+function cmToast(t){const d=document.createElement('div');d.className='ach-toast nt-toast';d.innerHTML=`<span class="g">✉</span><div><small>메시지함</small><b>${esc(t)}</b><small>눌러서 열기</small></div>`;d.addEventListener('click',()=>{d.remove();openMail()});document.body.appendChild(d);setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),450)},7000)}
+function cmBanNotice(){const ms=banLeft('ban');try{if(MODE==='pvp')leavePvp(true);else if(CO.on)coLeave()}catch(e){}say(`이용 정지 중이에요 (${banTxt(ms)} 남음) — 사유: ${CM.ban.r||'운영 정책 위반'} · 메시지함을 확인해 주세요`,6)}
+// 대전·협동 입장, 채팅, 랭크를 제재에 맞게 막기
+function cmGate(what){if(isBanned()){say(`이용 정지 중이라 ${what}을(를) 할 수 없어요 (${banTxt(banLeft('ban'))} 남음)`,3);return false}return true}
+
+// ---------- 커뮤니티 창 ----------
+const cmEl=document.createElement('div');cmEl.className='notice';cmEl.id='cmWin';cmEl.hidden=true;cmEl.setAttribute('role','dialog');cmEl.setAttribute('aria-label','커뮤니티');document.getElementById('stage').appendChild(cmEl);
+function chatSubOn(){if(CM.chatSub||!fbOk())return;const ref=firebase.database().ref('chat/g').orderByChild('t').limitToLast(120),cb=s=>{const v=s.val()||{};CM.chat=Object.keys(v).map(k=>Object.assign({k},v[k])).sort((a,b)=>(a.t||0)-(b.t||0));if(!cmEl.hidden)renderChatList()};ref.on('value',cb,()=>{});CM.chatSub=()=>ref.off('value',cb)}
+function renderChatList(){const L=cmEl.querySelector('#cmList');if(!L)return;const atBottom=L.scrollHeight-L.scrollTop-L.clientHeight<40,adm=ADMV(),mine=fbUid();
+  L.innerHTML=CM.chat.map(m=>`<div class="cm-m${m.a?' adm':''}${m.u===mine?' me':''}"><b>${m.a?'👑 ':''}${esc(m.n||'?')}</b><span>${esc(m.x||'')}</span><small>${fmtT(m.t)}</small>${adm&&!m.a?`<button type="button" class="mini" data-cmdel="${esc(m.k)}">삭제</button><button type="button" class="mini" data-cmusr="${esc(m.u)}" data-cmnick="${esc(m.n||'')}">유저 관리</button>`:adm?`<button type="button" class="mini" data-cmdel="${esc(m.k)}">삭제</button>`:''}</div>`).join('')||'<p class="pk-tip">아직 아무도 말하지 않았어요. 첫 인사를 남겨 보세요!</p>';
+  if(atBottom||!L.dataset.init){L.scrollTop=L.scrollHeight;L.dataset.init=1}}
+function renderCm(){const can=fbOk(),mut=isMuted();
+  cmEl.innerHTML=`<div class="nt-card wide cm-card"><div class="nt-head"><b>커뮤니티 <small>플레이하는 모두가 함께 쓰는 채팅</small></b><button type="button" class="mini" data-cmx>닫기</button></div>
+  <div class="nt-body"><div id="cmList" class="cm-list">${can?'<p class="pk-tip">불러오는 중…</p>':'<p class="pk-tip">커뮤니티는 사이트에서 로그인하면 쓸 수 있어요. (계정 버튼에서 로그인)</p>'}</div>
+  ${can?(mut?`<p class="cm-warn">채팅 금지 중이에요 (${banTxt(Math.max(banLeft('mute'),banLeft('ban')))} 남음) — 사유: ${esc(CM.ban.r||'운영 정책 위반')}</p>`:`<form class="cm-form" id="cmForm"><input id="cmIn" maxlength="200" placeholder="메시지 입력 (Enter로 보내기) · 욕설·도배는 제재될 수 있어요" autocomplete="off"><button class="btn sm" type="submit">보내기</button></form>`):''}</div></div>`;
+  if(can){chatSubOn();renderChatList();const f=cmEl.querySelector('#cmForm');if(f){const i=f.querySelector('#cmIn');i.addEventListener('keydown',e=>e.stopPropagation());setTimeout(()=>i.focus(),50);
+    f.addEventListener('submit',e=>{e.preventDefault();const x=i.value.replace(/\s+/g,' ').trim().slice(0,200);if(!x)return;if(isMuted()){renderCm();return}const now=Date.now();if(now-CM.lastSend<2000){say('너무 빨라요. 잠깐 뒤에 보내 주세요',1.2);return}
+      if(typeof confirmSensitive==='function'&&!confirmSensitive(x))return;CM.lastSend=now;i.value='';
+      firebase.database().ref('chat/g').push().set({u:fbUid(),n:String((acct&&acct.nick)||netName||'?').slice(0,20),x,t:fbTS(),a:ADMV()?1:0}).catch(err=>{say(String(err&&err.code||'').includes('PERMISSION')?'채팅을 보낼 수 없어요 (제재 중이거나 서버 규칙 갱신 필요)':'보내지 못했어요',2.4)})})}}}
+function openCm(){cmEl.hidden=false;renderCm();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
+cmEl.addEventListener('click',e=>{if(e.target===cmEl){cmEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.cmx!==undefined){cmEl.hidden=true;return}
+  if(b.dataset.cmdel){if(b.dataset.arm){firebase.database().ref('chat/g/'+b.dataset.cmdel).remove().catch(()=>say('지우지 못했어요',1.4))}else{b.dataset.arm=1;b.textContent='한 번 더'}return}
+  if(b.dataset.cmusr){openUserAdmin(b.dataset.cmusr,b.dataset.cmnick)}});
+addEventListener('keydown',e=>{if(!cmEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();cmEl.hidden=true}},true);
+
+// ---------- 메시지함 ----------
+const mbEl=document.createElement('div');mbEl.className='notice';mbEl.id='mbWin';mbEl.hidden=true;mbEl.setAttribute('role','dialog');mbEl.setAttribute('aria-label','메시지함');document.getElementById('stage').appendChild(mbEl);
+let mbOpen=null;
+function renderMail(){const can=fbOk();const L=CM.mail;
+  const sanc=[['ban','이용 정지'],['mute','채팅 금지'],['rank','랭크 금지']].filter(([k])=>banLeft(k)>0);
+  mbEl.innerHTML=`<div class="nt-card wide"><div class="nt-head"><b>메시지함 <small>운영자가 보낸 메일 · 안내</small></b><button type="button" class="mini" data-mbx>닫기</button></div><div class="nt-body">
+  ${sanc.length?`<p class="cm-warn">현재 제재: ${sanc.map(([k,n])=>`${n} ${banTxt(banLeft(k))} 남음`).join(' · ')}${CM.ban.r?` — 사유: ${esc(CM.ban.r)}`:''}</p>`:''}
+  ${!can?'<p class="pk-tip">메시지함은 사이트에서 로그인하면 쓸 수 있어요.</p>':L.length?`<div class="mb-list">${L.map(m=>`<div class="mb-it${m.rd?'':' new'}${mbOpen===m.k?' open':''}" data-mbk="${esc(m.k)}"><div class="mb-h"><b>${m.rd?'':'● '}${esc(m.s||'(제목 없음)')}</b><small>${esc(m.n||'운영자')} · ${fmtT(m.t)} (${agoT(m.t)})</small></div>${mbOpen===m.k?`<div class="mb-x">${esc(m.x||'').replace(/\n/g,'<br>')}</div><div class="mb-a"><button type="button" class="mini" data-mbdel="${esc(m.k)}">삭제</button></div>`:''}</div>`).join('')}</div>`:'<p class="pk-tip">받은 메일이 없어요.</p>'}
+  <p class="pk-tip">친구와 주고받는 쪽지는 계정 → 친구 목록의 「쪽지」에서 볼 수 있어요.</p></div></div>`}
+function openMail(){mbEl.hidden=false;renderMail();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
+mbEl.addEventListener('click',e=>{if(e.target===mbEl){mbEl.hidden=true;return}const b=e.target.closest('button,[data-mbk]');if(!b)return;
+  if(b.dataset.mbx!==undefined){mbEl.hidden=true;return}
+  if(b.dataset.mbdel){if(b.dataset.arm){firebase.database().ref('mail/'+fbUid()+'/'+b.dataset.mbdel).remove().catch(()=>{});mbOpen=null}else{b.dataset.arm=1;b.textContent='한 번 더 누르면 삭제'}return}
+  if(b.dataset.mbk){const k=b.dataset.mbk;mbOpen=mbOpen===k?null:k;const m=CM.mail.find(x=>x.k===k);if(m&&!m.rd&&fbOk())firebase.database().ref('mail/'+fbUid()+'/'+k+'/rd').set(1).catch(()=>{});renderMail()}});
+addEventListener('keydown',e=>{if(!mbEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();mbEl.hidden=true}},true);
+
+// ---------- 운영자: 유저 관리 (메일 보내기 · 제재) ----------
+const uaEl=document.createElement('div');uaEl.className='notice';uaEl.id='uaWin';uaEl.hidden=true;uaEl.setAttribute('role','dialog');uaEl.setAttribute('aria-label','유저 관리');document.getElementById('stage').appendChild(uaEl);
+const DURS=[['3600000','1시간'],['86400000','1일'],['259200000','3일'],['604800000','7일'],['2592000000','30일'],['-1','영구']];
+async function openUserAdmin(uid,nick){if(!ADMV()){say('운영자만 쓸 수 있어요',1.4);return}CM.adminTarget={uid,nick:nick||'?',ban:null};uaEl.hidden=false;renderUA();
+  try{const v=(await firebase.database().ref('bans/'+uid).once('value')).val()||{};CM.adminTarget.ban=v;renderUA()}catch(e){CM.adminTarget.ban={};renderUA()}}
+function renderUA(){const T=CM.adminTarget;if(!T)return;const B=T.ban,left=k=>{const v=+((B||{})[k])||0;return v===-1?Infinity:Math.max(0,v-Date.now())};
+  uaEl.innerHTML=`<div class="nt-card"><div class="nt-head"><b>유저 관리 · ${esc(T.nick)}</b><button type="button" class="mini" data-uax>닫기</button></div><div class="nt-body ua-body">
+  <p class="pk-tip">현재 제재: ${B?[['ban','이용 정지'],['mute','채팅 금지'],['rank','랭크 금지']].map(([k,n])=>left(k)>0?`<b>${n} ${banTxt(left(k))}</b>`:'').filter(Boolean).join(' · ')||'없음':'불러오는 중…'}${B&&B.r?` (사유: ${esc(B.r)})`:''}</p>
+  <h3>메일 보내기</h3><input id="uaSub" maxlength="60" placeholder="제목" autocomplete="off"><textarea id="uaTx" maxlength="1000" rows="4" placeholder="내용 — 이 유저의 메시지함으로 바로 가요"></textarea><button type="button" class="btn sm" data-uamail>메일 보내기</button>
+  <h3>제재</h3><div class="ua-row"><select id="uaK"><option value="mute">채팅 금지 (커뮤니티·방 채팅)</option><option value="rank">랭크 금지</option><option value="ban">이용 정지 (대전·협동·채팅 모두)</option></select><select id="uaD">${DURS.map(([v,n])=>`<option value="${v}"${v==='86400000'?' selected':''}>${n}</option>`).join('')}</select></div>
+  <input id="uaR" maxlength="120" placeholder="사유 (유저에게 보여요)" autocomplete="off"><div class="ua-row"><button type="button" class="btn sm" data-uaban>제재 걸기</button><button type="button" class="btn sm ghost" data-uaunban>모든 제재 풀기</button></div>
+  <p class="pk-tip" id="uaSt"></p></div></div>`;
+  uaEl.querySelectorAll('input,textarea,select').forEach(i=>i.addEventListener('keydown',e=>e.stopPropagation()))}
+async function uaMail(uid,s,x){return firebase.database().ref('mail/'+uid).push().set({f:fbUid(),n:'👑 운영자',s:String(s).slice(0,60),x:String(x).slice(0,1000),t:fbTS(),rd:0})}
+uaEl.addEventListener('click',async e=>{if(e.target===uaEl){uaEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;const T=CM.adminTarget,st=uaEl.querySelector('#uaSt');if(!T)return;
+  if(b.dataset.uax!==undefined){uaEl.hidden=true;return}
+  try{
+    if(b.dataset.uamail!==undefined){const s=uaEl.querySelector('#uaSub').value.trim(),x=uaEl.querySelector('#uaTx').value.trim();if(!x){st.textContent='내용을 써 주세요';return}b.disabled=true;await uaMail(T.uid,s||'운영자 메일',x);st.textContent='보냈어요 ✔';uaEl.querySelector('#uaTx').value='';b.disabled=false;return}
+    if(b.dataset.uaban!==undefined){const k=uaEl.querySelector('#uaK').value,d=+uaEl.querySelector('#uaD').value,r=uaEl.querySelector('#uaR').value.trim()||'운영 정책 위반';const until=d===-1?-1:Date.now()+d;
+      const up={};up[k]=until;up.r=r.slice(0,120);up.by=fbUid();up.t=fbTS();await firebase.database().ref('bans/'+T.uid).update(up);
+      const KN={mute:'채팅 금지',rank:'랭크 금지',ban:'이용 정지'}[k],DN=(DURS.find(z=>+z[0]===d)||[0,''])[1];
+      await uaMail(T.uid,`[제재 안내] ${KN} ${DN}`,`${KN} 제재가 걸렸어요.\n기간: ${DN}${until>0?` (${fmtT(until)}까지)`:''}\n사유: ${r}\n\n문의는 건의함으로 보내 주세요.`);
+      st.textContent=`${KN} ${DN} 걸고 안내 메일을 보냈어요 ✔`;T.ban=Object.assign({},T.ban,up);T.ban.t=Date.now();renderUA();uaEl.querySelector('#uaSt').textContent=`${KN} ${DN} 걸고 안내 메일을 보냈어요 ✔`;return}
+    if(b.dataset.uaunban!==undefined){await firebase.database().ref('bans/'+T.uid).remove();await uaMail(T.uid,'[제재 해제] 제재가 풀렸어요','걸려 있던 제재가 모두 풀렸어요. 즐겁게 플레이해 주세요!');T.ban={};renderUA();uaEl.querySelector('#uaSt').textContent='모든 제재를 풀었어요 ✔';return}
+  }catch(err){st.textContent='실패했어요: '+(String(err&&err.code||err).includes('PERMISSION')?'서버 규칙(database.rules.json)을 갱신해 주세요':String(err&&err.message||err).slice(0,60));b.disabled=false}});
+addEventListener('keydown',e=>{if(!uaEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();uaEl.hidden=true}},true);
+// 운영 창: 유저 줄을 누르면 유저 관리 · 아이디로 바로 찾기
+async function uaFindNick(n){try{const s=await firebase.database().ref('db/nicks/'+nickKey(n.trim())).once('value');const v=s.val();if(v&&v.uid){openUserAdmin(v.uid,v.nick||n);return true}}catch(e){}say('그 아이디를 찾지 못했어요',1.6);return false}
+
+// ---------- 상단 바 버튼 ----------
+{const tl=document.getElementById('tools');const mk=(id,t,f)=>{const b=document.createElement('button');b.type='button';b.id=id;b.textContent=t;b.addEventListener('click',e=>{e.currentTarget.blur();f()});return b};
+ const nt=document.getElementById('ntBtn');const cmB=mk('cmBtn','커뮤니티',openCm),mbB=mk('mbBtn','메시지함',openMail);if(nt){tl.insertBefore(mbB,nt);tl.insertBefore(cmB,mbB)}else{tl.prepend(mbB);tl.prepend(cmB)}}
 
 // ================= 대전 채팅 =================
 const chatLog=document.createElement('div');chatLog.className='chatlog';chatLog.id='chatLog';chatLog.setAttribute('aria-live','polite');
@@ -7261,7 +7358,7 @@ function closeChat(relock){chatForm.hidden=true;chatInEl.value='';chatInEl.blur(
 chatForm.addEventListener('submit',e=>{e.preventDefault();const t=chatInEl.value.replace(/\s+/g,' ').trim().slice(0,80);
   if(t){const now=performance.now();if(now-chatLast<700){chatAdd('','너무 빨라요. 잠깐 뒤에 보내 주세요',0,1)}else if(confirmSensitive(t)){chatLast=now;sendChat(t)}}closeChat(true)});
 chatInEl.addEventListener('keydown',e=>{if(e.code==='Escape'){e.preventDefault();e.stopPropagation();closeChat(true)}});
-function sendChat(t){chatAdd(netName||'나',t,teamCol(team));
+function sendChat(t){if(isMuted()){chatAdd('',`채팅 금지 중이에요 (${banTxt(Math.max(banLeft('mute'),banLeft('ban')))} 남음)`,0,1);return}chatAdd(netName||'나',t,teamCol(team));
   if(MODE==='pvp'&&R)netEmit({t:'chat',x:t});else if(R){chatQ.push({i:++evSeq,t:'chat',x:t,ts:performance.now()});lobbyChatSend()}}
 // 대기실에서는 netEmit이 막혀 있으니 따로 실어 보낸다
 const chatQ=[];function lobbyChatSend(){while(chatQ.length&&performance.now()-chatQ[0].ts>4000)chatQ.shift();if(!R)return;myEvents.push(...chatQ.map(c=>({ts:c.ts,d:{i:c.i,t:'chat',x:c.x}})));chatQ.length=0;netLast=0;netSend()}
@@ -7308,21 +7405,21 @@ const COM=(()=>{
   function dropMic(){if(V.pcs.size||V.room||V.call)return;if(V.stream){for(const t of V.stream.getTracks())t.stop();V.stream=null}}
   // 왜 0명인지 알려 주기
   function vcWhy(){if(!V.room)return '';let on=0,same=0,peers=0;const mine=me();for(const r of remotes.values()){if(r.isBot)continue;peers++;if(r.vo){if(r.uid&&r.uid===mine)same++;else on++}}
-    const n=[...V.pcs.values()].filter(p=>p.on).length;if(n>=on&&on>0)return '';if(!peers)return ' · 같은 방에 아무도 없어요';if(same&&!on)return ' · 같은 계정끼리는 연결이 안 돼요 (다른 계정으로 들어오세요)';if(!on)return ` · 동료 ${peers}명이 아직 음성을 안 켰어요`;return ` · ${on-n}명 연결 중…`}
+    const n=[...V.pcs.values()].filter(p=>p.on).length;if(n>=on&&on>0)return '';if(!peers)return ' · 같은 방에 아무도 없어요';if(same&&!on)return ' · 같은 계정끼리는 연결이 안 돼요 (다른 계정으로 들어오세요)';if(!on)return ` · 동료 ${peers}명이 아직 음성을 안 켰어요`;const st=[...V.pcs.values()].filter(p=>!p.on).map(p=>p.pc.iceConnectionState).join(',');return ` · ${on-n}명 연결 중…${st?' ('+st+')':' (상대 응답 대기)'}${V.err?' · 오류: '+V.err:''}`}
   function renderHud(){const n=[...V.pcs.values()].filter(p=>p.on).length;const on=V.room||V.call;hud.hidden=!on;if(!on)return;
     hud.innerHTML=`<span>${V.muted?'마이크 꺼짐':'● 말하는 중'}${V.call&&V.call.st==='on'?` · ${esc(V.call.nick)} 님과 통화`:V.call?` · ${esc(V.call.nick)} 님 ${V.call.st==='out'?'부르는 중…':''}`:` · 음성 ${n}명 연결${vcWhy()}`}</span><button type="button" class="mini" data-v="mute">${V.muted?'마이크 켜기':'마이크 끄기'} (V)</button>${V.call?'<button type="button" class="mini" data-v="hang">끊기</button>':'<button type="button" class="mini" data-v="roomoff">음성 끄기</button>'}`}
   hud.addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const a=b.dataset.v;if(a==='mute'){V.muted=!V.muted;applyMute()}else if(a==='hang')hangup(true);else if(a==='roomoff')setRoom(false)});
   addEventListener('keydown',e=>{if(e.code!=='KeyV'||e.repeat)return;if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;if(!V.room&&!V.call)return;V.muted=!V.muted;applyMute();say(V.muted?'마이크 꺼짐':'마이크 켜짐',.9)});
-  let sigRef=null,sigUid=null;const done=new Set();
+  let sigRef=null,sigUid=null,svOff=0,svOn=false;const done=new Set();
   function send(to,k,d,c){return fdb().ref('sig/'+to).push().set({f:me(),k,d:d==null?'':JSON.stringify(d),c:c||'',t:TS()})}
-  function listen(){const u=me();if(!ok()||!u){if(sigRef){sigRef.off();sigRef=null}sigUid=null;return}if(sigUid===u)return;if(sigRef)sigRef.off();sigUid=u;sigRef=fdb().ref('sig/'+u);
-    sigRef.on('value',s=>{const v=s.val()||{};const arr=Object.keys(v).map(k=>Object.assign({key:k},v[k])).sort((a,b)=>(+a.t||0)-(+b.t||0));
-      for(const m of arr){if(done.has(m.key))continue;done.add(m.key);fdb().ref('sig/'+u+'/'+m.key).remove().catch(()=>{});if(Date.now()-(+m.t||0)>60000)continue;try{handle(m)}catch(err){console.warn(err)}}},()=>{})}
+  function listen(){if(!svOn&&ok()){svOn=true;try{fdb().ref('.info/serverTimeOffset').on('value',x=>{svOff=+x.val()||0})}catch(e){}}const u=me();if(!ok()||!u){if(sigRef){sigRef.off();sigRef=null}sigUid=null;return}if(sigUid===u)return;if(sigRef)sigRef.off();sigUid=u;sigRef=fdb().ref('sig/'+u);
+    sigRef.on('value',s=>{V.sigOk=1;const v=s.val()||{};const arr=Object.keys(v).map(k=>Object.assign({key:k},v[k])).sort((a,b)=>(+a.t||0)-(+b.t||0));
+      for(const m of arr){if(done.has(m.key))continue;done.add(m.key);fdb().ref('sig/'+u+'/'+m.key).remove().catch(()=>{});if(Date.now()+svOff-(+m.t||0)>60000)continue;Promise.resolve().then(()=>handle(m)).catch(err=>{V.err=String(err&&(err.code||err.message)||err).slice(0,60);console.warn(err)})}},err=>{V.err='신호 읽기 실패: '+String(err&&err.code||err).slice(0,40)})}
   function closePc(uid){const p=V.pcs.get(uid);if(!p)return;try{p.pc.close()}catch(e){}if(p.au){p.au.srcObject=null;p.au.remove()}V.pcs.delete(uid);renderHud()}
   async function pcFor(uid,ctx,init){closePc(uid);const st=await mic();const pc=new RTCPeerConnection(ICE),p={pc,ctx,on:false,q:[],au:null,t0:performance.now()};V.pcs.set(uid,p);
     for(const t of st.getTracks())pc.addTrack(t,st);
     pc.ontrack=ev=>{if(!p.au){p.au=document.createElement('audio');p.au.autoplay=true;p.au.playsInline=true;document.body.appendChild(p.au)}p.au.srcObject=ev.streams[0];p.au.volume=Math.min(1,sfxVol||1)*VVOL;p.au.play().catch(()=>{})};
-    pc.onicecandidate=ev=>{if(ev.candidate)send(uid,'ice',ev.candidate.toJSON(),ctx).catch(()=>{})};
+    pc.onicecandidate=ev=>{if(ev.candidate)send(uid,'ice',ev.candidate.toJSON(),ctx).catch(err=>{V.err=String(err&&(err.code||err.message)||err).slice(0,60)})};
     pc.onconnectionstatechange=()=>{const s=pc.connectionState;p.on=s==='connected';if(s==='failed'){closePc(uid);if(ctx==='call'){say('통화 연결에 실패했어요 (네트워크가 막혀 있을 수 있어요)',2.4);endCall()}}if(s==='connected'&&ctx==='call'&&V.call){V.call.st='on'}renderHud()};
     if(init){const of=await pc.createOffer();await pc.setLocalDescription(of);await send(uid,'offer',{type:of.type,sdp:of.sdp},ctx)}
     renderHud();return p}
@@ -7354,7 +7451,7 @@ const COM=(()=>{
   function syncVcBtn(){for(const id of ['vcBtn','coVcBtn','pzVcBtn']){const b=document.getElementById(id);if(b){b.textContent=V.room?'음성 대화 끄기':'음성 대화 켜기';b.setAttribute('aria-pressed',V.room?'true':'false')}}}
   function tick(){listen();watchInbox();
     if(V.room){if(!R){setRoom(false);return}const mine=me(),want=new Set();
-      for(const r of remotes.values()){if(!r.vo||!r.uid||r.uid===mine)continue;want.add(r.uid);if(!V.pcs.has(r.uid)&&mine<r.uid&&!(r.vcT>performance.now())){r.vcT=performance.now()+8000;pcFor(r.uid,'room',true).catch(()=>{})}
+      for(const r of remotes.values()){if(!r.vo||!r.uid||r.uid===mine)continue;want.add(r.uid);if(!V.pcs.has(r.uid)&&mine<r.uid&&!(r.vcT>performance.now())){r.vcT=performance.now()+8000;pcFor(r.uid,'room',true).catch(err=>{V.err=String(err&&(err.code||err.message)||err).slice(0,60)})}
         const p=V.pcs.get(r.uid);if(p&&p.au){const d=Math.hypot((r.x||0)-P.x,(r.y||0)-P.y);p.au.volume=(MODE==='coop'||CO.lobby?1:Math.max(.25,Math.min(1,1.15-d*.04)))*Math.min(1,sfxVol||1)*VVOL}}
       for(const [u,p] of [...V.pcs])if(p.ctx==='room'&&(!want.has(u)||(!p.on&&performance.now()-p.t0>15000)))closePc(u)}
     renderHud()}

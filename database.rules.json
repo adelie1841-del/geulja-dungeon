@@ -5,7 +5,7 @@
         "peers": {
           ".read": "auth != null",
           "$peer": {
-            ".write": "auth != null && (!data.exists() || data.child('u').val() === auth.uid) && (!newData.exists() || newData.child('u').val() === auth.uid)"
+            ".write": "(auth != null && (!data.exists() || data.child('u').val() === auth.uid) && (!newData.exists() || newData.child('u').val() === auth.uid)) && (!newData.exists() || !(root.child('bans').child(auth.uid).child('ban').val() > now || root.child('bans').child(auth.uid).child('ban').val() === -1))"
           }
         }
       }
@@ -23,7 +23,13 @@
           "bestFloor"
         ],
         "$uid": {
-          ".write": "auth != null && auth.uid === $uid"
+          ".write": "auth != null && ((auth.uid === $uid && newData.exists()) || root.child('db').child('admins').child(auth.uid).val() === true)",
+          "rating": {
+            ".validate": "newData.isNumber() && (root.child('db').child('admins').child(auth.uid).val() === true || (newData.val() >= 500 && newData.val() <= 9999 && ((!data.exists() && newData.val() === 1000) || newData.val() === data.val() || (data.val() < 500 && newData.val() === 500) || (newData.val() < data.val() && data.val() - newData.val() <= 60) || (newData.val() > data.val() && newData.val() - data.val() <= 60 && newData.parent().child('rT').val() === now && (!data.parent().child('rT').exists() || now - data.parent().child('rT').val() >= 45000)))))"
+          },
+          "rT": {
+            ".validate": "newData.isNumber() && (newData.val() === now || newData.val() === data.val())"
+          }
         }
       },
       "nicks": {
@@ -106,6 +112,39 @@
           ".write": "auth != null && ((!data.exists() && newData.child('f').val() === auth.uid) || (auth.uid === $to && !newData.exists()))",
           ".validate": "!newData.exists() || newData.child('d').val().length < 20000"
         }
+      }
+    },
+    "chat": {
+      "g": {
+        ".read": "auth != null",
+        ".indexOn": [
+          "t"
+        ],
+        "$m": {
+          ".write": "auth != null && ((!data.exists() && newData.child('u').val() === auth.uid && !(root.child('bans').child(auth.uid).child('ban').val() > now || root.child('bans').child(auth.uid).child('ban').val() === -1) && !(root.child('bans').child(auth.uid).child('mute').val() > now || root.child('bans').child(auth.uid).child('mute').val() === -1) && (newData.child('a').val() !== 1 || root.child('db').child('admins').child(auth.uid).val() === true)) || (root.child('db').child('admins').child(auth.uid).val() === true && !newData.exists()))",
+          ".validate": "!newData.exists() || (newData.child('x').isString() && newData.child('x').val().length >= 1 && newData.child('x').val().length <= 200 && newData.child('n').isString() && newData.child('n').val().length <= 20 && newData.child('t').val() === now)"
+        }
+      }
+    },
+    "mail": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('db').child('admins').child(auth.uid).val() === true)",
+        ".indexOn": [
+          "t"
+        ],
+        "$m": {
+          ".write": "auth != null && (root.child('db').child('admins').child(auth.uid).val() === true || (auth.uid === $uid && !newData.exists()))",
+          "rd": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.isNumber()"
+          }
+        }
+      }
+    },
+    "bans": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('db').child('admins').child(auth.uid).val() === true)",
+        ".write": "auth != null && root.child('db').child('admins').child(auth.uid).val() === true"
       }
     }
   }
