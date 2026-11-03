@@ -6977,9 +6977,9 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-03a';
+const NOTICE_VER='2026-11-03b';
 const NOTICE=[
- {v:'2026-11-03',t:'커뮤니티 · 메시지함',items:['상단 바 「커뮤니티」: 플레이하는 모두가 함께 쓰는 전체 채팅 (사이트 로그인 필요 · 2초에 한 번 · 200자)','상단 바 「메시지함」: 운영자가 보낸 메일과 안내가 와요 — 새 메일이 오면 숫자와 알림으로 알려 줘요','욕설·도배 등은 운영자가 채팅 금지 · 랭크 금지 · 이용 정지를 걸 수 있어요 (기간과 사유는 메시지함으로 안내)']},
+ {v:'2026-11-03',t:'커뮤니티 · 메시지함',items:['상단 바 「커뮤니티」: 플레이하는 모두가 함께 쓰는 전체 채팅 (사이트 로그인 필요 · 2초에 한 번 · 200자)','상단 바 「메시지함」: 운영자가 보낸 메일과 안내가 와요 — 새 메일이 오면 숫자와 알림으로 알려 줘요','욕설·도배 등은 운영자가 채팅 금지 · 랭크 금지 · 이용 정지를 걸 수 있어요 (기간과 사유는 메시지함으로 안내)','부적절한 이름은 운영자가 바꿀 수 있어요 (로그인 아이디는 그대로 · 메시지함으로 안내)']},
  {v:'2026-11-02 오후',t:'협동 던전 보이스톡',items:['협동 던전에 보이스톡 — 협동 방에 들어간 뒤 「음성 대화 켜기」를 누르면 같은 방에서 음성을 켠 동료와 바로 이어져요 (멤버 이름 옆 🎤)','게임 중 K 키로 음성 켜기/끄기 · V 키로 마이크 끄기/켜기 · 메뉴(P)에도 버튼이 있어요 · 협동에서는 거리와 상관없이 또렷하게 들려요','음성은 사이트(로그인)에서만 돼요 · 처음 켤 때 브라우저가 마이크 권한을 물어봐요','음성 연결 개선: 휴대폰 데이터·막힌 망에서도 중계 서버로 이어지고, 15초 안에 안 이어지면 다시 시도해요 · 0명일 때 이유(동료가 음성을 안 켬, 같은 계정 등)를 보여 줘요']},
  {v:'2026-11-02 낮',t:'금단의 계약 보상 대폭 강화 (초월보다 세게)',items:['피의 서약: 피해 ×6 · 치명 +40% · 흡혈 10% · 회피 +25% · 이동 +20%','유리의 맹세: 피해 ×3 · 연사·장전 3배 · 회피 +35% · 탄 퍼짐 −70%','굶주린 계약: 처음부터 피해 ×2 · 처치마다 +6% (최대 +1500%) · 받는 피해 −30% · 이동 +35%','쇠사슬 낙인: 피해 ×4 · 최대 체력 +100 · 초당 체력 +3 · 반사 5배','시간의 빚: 피해 ×5 · 연사 2배 · 이동 +60% · 받는 피해 −20% · 흡혈 6%','영혼 저당: 피해 +60% · 최대 체력 +50 · 보스마다 신화 증강 3개']},
  {v:'2026-11-02 낮',t:'달리기',items:['달리기: Shift를 누른 채 이동하면 훨씬 빨라져요 (2.7 → 4.2) · 모바일은 이동 조이스틱을 끝까지 밀면 달려요','기력: 최대 5초 달릴 수 있고, 멈추면 다시 차요 (왼쪽 아래 파란 막대) · 기력이 바닥나면 조금 쉬어야 해요 · 조준·앉기 중에는 못 달려요','달리면 발소리가 커져서 AI가 더 잘 들어요']},
@@ -7289,7 +7289,7 @@ function renderCm(){const can=fbOk(),mut=isMuted();
   if(can){chatSubOn();renderChatList();const f=cmEl.querySelector('#cmForm');if(f){const i=f.querySelector('#cmIn');i.addEventListener('keydown',e=>e.stopPropagation());setTimeout(()=>i.focus(),50);
     f.addEventListener('submit',e=>{e.preventDefault();const x=i.value.replace(/\s+/g,' ').trim().slice(0,200);if(!x)return;if(isMuted()){renderCm();return}const now=Date.now();if(now-CM.lastSend<2000){say('너무 빨라요. 잠깐 뒤에 보내 주세요',1.2);return}
       if(typeof confirmSensitive==='function'&&!confirmSensitive(x))return;CM.lastSend=now;i.value='';
-      firebase.database().ref('chat/g').push().set({u:fbUid(),n:String((acct&&acct.nick)||netName||'?').slice(0,20),x,t:fbTS(),a:ADMV()?1:0}).catch(err=>{say(String(err&&err.code||'').includes('PERMISSION')?'채팅을 보낼 수 없어요 (제재 중이거나 서버 규칙 갱신 필요)':'보내지 못했어요',2.4)})})}}}
+      firebase.database().ref('chat/g').push().set({u:fbUid(),n:String((acct&&acct.nick)||netName||'?').slice(0,20),x,t:fbTS(),a:ADMV()?1:0}).catch(err=>{const c=String(err&&(err.code||err.message)||err);say(/PERMISSION|permission/.test(c)?'채팅을 보낼 수 없어요 — Firebase 규칙(database.rules.json)을 콘솔에 게시했는지 확인해 주세요 (제재 중이어도 이래요)':'보내지 못했어요: '+c.slice(0,60),3.4);i.value=x})})}}}
 function openCm(){cmEl.hidden=false;renderCm();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
 cmEl.addEventListener('click',e=>{if(e.target===cmEl){cmEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;
   if(b.dataset.cmx!==undefined){cmEl.hidden=true;return}
@@ -7322,6 +7322,7 @@ function renderUA(){const T=CM.adminTarget;if(!T)return;const B=T.ban,left=k=>{c
   uaEl.innerHTML=`<div class="nt-card"><div class="nt-head"><b>유저 관리 · ${esc(T.nick)}</b><button type="button" class="mini" data-uax>닫기</button></div><div class="nt-body ua-body">
   <p class="pk-tip">현재 제재: ${B?[['ban','이용 정지'],['mute','채팅 금지'],['rank','랭크 금지']].map(([k,n])=>left(k)>0?`<b>${n} ${banTxt(left(k))}</b>`:'').filter(Boolean).join(' · ')||'없음':'불러오는 중…'}${B&&B.r?` (사유: ${esc(B.r)})`:''}</p>
   <h3>메일 보내기</h3><input id="uaSub" maxlength="60" placeholder="제목" autocomplete="off"><textarea id="uaTx" maxlength="1000" rows="4" placeholder="내용 — 이 유저의 메시지함으로 바로 가요"></textarea><button type="button" class="btn sm" data-uamail>메일 보내기</button>
+  <h3>이름 강제 변경</h3><div class="ua-row"><input id="uaNick" maxlength="10" placeholder="새 이름 (2~10자)" autocomplete="off"><button type="button" class="btn sm" data-uanick>이름 바꾸기</button></div><p class="pk-tip">게임에 보이는 이름만 바뀌어요. 로그인할 때 쓰는 아이디는 그대로예요.</p>
   <h3>제재</h3><div class="ua-row"><select id="uaK"><option value="mute">채팅 금지 (커뮤니티·방 채팅)</option><option value="rank">랭크 금지</option><option value="ban">이용 정지 (대전·협동·채팅 모두)</option></select><select id="uaD">${DURS.map(([v,n])=>`<option value="${v}"${v==='86400000'?' selected':''}>${n}</option>`).join('')}</select></div>
   <input id="uaR" maxlength="120" placeholder="사유 (유저에게 보여요)" autocomplete="off"><div class="ua-row"><button type="button" class="btn sm" data-uaban>제재 걸기</button><button type="button" class="btn sm ghost" data-uaunban>모든 제재 풀기</button></div>
   <p class="pk-tip" id="uaSt"></p></div></div>`;
@@ -7336,6 +7337,11 @@ uaEl.addEventListener('click',async e=>{if(e.target===uaEl){uaEl.hidden=true;ret
       const KN={mute:'채팅 금지',rank:'랭크 금지',ban:'이용 정지'}[k],DN=(DURS.find(z=>+z[0]===d)||[0,''])[1];
       await uaMail(T.uid,`[제재 안내] ${KN} ${DN}`,`${KN} 제재가 걸렸어요.\n기간: ${DN}${until>0?` (${fmtT(until)}까지)`:''}\n사유: ${r}\n\n문의는 건의함으로 보내 주세요.`);
       st.textContent=`${KN} ${DN} 걸고 안내 메일을 보냈어요 ✔`;T.ban=Object.assign({},T.ban,up);T.ban.t=Date.now();renderUA();uaEl.querySelector('#uaSt').textContent=`${KN} ${DN} 걸고 안내 메일을 보냈어요 ✔`;return}
+    if(b.dataset.uanick!==undefined){const nn=(uaEl.querySelector('#uaNick').value||'').replace(/[^\p{L}\p{N} _-]/gu,'').trim().slice(0,10);if(nn.length<2){st.textContent='새 이름은 2~10자, 글자·숫자·_-만 돼요';return}
+      const db=firebase.database(),nk=nickKey(nn),cur=(await db.ref('db/nicks/'+nk).once('value')).val();if(cur&&cur.uid&&cur.uid!==T.uid){st.textContent='이미 다른 사람이 쓰는 이름이에요';return}
+      b.disabled=true;const old=T.nick;await db.ref('db/nicks/'+nk).set({uid:T.uid,nick:nn});await db.ref('db/players/'+T.uid).update({nick:nn,nickBy:'admin',nickT:fbTS()});
+      await uaMail(T.uid,'[안내] 이름이 바뀌었어요',`운영자가 이름을 「${old}」에서 「${nn}」(으)로 바꿨어요.\n로그인할 때 쓰는 아이디는 그대로예요.\n문의는 건의함으로 보내 주세요.`);
+      T.nick=nn;renderUA();uaEl.querySelector('#uaSt').textContent=`이름을 「${nn}」(으)로 바꾸고 안내 메일을 보냈어요 ✔`;return}
     if(b.dataset.uaunban!==undefined){await firebase.database().ref('bans/'+T.uid).remove();await uaMail(T.uid,'[제재 해제] 제재가 풀렸어요','걸려 있던 제재가 모두 풀렸어요. 즐겁게 플레이해 주세요!');T.ban={};renderUA();uaEl.querySelector('#uaSt').textContent='모든 제재를 풀었어요 ✔';return}
   }catch(err){st.textContent='실패했어요: '+(String(err&&err.code||err).includes('PERMISSION')?'서버 규칙(database.rules.json)을 갱신해 주세요':String(err&&err.message||err).slice(0,60));b.disabled=false}});
 addEventListener('keydown',e=>{if(!uaEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();uaEl.hidden=true}},true);

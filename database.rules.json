@@ -5,7 +5,7 @@
         "peers": {
           ".read": "auth != null",
           "$peer": {
-            ".write": "(auth != null && (!data.exists() || data.child('u').val() === auth.uid) && (!newData.exists() || newData.child('u').val() === auth.uid)) && (!newData.exists() || !(root.child('bans').child(auth.uid).child('ban').val() > now || root.child('bans').child(auth.uid).child('ban').val() === -1))"
+            ".write": "(auth != null && (!data.exists() || data.child('u').val() === auth.uid) && (!newData.exists() || newData.child('u').val() === auth.uid)) && (!newData.exists() || !(root.child('bans').child(auth.uid).child('ban').isNumber() && (root.child('bans').child(auth.uid).child('ban').val() > now || root.child('bans').child(auth.uid).child('ban').val() === -1)))"
           }
         }
       }
@@ -35,7 +35,7 @@
       "nicks": {
         ".read": true,
         "$n": {
-          ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid)"
+          ".write": "auth != null && (!data.exists() || data.child('uid').val() === auth.uid || root.child('db').child('admins').child(auth.uid).val() === true)"
         }
       },
       "reqs": {
@@ -121,7 +121,7 @@
           "t"
         ],
         "$m": {
-          ".write": "auth != null && ((!data.exists() && newData.child('u').val() === auth.uid && !(root.child('bans').child(auth.uid).child('ban').val() > now || root.child('bans').child(auth.uid).child('ban').val() === -1) && !(root.child('bans').child(auth.uid).child('mute').val() > now || root.child('bans').child(auth.uid).child('mute').val() === -1) && (newData.child('a').val() !== 1 || root.child('db').child('admins').child(auth.uid).val() === true)) || (root.child('db').child('admins').child(auth.uid).val() === true && !newData.exists()))",
+          ".write": "auth != null && ((!data.exists() && newData.child('u').val() === auth.uid && !(root.child('bans').child(auth.uid).child('ban').isNumber() && (root.child('bans').child(auth.uid).child('ban').val() > now || root.child('bans').child(auth.uid).child('ban').val() === -1)) && !(root.child('bans').child(auth.uid).child('mute').isNumber() && (root.child('bans').child(auth.uid).child('mute').val() > now || root.child('bans').child(auth.uid).child('mute').val() === -1)) && (!newData.child('a').exists() || newData.child('a').val() === 0 || root.child('db').child('admins').child(auth.uid).val() === true)) || (root.child('db').child('admins').child(auth.uid).val() === true && !newData.exists()))",
           ".validate": "!newData.exists() || (newData.child('x').isString() && newData.child('x').val().length >= 1 && newData.child('x').val().length <= 200 && newData.child('n').isString() && newData.child('n').val().length <= 20 && newData.child('t').val() === now)"
         }
       }
