@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>글자 던전</title>
 <meta name="description" content="글자 던전 — 한글 글자로 지은 무료 웹 FPS 게임. 설치 없이 브라우저에서 바로 플레이. 층을 내려가며 941가지 증강을 모으는 로그라이크 혼자 하기, 최대 3:3 실시간 대전과 랭크전, 19종 보스, 3D 그래픽. PC·모바일 지원.">
 <meta name="keywords" content="글자 던전,글자던전,한글 게임,웹 게임,브라우저 게임,무료 FPS,로그라이크,증강,3D 슈팅,온라인 대전,모바일 게임,geulja dungeon">
@@ -132,17 +132,25 @@ window.GD_FIREBASE_CONFIG = {
     const build=()=>{snap=Object.freeze([Object.freeze({peer:PEER,by:uid(),isMe:true,sameTab:true,kind:'viewer',guest:false,presence:mine,updatedAt:Date.now()}),...others.values()])};
     build();
     const notify=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;build();for(const f of subs){try{f({peers:snap,joined:[],left:[],updated:[]})}catch(e){console.error(e)}}})};
-    let swept=false;
-    const onVal=s=>{const v=s.val()||{},now=Date.now(),next=new Map(),me=uid(),best={};
-      // 같은 계정(uid)으로 남은 옛 접속은 하나만(가장 최근) 남긴다 → 나갔다 들어와도 두 명으로 안 보임
-      for(const k in v){const e=v[k]||{};if(!e.u)continue;if(k!==PEER&&e.u===me){if(!swept)try{base.child(k).remove()}catch(_){}continue}const b=best[e.u];if(!b||(+e.t||0)>(+v[b].t||0))best[e.u]=k}
+    let swept=false;const raw={};let dirtyAll=true;
+    // 바뀐 사람 것만 받아서 처리 (예전엔 누가 움직일 때마다 방 전체를 다시 읽어서 사람이 많을수록 렉이 심했음)
+    const rebuild=changed=>{const now=Date.now(),next=new Map(),me=uid(),best={};
+      for(const k in raw){const e=raw[k]||{};if(!e.u)continue;if(k!==PEER&&e.u===me){if(!swept)try{base.child(k).remove()}catch(_){}continue}const b=best[e.u];if(!b||(+e.t||0)>(+raw[b].t||0))best[e.u]=k}
       swept=true;
-      for(const k in v){if(k===PEER)continue;const e=v[k]||{};if(e.u&&best[e.u]!==k)continue;const old=others.get(k);const pres=e.p||{};
-        next.set(k,old&&JSON.stringify(old.presence)===JSON.stringify(pres)?old:Object.freeze({peer:k,by:e.u||null,isMe:false,sameTab:false,kind:'viewer',guest:false,presence:pres,updatedAt:now}))}
-      others=next;notify()};
-    base.on('value',onVal);
+      for(const k in raw){if(k===PEER)continue;const e=raw[k]||{};if(e.u&&best[e.u]!==k)continue;const old=others.get(k);
+        if(old&&changed!==k&&!dirtyAll){next.set(k,old);continue}
+        const pres=e.p||{};next.set(k,old&&JSON.stringify(old.presence)===JSON.stringify(pres)?old:Object.freeze({peer:k,by:e.u||null,isMe:false,sameTab:false,kind:'viewer',guest:false,presence:pres,updatedAt:now}))}
+      dirtyAll=false;others=next;notify()};
+    const onAdd=s=>{raw[s.key]=s.val();dirtyAll=true;rebuild(s.key)},onChg=s=>{const was=raw[s.key];raw[s.key]=s.val();if(!was||(was.u!==raw[s.key].u))dirtyAll=true;rebuild(s.key)},onRem=s=>{delete raw[s.key];dirtyAll=true;rebuild(null)};
+    base.on('child_added',onAdd);base.on('child_changed',onChg);base.on('child_removed',onRem);
     myRef.onDisconnect().remove();
-    const write=()=>{timer=null;if(!live)return;lastW=Date.now();myRef.set({u:uid(),p:clean(mine),t:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{})};
+    // 내 상태도 바뀐 칸만 보냄 (가끔은 통째로 다시 써서 끊겼다 붙어도 안전)
+    let sent=null,fullT=0;
+    try{fdb().ref('.info/connected').on('value',c=>{if(c.val()===true){sent=null;try{myRef.onDisconnect().remove()}catch(_){}}})}catch(_){}
+    const write=()=>{timer=null;if(!live)return;lastW=Date.now();const c=clean(mine)||{};
+      if(!sent||lastW-fullT>4000){fullT=lastW;sent=c;myRef.set({u:uid(),p:c,t:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{sent=null});return}
+      const up={};let n=0;for(const k in c){const a=c[k],b=sent[k];if(a!==b&&(typeof a!=='object'||JSON.stringify(a)!==JSON.stringify(b))){up['p/'+k]=a;n++}}for(const k in sent)if(!(k in c)){up['p/'+k]=null;n++}
+      if(!n)return;sent=c;up.t=firebase.database.ServerValue.TIMESTAMP;myRef.update(up).catch(()=>{sent=null})};
     return {name,
       emit:async()=>{},on:()=>()=>{},
       presence:async patch=>{const m=Object.assign({},mine);for(const k in patch){if(patch[k]===null)delete m[k];else m[k]=patch[k]}mine=m;build();
@@ -151,7 +159,7 @@ window.GD_FIREBASE_CONFIG = {
       onPeers(fn){subs.add(fn);setTimeout(()=>fn({peers:snap,joined:snap,left:[],updated:[]}),0);return()=>subs.delete(fn)},
       connected:()=>live,
       onConnection(fn){setTimeout(()=>fn(live),0);return()=>{}},
-      leave:async()=>{live=false;base.off('value',onVal);subs.clear();delete rooms[name];try{await myRef.onDisconnect().cancel()}catch(e){}await myRef.remove()}
+      leave:async()=>{live=false;base.off('child_added',onAdd);base.off('child_changed',onChg);base.off('child_removed',onRem);subs.clear();delete rooms[name];try{await myRef.onDisconnect().cancel()}catch(e){}await myRef.remove()}
     };
   }
   let lobby=null;
@@ -207,6 +215,8 @@ html.pfs .stage{position:fixed;left:0;top:0;width:100vw;height:100vh;height:100d
 #pfsX{display:none;position:fixed;z-index:61;top:calc(4px + env(safe-area-inset-top));right:calc(4px + env(safe-area-inset-right));font:11px inherit;padding:2px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.45);color:#e4ece6;opacity:.7}
 html.pfs #pfsX{display:block}
 canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none}
+/* 아이패드: 연속으로 누르면 화면이 확대되던 문제 (두 번 탭 확대 끄기) */
+html,body,button,a,input,select,textarea,label,.notice,.card{touch-action:manipulation}html{-webkit-text-size-adjust:100%}button,.card,.pad{-webkit-tap-highlight-color:transparent}
 .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;gap:12px;
   background:radial-gradient(ellipse at center,rgba(6,7,8,.55),rgba(6,7,8,.9));text-align:center;padding:16px}
 .overlay>:first-child{margin-top:auto}.overlay>:last-child{margin-bottom:auto}
@@ -525,6 +535,9 @@ html.touchui .tools button{font-size:15px;padding:10px 12px;text-align:left}
 .ach-toast .g,.ach .g{flex:none;width:38px;height:38px;border-radius:8px;display:grid;place-items:center;background:#2a2410;color:#ffc857;font-weight:700;font-size:18px}.ach-toast b{display:block;font-size:15px}.ach-toast small{display:block;font-size:12px;color:#aaa}.ach-toast small.un{color:#ff8a7a;margin-top:3px}
 .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;padding:10px 0}.ach{display:flex;gap:10px;align-items:center;background:#1b1e24;border:1px solid #2a2f38;border-radius:8px;padding:8px;opacity:.6}.ach.got{opacity:1;border-color:#6b5a22}.ach:not(.got) .g{background:#222;color:#777}.ach b{display:block;font-size:13px}.ach small{display:block;font-size:11px;color:#9a9a9a}.ach .bar{display:block;height:4px;background:#333;border-radius:2px;margin-top:4px;overflow:hidden}.ach .bar b{display:block;height:100%;background:#ffc857}
 .card.locked{opacity:.55;cursor:not-allowed;border-style:dashed}
+.kb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px}.kb-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 8px;border:1px solid var(--line);border-radius:6px}.kb-row.chg{border-color:#ffc864}.kb-key{min-width:96px;font:inherit;background:#151a19;color:var(--ink);border:1px solid #3a4a44;border-radius:5px;padding:4px 8px;cursor:pointer}.kb-key.wait{border-color:#ffc864;color:#ffc864}
+.mb-g{margin:6px 0;padding:8px;border:1px solid #ffc864;border-radius:6px;display:flex;gap:8px;align-items:center}.gf-list{display:grid;gap:4px;max-height:180px;overflow:auto}.gf-it small{color:var(--dim)}
+.card.unrel{border-color:#ffc864;box-shadow:inset 0 0 0 1px rgba(255,200,100,.25)}.card .ur{font-style:normal;font-size:.7em;color:#1a1206;background:#ffc864;border-radius:3px;padding:0 4px;margin-left:4px;vertical-align:middle}
 
 /* 손으로 다듬은 단말기 느낌: 둥근 카드·그라데이션 대신 각진 판, 호박색 선, 글자 도장 */
 .nt-card,.set-box,.sk-box{border-radius:3px!important;border:1px solid #4a3f2c!important;background:#0f1211 repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 3px)!important;box-shadow:0 0 0 1px #000,0 0 0 4px rgba(255,179,71,.06),0 24px 60px rgba(0,0,0,.65)!important}
@@ -1687,6 +1700,25 @@ function computeFlow(){
 }
 
 // ================= 입력 =================
+// 아이패드 사파리는 maximum-scale을 무시하고 두 번 탭·꼬집기로 확대함 → 직접 막음 (글 입력칸·스크롤은 그대로)
+{let lastTE=0;const typing=t=>t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+ for(const ev of ['gesturestart','gesturechange','gestureend'])document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+ document.addEventListener('touchend',e=>{const now=performance.now();if(now-lastTE<350&&!typing(e.target)&&e.cancelable){e.preventDefault();const t=e.target&&e.target.closest&&e.target.closest('button,a,label,summary,[role=button],.card,[data-mbk],[data-k]');if(t&&typeof t.click==='function')t.click()}lastTE=now},{passive:false});
+ document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1&&e.cancelable&&!typing(e.target))e.preventDefault()},{passive:false});
+ document.addEventListener('dblclick',e=>{if(!typing(e.target))e.preventDefault()},{passive:false})}
+// ---- 조작키 바꾸기: 누른 키를 원래 키로 바꿔서 게임에 넘겨요 (게임 안의 모든 단축키가 그대로 따라옴) ----
+const KB_ACT=[['KeyW','앞으로'],['KeyS','뒤로'],['KeyA','왼쪽'],['KeyD','오른쪽'],['Space','점프'],['KeyC','앉기'],['ShiftLeft','달리기 · 숨 참기'],['KeyE','대시'],
+ ['KeyR','재장전'],['KeyZ','막기 · 근접'],['KeyQ','무기 바꾸기'],['Digit1','주무기'],['Digit2','보조무기'],['Digit3','근접 무기'],['KeyG','수류탄'],['KeyH','섬광탄'],['KeyT','아이템'],
+ ['KeyF','손전등'],['KeyB','상점 · 무기 선택'],['Tab','점수판 · 지도'],['KeyI','증강 목록'],['KeyY','무기 살펴보기'],['KeyK','음성 켜기/끄기'],['KeyM','소리'],['KeyN','밝기'],['KeyP','일시정지'],['Enter','공격 (키보드)']];
+let KB={},KB_MAP={},KB_CAP=null;
+try{const v=JSON.parse(localStorage.getItem('gd-keys')||'{}');if(v&&typeof v==='object')KB=v}catch(e){}
+function kbOf(d){return KB[d]||d}
+function kbBuild(){KB_MAP={};const bound=new Set(KB_ACT.map(([d])=>kbOf(d)));for(const [d] of KB_ACT){const k=kbOf(d);if(k!==d)KB_MAP[k]=d}for(const [d] of KB_ACT){const k=kbOf(d);if(k!==d&&!(d in KB_MAP)&&!bound.has(d))KB_MAP[d]='KbNone'}}
+kbBuild();
+function kbName(c){if(!c)return '-';const M={Space:'스페이스',ShiftLeft:'왼 Shift',ShiftRight:'오른 Shift',ControlLeft:'왼 Ctrl',ControlRight:'오른 Ctrl',AltLeft:'왼 Alt',AltRight:'오른 Alt',Tab:'Tab',Enter:'Enter',Backquote:'`',Minus:'-',Equal:'=',Semicolon:';',Quote:"'",Slash:'/',Comma:',',Period:'.',BracketLeft:'[',BracketRight:']',Backslash:'\\',CapsLock:'CapsLock',ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'};
+  return M[c]||c.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Numpad/,'숫자패드 ')}
+function kbRemap(e){if(KB_CAP)return;if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT'))return;const v=KB_MAP[e.code];if(v){try{Object.defineProperty(e,'code',{value:v,configurable:true})}catch(_){}}}
+addEventListener('keydown',kbRemap,true);addEventListener('keyup',kbRemap,true);
 const keys={};
 let state='title',mouseTurn=0,wasLocked=false;
 const ov=document.getElementById('ov'),ovT=document.getElementById('ovTitle'),ovS=document.getElementById('ovSub'),ovP=document.getElementById('ovText'),legend=document.getElementById('legend'),btn=document.getElementById('startBtn');
@@ -1840,7 +1872,7 @@ const SKINS=[
  {n:'벚꽃',f:(e,k)=>[e[0],335,70,clamp(e[3]*.6+38,45,86),k==='s'?.3:.05]},
  {n:'심연',f:(e,k,i,r)=>((i+r)%4===0)?[e[0],278,100,62,1]:[e[0],268,30,clamp(e[3]*.35+4,4,22),0]},
  {n:'백은',f:e=>[e[0],205,12,clamp(e[3]*1.3+18,50,94),.12]}];
-const SKIN_W=w=>!!(w&&w.art&&!w.spear&&!w.bow&&!w.admin&&!w.cadu);
+const SKIN_W=w=>!!(w&&w.art&&!w.spear&&!w.bow&&!w.admin&&!w.cadu&&!w.unrel);
 let SKSEL={0:9};try{Object.assign(SKSEL,JSON.parse(localStorage.getItem('gd-skin')||'{}'))}catch(e){}
 function skinOf(wi){const w=WEAP[wi];if(!SKIN_W(w))return SKINS[0];return SKINS[(SKSEL[wi]|0)%SKINS.length]||SKINS[0]}
 function cycleSkinW(wi,d){if(!SKIN_W(WEAP[wi]))return false;SKSEL[wi]=(((SKSEL[wi]|0)+d)%SKINS.length+SKINS.length)%SKINS.length;try{localStorage.setItem('gd-skin',JSON.stringify(SKSEL))}catch(e){}return true}
@@ -2053,7 +2085,7 @@ function swordHit(type,second){
     let crit=false;if(AU&&t.T&&rand()<PS('meleeCrit')+(MW_.rapier?.12:0)+(type==='thrust'&&M_PIERCE(MW_)?PS('mPierceCrit'):0)+wxv(cur,'crit')+(SOLO()?PS('crit'):0)){crit=true;dd*=2}
     if(cadO&&!crit&&(cadO.forceCrit||rand()<cadO.crit)){crit=true;dd*=2}
     if(t.T&&t.T.boss){t.mhN=(time-(t.mhT||0)<2.5?(t.mhN|0):0)+1;t.mhT=time;if(t.ctT>0){bossCounter(t);continue}bossThorns(t)}
-    lastZone=zone;hitMelee=!!t.remote;damage(t,dd,dx/(d||1),dy/(d||1),true);hitMelee=false;lastZone='body';hits++;if(MW_.cadu)cadAfterHit(t,type);if(t.T){dmgNum(t,zone==='head'?t.T.h*.9:zone==='legs'?t.T.h*.25:t.T.h*.55,dd,zone,crit);if(zone==='legs')t.slow=Math.max(t.slow||0,1.2*(PS('legs')?2:1));if(zone==='head'&&!t.T.ghost)burst(t.x,t.y,t.T.h*.9,6,'피',0,85,40,0,2.2,.6,.07,5,true)}
+    lastZone=zone;hitMelee=!!t.remote;damage(t,dd,dx/(d||1),dy/(d||1),true);hitMelee=false;lastZone='body';hits++;if(MW_.cadu)cadAfterHit(t,type);if(MW_.frost&&!t.remote){t.slow=Math.max(t.slow||0,1.6);for(let q=0;q<5;q++)burst(t.x+(rand()-.5)*.6,t.y+(rand()-.5)*.6,(t.T?t.T.h:1)*.7,1,q%2?'설':'❄',195,90,85,1,1.2,.6,.07,-1,false)}if(MW_.pan&&!t.remote){try{sfx('clink')}catch(_){}burst(t.x,t.y,(t.T?t.T.h:1)*.9,3,'땡',50,90,70,1,1.6,.5,.08,0,false)}if(t.T){dmgNum(t,zone==='head'?t.T.h*.9:zone==='legs'?t.T.h*.25:t.T.h*.55,dd,zone,crit);if(zone==='legs')t.slow=Math.max(t.slow||0,1.2*(PS('legs')?2:1));if(zone==='head'&&!t.T.ghost)burst(t.x,t.y,t.T.h*.9,6,'피',0,85,40,0,2.2,.6,.07,5,true)}
     if(t.T){t.stun=Math.max(t.stun||0,(type==='thrust'?.55:type==='spin'?.8:.4)*(MW_.mstun||1)*(1+(AU?PS('meleeStun'):0)));t.wind=0;hitFx(t,(zone==='head'?'머리 ':zone==='legs'?'다리 ':'')+(crit?'치명 베기!':type==='thrust'?'찌르기!':type==='spin'?'회전베기!':second?'쌍검 베기!':combo===1?'역베기!':'베기!'));
       if(AU&&!t.dead){perkOnHit(t,dd,'body');const bl=PS('meleeBleed');if(bl){t.pois=Math.min(6,(t.pois||0)+bl);t.poisT=4}}
       if(AU&&PS('meleeHeal'))hp=Math.min(MAXHP(),hp+PS('meleeHeal')*healMul())}
@@ -2297,6 +2329,42 @@ WEAP.push({name:'카두세우스',cd:.2,melee:1,sword:1,cadu:1,shake:.12,mdmg:1,
 const CADI=WEAP.length-1;
 META[CADI]={st:[7,6,4],mag:'근접',d:'신탁 단말기. 금빛 원통에서 흘러나온 검은 액체가 6초마다 14가지 무기로 굳음 · 아주 가끔 숨겨진 형상'};
 PRICE[CADI]=1100;SHOP[2].items.push(CADI);
+// ================= 미공개 무기 (운영자 선물로만 얻음 · 운영자는 항상 고를 수 있음) =================
+// uid: 선물 아이디 · only: 이 닉네임에게만 줄 수 있는 전용 무기
+const UNREL=[];const UNREL_BY={};
+function addUnrel(slot,w,meta,price){w.unrel=1;WEAP.push(w);const i=WEAP.length-1;META[i]=meta;PRICE[i]=price||0;SHOP[slot].items.push(i);UNREL.push(i);UNREL_BY[w.uid]=i;return i}
+const RELEG=(o,base)=>Object.assign({},base,o);
+// 카타나
+addUnrel(2,Object.assign({},WEAP[22],{name:'카타나',uid:'katana',mdmg:2.7,mspd:.58,mreach:1.6,mstun:1.5,vm:()=>melee('katana'),
+  leg:RELEG({K:['카',205,30,94],k:['타',210,18,72],g:['나',0,70,42],G:['나',0,60,30]},WEAP[22].leg)}),{st:[10,10,6],mag:'근접',d:'미공개 · 사기 · 발도의 칼. 아주 빠르고 묵직하며 길게 벰'},900);
+// penguin080 전용 카타나
+addUnrel(2,Object.assign({},WEAP[22],{name:'설빙 카타나',uid:'pkatana',only:'penguin080',frost:1,mdmg:3.1,mspd:.52,mreach:1.8,mstun:1.7,
+  vm:()=>{const m=melee('katana');const c=m.parts['core|4']||(m.parts['core|4']=new GB().use(null));c.hsl(195,100,78,.9);const L=Math.min(.8,(m.len||.6)*.95);
+    let pv=null;for(let i=0;i<=18;i++){const u=i/18,y=.06+L*u,x=Math.sin(u*PI*5)*.003,pt=[x,y,0];if(pv)for(const z of [-1,1])c.rod(pv[0],pv[1],z*.004,pt[0],pt[1],z*.004,.0012,4);pv=pt}
+    c.hsl(200,100,88);for(let i=0;i<6;i++){const a=i*PI/3;c.save().t(Math.cos(a)*.012,.02,Math.sin(a)*.012).sph(.004,6,4).restore()}return m},
+  leg:RELEG({K:['설',195,90,82,.6],k:['빙',200,80,70,.4],g:['펭',210,30,30],G:['귄',45,90,58]},WEAP[22].leg)}),{st:[10,10,7],mag:'근접',d:'penguin080 전용 · 사기 · 벤 적이 얼어붙어 느려지고 눈꽃이 흩날림'},0);
+// 바게트
+addUnrel(2,Object.assign({},WEAP[23],{name:'바게트',uid:'baguette',mdmg:2,mspd:.7,mreach:1.35,mstun:3.2,vm:()=>melee('club'),
+  leg:RELEG({K:['바',32,70,58],k:['게',30,60,46],j:['트',28,55,38]},WEAP[23].leg)}),{st:[8,9,4],mag:'근접',d:'미공개 · 사기 · 갓 구운 빵. 맞으면 아주 오래 어지러움'},0);
+// 프라이팬
+addUnrel(2,Object.assign({},WEAP[23],{name:'프라이팬',uid:'pan',pan:1,mdmg:2.7,mspd:.85,mreach:1.15,mstun:3,vm:()=>melee('mace'),
+  leg:RELEG({K:['팬',215,10,30],k:['땡',215,10,48],j:['손',20,40,30]},WEAP[23].leg)}),{st:[10,6,3],mag:'근접',d:'미공개 · 사기 · 땡! 한 대 맞으면 한참 기절'},0);
+// 다트
+addUnrel(0,Object.assign({},WEAP[14],{name:'다트',uid:'dart',auto:1,cd:.13,dmg:4.2,pellets:1,spread:.003,shake:.04,snd:'paintgun',flash:'슉',headMul:4,fall:[14,30,.85],zoom:1.6,mag:12,res:96,relT:.7,kick:.003,rv:.002,rh:.001,
+  vm:()=>pistol({len:.14,h:.03,w:.024}),leg:RELEG({A:['다',0,80,58],a:['트',0,70,42],z:['깃',50,90,60],F:['다',215,8,34],f:['트',215,8,22]},WEAP[14].leg)}),{st:[9,8,9],mag:'12발',d:'미공개 · 사기 · 연사되는 다트. 머리에 꽂으면 4배'},0);
+// 꽥꽥 오리총
+addUnrel(1,Object.assign({},WEAP[17],{name:'꽥꽥 오리총',uid:'duck',auto:1,cd:.3,dmg:1.15,pellets:14,spread:.1,flash:'꽥',mag:8,res:64,relT:1.1,duck:1,
+  leg:RELEG({B:['꽥',52,95,58],b:['꽥',52,90,44],d:['오',30,95,50],T:['리',52,90,40],w:['총',30,90,40],W:['꽥',52,95,56]},WEAP[17].leg)}),{st:[10,5,3],mag:'8발',d:'미공개 · 사기 · 고무 오리 14마리가 연사로 우르르'},0);
+// 물총
+addUnrel(1,Object.assign({},WEAP[9],{name:'물총',uid:'water',cd:.04,dmg:.75,spread:.03,shake:.03,snd:'paintgun',flash:'찍',headMul:1.5,mag:150,res:600,relT:1,kick:.001,wet:1,
+  vm:()=>{const g=pistol({len:.24,h:.04,w:.03});const tk=g.parts['tank|4']=new GB().use(null);tk.hsl(200,90,60,.7).save().t(0,.09,-.05).s(1,1.1,1.5).sph(.042,14,10).restore();g.sightY=.075;return g},
+  leg:RELEG({B:['물',200,80,56],b:['물',200,70,40],d:['총',200,60,26],g:['찍',200,90,50],G:['물',200,90,60]},WEAP[9].leg)}),{st:[6,10,6],mag:'150발',d:'미공개 · 사기 · 쉬지 않고 쏘는 물줄기. 맞은 적이 젖어서 느려짐'},0);
+const UNREL_SET=new Set(UNREL);
+// 선물(인벤토리) 상태: inv/<uid>/<선물 아이디> = {t, by, c(받음)}
+const GIFT={inv:{},uid:null,sub:null};
+try{const c=JSON.parse(localStorage.getItem('gd-gift')||'{}');if(c&&c.inv)GIFT.inv=c.inv}catch(e){}
+function giftHas(id){const g=GIFT.inv[id];return !!(g&&g.c===true)}
+function unrelOk(i){if(!UNREL_SET.has(i))return true;try{if(window.GD_ADMIN&&GD_ADMIN.isAdmin())return true}catch(e){}return giftHas(WEAP[i].uid)}
 const CAD={form:2,t:0,morph:1,prevF:null};
 const CAD_PERIOD=6;function cadPeriod(){return CAD_PERIOD-(PK.wx29&&AUGON()?1.5:0)}
 function cadSetForm(f,quick){const w=WEAP[CADI],F=CADF[f];CAD.drawn=F.id==='katana';CAD.seen=CAD.seen||{};CAD.seen[f]=1;try{achCadSeen()}catch(e){}if(!quick&&f!==CAD.form)CAD.prevF=CAD.form;CAD.form=f;CAD.morph=quick?.7:-.35;w.mdmg=F.mdmg;w.mspd=F.mspd;w.mreach=F.mreach;w.mstun=F.mstun;w.art=F.art;w.leg=F.leg;w.scythe=F.id==='scythe'?1:0;w.rapier=F.id==='rapier'?1:0;w.great=F.id==='great'?1:0;
@@ -2374,7 +2442,7 @@ function nameOf(peer){if(peer===myPeer)return netName;const r=remotes.get(peer);
 function teamOf(peer){if(peer===myPeer)return team;const r=remotes.get(peer);return r?r.tm:-1}
 function netSend(){
   if(!R)return;const now=performance.now();if(now-netLast<(SITE()?70:45))return;netLast=now;
-  while(myEvents.length&&now-myEvents[0].ts>4000)myEvents.shift();
+  while(myEvents.length&&now-myEvents[0].ts>2000)myEvents.shift();
   const pr={v:1,n:netName,tm:team,rd:pv.round,k:pv.k,d:pv.d,hp:Math.max(0,Math.round(hp)),al:(MODE==='pvp'&&pv.alive&&state!=='title')?1:0,w:cur,ar:[armH,armB],rt:acctState==='in'&&acct?acct.rating|0:0,kb:pv.kb,ms:pv.ms,rr:pv.rr,mi:pv.mi|0,rl:pv.rl||null,ag:MODE==='pvp'&&GM==='aug'?Object.keys(PK).slice(0,24):null,vo:window.__vo?1:0,ev:myEvents.map(e=>e.d)};
   if(CO.lobby||CO.on){pr.cm=1;pr.co=CO.on?1:0;pr.cf=CO.fl|0;pr.tm=0;pr.ky=CO.on&&hasKey?1:0;pr.tg=CO.on&&CO.alive&&state==='play'?1:0;pr.cst=String(state);pr.cj=CO.joinT||0;pr.crd=CO.ready&&state==='clear'?1:0;pr.ap=CO.on?augPower()|0:0;pr.hd=CO.on?(RUN.hard||{}):null;pr.ex=CO.atExit?1:0;pr.al=CO.on&&CO.alive?1:0;
     if(CO.on&&CO.host){pr.df=CO.diff|0;pr.na=CO.noAug?1:0;pr.csd=CO.seed;pr.cl=CO.cl==null?-1:CO.cl;pr.wp=CO.wipe|0;if(now-(CO.enT||0)>95){CO.enT=now;pr.en=coPackEnemies()}}else{pr.df=null;pr.na=null;pr.csd=null;pr.cl=null;pr.wp=null;pr.en=null}}else{pr.cm=null;pr.co=null}
@@ -2565,6 +2633,7 @@ let hitMelee=false;// 대전: 근접 무기는 몸 두 방 · 머리 한 방
 function damage(t,dmg,dx,dy,heavy){
   if(t.remote){if(hitMelee)dmg=Math.max(dmg,lastZone==='head'?10.5:5.6);else if(MODE==='pvp')dmg*=PVP_GUN;if(t.isBot&&amBotHost()){aiTakeHit(t.peer,dmg,hitMelee,lastZone==='head',myPeer,cur,P.x,P.y)}else netEmit({t:'hit',rd:pv.round,to:t.peer,d:+dmg.toFixed(2),hd:lastZone==='head'?1:0,z:lastZone[0],w:cur,m:hitMelee?1:0});t.hit=.12;burst(t.x,t.y,.55,5,'피',0,80,36,0,2.2,.7,.07,6,true);sfx('hit');return}
   if(t.T){ // 적
+    if(WEAP[cur]&&WEAP[cur].wet&&!hitMelee)t.slow=Math.max(t.slow||0,.8);
     if(MODE==='coop'&&!CO_EXT)dmg*=coDmgMul();
     if(CO.on&&!CO.host&&MODE==='coop'){coSendHit(t,dmg,dx,dy,heavy);return}
     const e=t;if(e.dr)dmg*=e.dr;if(e.phT>0)dmg*=.1;if(SOLO())dmg*=Math.max(.4,1-.08*HL('armor'));if(SOLO()&&!CO_EXT&&!e.dead&&e.hp>0&&dmg>0){const real=Math.min(dmg,e.hp);RUN.dmg=(RUN.dmg||0)+real;if(dmg>(RUN.maxHit||0))RUN.maxHit=dmg}e.hp-=dmg;if(AUGON()&&!CO_EXT&&PS('execKill')&&e.hp>0&&!e.T.boss&&e.hp<(e.max||e.T.hp)*PS('execKill')){e.hp=0;burst(e.x,e.y,.8,8,'처',0,90,55,1,2,.4,.08,0,false)}{const lc=CO_EXT?0:PS('leech');if(lc&&hp>0)hp=Math.min(MAXHP(),hp+dmg*lc*10*healMul())}e.hit=.12;e.alert=true;
@@ -4274,7 +4343,7 @@ function getCadVM(f){const key='cad'+f;if(VM[key])return VM[key];const kind=CAD_
   m.parts['dev|3']=dv;m.parts['drop|1']=dp;
   const meshes={};for(const k in m.parts){const [name,role]=k.split('|');const mesh=m.parts[k].build();if(!mesh)continue;(meshes[name]||(meshes[name]=[])).push({mesh,role:+role})}
   m.meshes=meshes;delete m.parts;m.scy=0;m.cadLen=Math.min(.9,m.len||.5);m.hid=hk;m.big=hk==='abyss'?1.4:1;VM[key]=m;return m}
-function getVM(wi){if(VM[wi])return VM[wi];const w=WEAP[wi];let f=WSPEC[wi];
+function getVM(wi){if(VM[wi])return VM[wi];const w=WEAP[wi];let f=WSPEC[wi]||(w&&w.vm);
   if(!f){if(w&&w.admin)f=()=>{const g=rifle({barrel:.3,hg:.22,stock:'full',sight:'scope',muzzle:'brake',mag:'drum',recH:.07,recW:.05});const c=g.parts['core|4']=new GB().use(null);c.hsl(46,100,70,.95);
       for(let i=0;i<5;i++)c.save().t(0,.04,-(.22+i*.05)).rx(PI/2).torus(.024,.004,14,4).restore();c.save().t(-.026,.035,-.04).sph(.012,8,6).restore();g.admin=1;return g};
     else if(w&&w.sword)f=()=>melee('sword');else if(w&&w.gen)f=()=>rifle({barrel:.24,hg:.2,stock:'full',sight:'iron',muzzle:'flash',mag:'straight'});else f=()=>pistol({})}
@@ -6911,9 +6980,9 @@ const shopEl=document.getElementById('shop'),shopCols=document.getElementById('s
 function slotOf(i){return SHOP.find(g=>g.items.includes(i)).cat}
 function renderShop(){
   const rnd=isRound(),sm=document.getElementById('shopMoney'),canRf=rnd&&time-pv.rStart<=20&&pv.alive,blog=pv.buyLog||[];sm.hidden=!rnd;if(rnd)sm.innerHTML=`보유 <b>₩ ${pv.money.toLocaleString()}</b> · 구매 시간 ${Math.max(0,Math.ceil(20-(time-pv.rStart)))}초`;
-  shopCols.innerHTML=SHOP.map(g=>`<div class="shop-col"><h3>${g.cat}</h3><div class="list">${g.items.map(i=>{if(wLocked(i))return `<button type="button" class="card locked" disabled aria-disabled="true"><span class="gl">?</span><span class="nm">???</span><span class="pr">잠김</span><span class="ds">숨겨진 무기 · 업적 「${ACHMAP[HIDDEN_W[i]].n}」(${ACHMAP[HIDDEN_W[i]].d})을 달성하면 열려요</span></button>`;const m=META[i],w=WEAP[i],eq=SLOTS().includes(i);
+  shopCols.innerHTML=SHOP.map(g=>`<div class="shop-col"><h3>${g.cat}</h3><div class="list">${g.items.filter(i=>unrelOk(i)).map(i=>{if(wLocked(i))return `<button type="button" class="card locked" disabled aria-disabled="true"><span class="gl">?</span><span class="nm">???</span><span class="pr">잠김</span><span class="ds">숨겨진 무기 · 업적 「${ACHMAP[HIDDEN_W[i]].n}」(${ACHMAP[HIDDEN_W[i]].d})을 달성하면 열려요</span></button>`;const m=META[i],w=WEAP[i],eq=SLOTS().includes(i);
     const pr=eq?'장착됨':rnd?(PRICE[i]?`₩ ${PRICE[i]}`:'무료'):'선택';
-    return `<button type="button" class="card" data-w="${i}" aria-pressed="${eq}"><span class="gl">${w.name[0]}</span><span class="nm">${w.name}</span><span class="pr">${pr}</span><span class="ds">${m.d} · ${m.mag}</span>${canRf&&eq&&blog.some(b=>b.i===i)?`<span class="rfd" data-rf="${i}" role="button" tabindex="0">되돌리기 +₩ ${blog.find(b=>b.i===i).price}</span>`:''}${SKIN_W(w)?`<span class="skn" data-sk="${i}" role="button" tabindex="0">스킨: ${skinOf(i).n} ▸</span>`:''}
+    return `<button type="button" class="card${UNREL_SET.has(i)?' unrel':''}" data-w="${i}" aria-pressed="${eq}"><span class="gl">${w.name[0]}</span><span class="nm">${w.name}${UNREL_SET.has(i)?' <em class="ur">'+(w.only?'전용':'미공개')+'</em>':''}</span><span class="pr">${pr}</span><span class="ds">${m.d} · ${m.mag}</span>${canRf&&eq&&blog.some(b=>b.i===i)?`<span class="rfd" data-rf="${i}" role="button" tabindex="0">되돌리기 +₩ ${blog.find(b=>b.i===i).price}</span>`:''}${SKIN_W(w)?`<span class="skn" data-sk="${i}" role="button" tabindex="0">스킨: ${skinOf(i).n} ▸</span>`:''}
       <span class="bars"><span>피해<i><b style="width:${m.st[0]*10}%"></b></i></span><span>연사<i><b style="width:${m.st[1]*10}%"></b></i></span><span>사거리<i><b style="width:${m.st[2]*10}%"></b></i></span></span></button>`}).join('')}</div></div>`).join('');
   shopCols.insertAdjacentHTML('beforeend',`<div class="shop-col"><h3>방어구</h3><div class="list">${['h','b'].map(k=>ARMOR[k].map((a,i)=>{const eq=(k==='h'?armH:armB)===i;
     return `<button type="button" class="card" data-ak="${k}" data-ai="${i}" aria-pressed="${eq}"><span class="gl">${a.g}</span><span class="nm">${k==='h'?'머리':'몸'} · ${a.n}</span><span class="pr">${eq?'장착됨':rnd&&APRICE[k][i]?`₩ ${APRICE[k][i]}`:'선택'}</span><span class="ds">${a.d}</span>${canRf&&eq&&blog.some(b=>b.ak===k&&b.ai===i)?`<span class="rfd" data-rfa="${k}" role="button" tabindex="0">되돌리기 +₩ ${blog.find(b=>b.ak===k&&b.ai===i).price}</span>`:''}</button>`}).join('')).join('')}</div></div>`);
@@ -6932,7 +7001,7 @@ function refundBuy(o){const lg=pv.buyLog||[];
     if(b.cat==='주무기')primary=b.prev;else if(b.cat==='보조무기')secondary=b.prev;else melee=b.prev;if(cur===o.i)cur=primary>=0?primary:secondary}
   sfx('pick');say('구매를 되돌렸어요',1);renderShop()}
 function buyWeapon(i){
-  if(wLocked(i)){sfx('dry');return}
+  if(wLocked(i)||!unrelOk(i)){sfx('dry');return}
   const m=META[i];
   if(isRound()&&!SLOTS().includes(i)){const PR=PRICE[i]||0;if(PR&&time-pv.rStart>20){sfx('dry');say('구매 시간이 끝났어요',1.2);return}
     const cat=slotOf(i),lg=(pv.buyLog=pv.buyLog||[]),curW=cat==='주무기'?primary:cat==='보조무기'?secondary:melee,old=lg.findIndex(b=>b.i===curW&&b.cat===cat);let refund=0,prev=curW;
@@ -6977,8 +7046,9 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-03b';
+const NOTICE_VER='2026-11-03c';
 const NOTICE=[
+ {v:'2026-11-03 낮',t:'렉 줄임 · 조작키 설정 · 운영자 선물',items:['멀티(대전·협동) 렉 줄임: 바뀐 정보만 주고받아서 통신량이 크게 줄었어요 (협동 기준 약 1/7)','상단 바 「조작키」: 이동·점프·재장전·수류탄 등 모든 키를 원하는 키로 바꿀 수 있어요 (겹치면 서로 바뀜 · 「기본값으로」로 되돌리기)','운영자 선물: 운영자가 메시지함으로 선물을 보내면 「받기」를 눌러 받아요 — 받은 미공개 무기는 상점·무기 선택(B)에 나타나요','아이패드에서 버튼을 빠르게 누르면 화면이 확대되던 문제 고침']},
  {v:'2026-11-03',t:'커뮤니티 · 메시지함',items:['상단 바 「커뮤니티」: 플레이하는 모두가 함께 쓰는 전체 채팅 (사이트 로그인 필요 · 2초에 한 번 · 200자)','상단 바 「메시지함」: 운영자가 보낸 메일과 안내가 와요 — 새 메일이 오면 숫자와 알림으로 알려 줘요','욕설·도배 등은 운영자가 채팅 금지 · 랭크 금지 · 이용 정지를 걸 수 있어요 (기간과 사유는 메시지함으로 안내)','부적절한 이름은 운영자가 바꿀 수 있어요 (로그인 아이디는 그대로 · 메시지함으로 안내)']},
  {v:'2026-11-02 오후',t:'협동 던전 보이스톡',items:['협동 던전에 보이스톡 — 협동 방에 들어간 뒤 「음성 대화 켜기」를 누르면 같은 방에서 음성을 켠 동료와 바로 이어져요 (멤버 이름 옆 🎤)','게임 중 K 키로 음성 켜기/끄기 · V 키로 마이크 끄기/켜기 · 메뉴(P)에도 버튼이 있어요 · 협동에서는 거리와 상관없이 또렷하게 들려요','음성은 사이트(로그인)에서만 돼요 · 처음 켤 때 브라우저가 마이크 권한을 물어봐요','음성 연결 개선: 휴대폰 데이터·막힌 망에서도 중계 서버로 이어지고, 15초 안에 안 이어지면 다시 시도해요 · 0명일 때 이유(동료가 음성을 안 켬, 같은 계정 등)를 보여 줘요']},
  {v:'2026-11-02 낮',t:'금단의 계약 보상 대폭 강화 (초월보다 세게)',items:['피의 서약: 피해 ×6 · 치명 +40% · 흡혈 10% · 회피 +25% · 이동 +20%','유리의 맹세: 피해 ×3 · 연사·장전 3배 · 회피 +35% · 탄 퍼짐 −70%','굶주린 계약: 처음부터 피해 ×2 · 처치마다 +6% (최대 +1500%) · 받는 피해 −30% · 이동 +35%','쇠사슬 낙인: 피해 ×4 · 최대 체력 +100 · 초당 체력 +3 · 반사 5배','시간의 빚: 피해 ×5 · 연사 2배 · 이동 +60% · 받는 피해 −20% · 흡혈 6%','영혼 저당: 피해 +60% · 최대 체력 +50 · 보스마다 신화 증강 3개']},
@@ -7270,7 +7340,42 @@ function cmSync(){if(!fbOk())return;const u=fbUid();const db=firebase.database()
   if(CM.mailUid!==u){if(CM.mailSub)CM.mailSub();CM.mailUid=u;const ref=db.ref('mail/'+u).orderByChild('t').limitToLast(60),cb=s=>{const v=s.val()||{};const prev=CM.mail.length;CM.mail=Object.keys(v).map(k=>Object.assign({k},v[k])).sort((a,b)=>(b.t||0)-(a.t||0));const un=CM.mail.filter(m=>!m.rd).length;
       if(CM.mail.length>prev&&prev>0&&un)cmToast(`새 메일: ${CM.mail[0].s||'운영자 메일'}`);cmBadge();if(!mbEl.hidden)renderMail()};ref.on('value',cb,()=>{});CM.mailSub=()=>ref.off('value',cb)}}
 setInterval(()=>{try{cmSync()}catch(e){}},2000);
-function cmBadge(){const n=CM.mail.filter(m=>!m.rd).length,b=document.getElementById('mbBtn');if(b){b.textContent=n?`메시지함 ${n}`:'메시지함';b.classList.toggle('has-new',n>0)}}
+// ---------- 선물 (운영자 → 메시지함 → 받기) ----------
+function giftSync(){if(!fbOk())return;const u=fbUid();if(GIFT.uid===u)return;if(GIFT.sub)GIFT.sub();GIFT.uid=u;if(!u)return;const ref=firebase.database().ref('inv/'+u),cb=s=>{GIFT.inv=s.val()||{};try{localStorage.setItem('gd-gift',JSON.stringify({inv:GIFT.inv}))}catch(e){}giftFix();cmBadge();if(!mbEl.hidden)renderMail();if(!shopEl.hidden)try{renderShop()}catch(e){}};ref.on('value',cb,()=>{});GIFT.sub=()=>ref.off('value',cb)}
+// 못 쓰게 된 미공개 무기를 들고 있으면 기본 무기로
+function giftFix(){try{if(!unrelOk(melee)){if(cur===melee)cur=2;melee=2}if(!unrelOk(secondary)){if(cur===secondary)cur=6;secondary=6}if(primary>=0&&!unrelOk(primary)){if(cur===primary)cur=secondary;primary=-1}if(!unrelOk(cur))cur=secondary}catch(e){}}
+setInterval(()=>{try{giftSync();giftFix()}catch(e){}},2000);
+function giftName(id){const i=UNREL_BY[id];return i!=null?WEAP[i].name:id}
+async function giftClaim(id){if(!fbOk())return;const g=GIFT.inv[id];if(!g){say('이 선물은 회수됐어요',1.4);return}if(g.c===true)return;
+  try{await firebase.database().ref('inv/'+fbUid()+'/'+id+'/c').set(true);sfx('exit');say(`🎁 「${giftName(id)}」을(를) 받았어요! 무기 선택(B)에서 고를 수 있어요`,3)}catch(e){say(/PERMISSION/i.test(String(e&&(e.code||e.message)))?'선물을 받으려면 사이트 주인이 Firebase 규칙을 새로 붙여 넣어야 해요':'선물을 받지 못했어요. 잠시 뒤 다시 해 주세요',2.5)}}
+function giftUnclaimed(){return Object.keys(GIFT.inv||{}).filter(k=>GIFT.inv[k]&&GIFT.inv[k].c!==true).length}
+// 운영자: 선물 보내기 (전용 무기는 그 사람에게만)
+function giftCanSend(id,nick){const i=UNREL_BY[id];if(i==null)return false;const w=WEAP[i];return !w.only||nickKey(String(nick||''))===nickKey(w.only)}
+async function giftSend(uid,nick,id,note){if(!ADMV())throw new Error('운영자만');if(!giftCanSend(id,nick))throw new Error(`「${giftName(id)}」은(는) ${WEAP[UNREL_BY[id]].only} 전용이에요`);
+  const db=firebase.database();await db.ref('inv/'+uid+'/'+id).set({t:fbTS(),by:fbUid(),c:false});
+  await db.ref('mail/'+uid).push().set({f:fbUid(),n:'👑 운영자',s:`🎁 선물: ${giftName(id)}`.slice(0,60),x:String(note||`운영자가 「${giftName(id)}」을(를) 보냈어요. 아래 「받기」를 누르면 무기 선택에 나타나요.`).slice(0,1000),g:id,t:fbTS(),rd:0})}
+function giftOpts(nick){return UNREL.map(i=>{const w=WEAP[i],ok=!w.only||nickKey(String(nick||''))===nickKey(w.only);return `<option value="${w.uid}"${ok?'':' disabled'}>${esc(w.name)}${w.only?` (${esc(w.only)} 전용)`:''} · ${esc(slotOf(i))}</option>`}).join('')}
+// 운영자 선물함 창
+const gfEl=document.createElement('div');gfEl.className='notice';gfEl.id='gfWin';gfEl.hidden=true;gfEl.setAttribute('role','dialog');gfEl.setAttribute('aria-label','운영자 선물함');document.getElementById('stage').appendChild(gfEl);
+function renderGift(){gfEl.innerHTML=`<div class="nt-card"><div class="nt-head"><b>🎁 운영자 선물함 <small>미공개 무기를 메시지함으로 보내요</small></b><button type="button" class="mini" data-gfx>닫기</button></div><div class="nt-body ua-body">
+  <h3>받는 사람</h3><input id="gfNick" maxlength="10" placeholder="닉네임 (예: penguin080)" autocomplete="off">
+  <h3>선물</h3><select id="gfItem">${giftOpts('')}</select>
+  <textarea id="gfTx" maxlength="1000" rows="3" placeholder="함께 보낼 말 (비워 두면 기본 안내문)"></textarea>
+  <button type="button" class="btn sm" data-gfsend>선물 보내기</button><p class="pk-tip" id="gfSt"></p>
+  <h3>미공개 무기 목록</h3><div class="gf-list">${UNREL.map(i=>`<div class="gf-it"><b>${esc(WEAP[i].name)}</b> <small>${esc(slotOf(i))} · ${esc(META[i].d)}</small></div>`).join('')}</div>
+  <p class="pk-tip">운영자 계정은 상점·무기 선택에서 미공개 무기를 언제든 고를 수 있어요. 전용 무기는 그 닉네임에게만 보낼 수 있어요.</p></div></div>`;
+  const ni=gfEl.querySelector('#gfNick'),it=gfEl.querySelector('#gfItem');gfEl.querySelectorAll('input,textarea,select').forEach(i=>i.addEventListener('keydown',e=>e.stopPropagation()));
+  ni.addEventListener('input',()=>{const v=it.value;it.innerHTML=giftOpts(ni.value.trim());const o=[...it.options].find(o=>o.value===v&&!o.disabled);if(o)it.value=v;else{const f=[...it.options].find(o=>!o.disabled);if(f)it.value=f.value}})}
+function openGift(nick){if(!ADMV()){say('운영자만 쓸 수 있어요',1.4);return}renderGift();gfEl.hidden=false;if(nick){const ni=gfEl.querySelector('#gfNick');ni.value=nick;ni.dispatchEvent(new Event('input'))}if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
+gfEl.addEventListener('click',async e=>{if(e.target===gfEl){gfEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;if(b.dataset.gfx!==undefined){gfEl.hidden=true;return}
+  if(b.dataset.gfsend!==undefined){const st=gfEl.querySelector('#gfSt'),nick=gfEl.querySelector('#gfNick').value.trim(),id=gfEl.querySelector('#gfItem').value,tx=gfEl.querySelector('#gfTx').value.trim();
+    if(!nick){st.textContent='받는 사람 닉네임을 적어 주세요';return}if(!giftCanSend(id,nick)){st.textContent=`「${giftName(id)}」은(는) ${WEAP[UNREL_BY[id]].only} 전용이라 다른 사람에게는 못 보내요`;return}
+    b.disabled=true;st.textContent='찾는 중…';try{const v=(await firebase.database().ref('db/nicks/'+nickKey(nick)).once('value')).val();if(!v||!v.uid){st.textContent=`「${nick}」 닉네임을 쓰는 계정을 못 찾았어요`;b.disabled=false;return}
+      await giftSend(v.uid,v.nick||nick,id,tx);st.textContent=`「${v.nick||nick}」에게 「${giftName(id)}」을(를) 보냈어요. 메시지함에서 받기를 누르면 생겨요.`;sfx('pick')}catch(err){st.textContent=/PERMISSION/i.test(String(err&&(err.code||err.message)))?'보내지 못했어요: Firebase 규칙(database.rules.json)을 새로 붙여 넣어야 해요':'보내지 못했어요: '+String(err&&err.message||err).slice(0,80)}b.disabled=false}});
+addEventListener('keydown',e=>{if(!gfEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();gfEl.hidden=true}},true);
+{const b=document.createElement('button');b.type='button';b.id='gfBtn';b.textContent='🎁 선물함';b.hidden=true;b.addEventListener('click',e=>{e.currentTarget.blur();openGift()});document.getElementById('tools').appendChild(b);setInterval(()=>{const on=ADMV();if(b.hidden===on)b.hidden=!on},1500)}
+
+function cmBadge(){let n=CM.mail.filter(m=>!m.rd).length;try{n=Math.max(n,giftUnclaimed())}catch(e){}const b=document.getElementById('mbBtn');if(b){b.textContent=n?`메시지함 ${n}`:'메시지함';b.classList.toggle('has-new',n>0)}}
 function cmToast(t){const d=document.createElement('div');d.className='ach-toast nt-toast';d.innerHTML=`<span class="g">✉</span><div><small>메시지함</small><b>${esc(t)}</b><small>눌러서 열기</small></div>`;d.addEventListener('click',()=>{d.remove();openMail()});document.body.appendChild(d);setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),450)},7000)}
 function cmBanNotice(){const ms=banLeft('ban');try{if(MODE==='pvp')leavePvp(true);else if(CO.on)coLeave()}catch(e){}say(`이용 정지 중이에요 (${banTxt(ms)} 남음) — 사유: ${CM.ban.r||'운영 정책 위반'} · 메시지함을 확인해 주세요`,6)}
 // 대전·협동 입장, 채팅, 랭크를 제재에 맞게 막기
@@ -7278,7 +7383,7 @@ function cmGate(what){if(isBanned()){say(`이용 정지 중이라 ${what}을(를
 
 // ---------- 커뮤니티 창 ----------
 const cmEl=document.createElement('div');cmEl.className='notice';cmEl.id='cmWin';cmEl.hidden=true;cmEl.setAttribute('role','dialog');cmEl.setAttribute('aria-label','커뮤니티');document.getElementById('stage').appendChild(cmEl);
-function chatSubOn(){if(CM.chatSub||!fbOk())return;const ref=firebase.database().ref('chat/g').orderByChild('t').limitToLast(120),cb=s=>{const v=s.val()||{};CM.chat=Object.keys(v).map(k=>Object.assign({k},v[k])).sort((a,b)=>(a.t||0)-(b.t||0));if(!cmEl.hidden)renderChatList()};ref.on('value',cb,()=>{});CM.chatSub=()=>ref.off('value',cb)}
+function chatSubOn(){if(CM.chatSub||!fbOk())return;const ref=firebase.database().ref('chat/g').orderByChild('t').limitToLast(80),cb=s=>{const v=s.val()||{};CM.chat=Object.keys(v).map(k=>Object.assign({k},v[k])).sort((a,b)=>(a.t||0)-(b.t||0));if(!cmEl.hidden)renderChatList()};ref.on('value',cb,()=>{});CM.chatSub=()=>ref.off('value',cb)}
 function renderChatList(){const L=cmEl.querySelector('#cmList');if(!L)return;const atBottom=L.scrollHeight-L.scrollTop-L.clientHeight<40,adm=ADMV(),mine=fbUid();
   L.innerHTML=CM.chat.map(m=>`<div class="cm-m${m.a?' adm':''}${m.u===mine?' me':''}"><b>${m.a?'👑 ':''}${esc(m.n||'?')}</b><span>${esc(m.x||'')}</span><small>${fmtT(m.t)}</small>${adm&&!m.a?`<button type="button" class="mini" data-cmdel="${esc(m.k)}">삭제</button><button type="button" class="mini" data-cmusr="${esc(m.u)}" data-cmnick="${esc(m.n||'')}">유저 관리</button>`:adm?`<button type="button" class="mini" data-cmdel="${esc(m.k)}">삭제</button>`:''}</div>`).join('')||'<p class="pk-tip">아직 아무도 말하지 않았어요. 첫 인사를 남겨 보세요!</p>';
   if(atBottom||!L.dataset.init){L.scrollTop=L.scrollHeight;L.dataset.init=1}}
@@ -7291,6 +7396,8 @@ function renderCm(){const can=fbOk(),mut=isMuted();
       if(typeof confirmSensitive==='function'&&!confirmSensitive(x))return;CM.lastSend=now;i.value='';
       firebase.database().ref('chat/g').push().set({u:fbUid(),n:String((acct&&acct.nick)||netName||'?').slice(0,20),x,t:fbTS(),a:ADMV()?1:0}).catch(err=>{const c=String(err&&(err.code||err.message)||err);say(/PERMISSION|permission/.test(c)?'채팅을 보낼 수 없어요 — Firebase 규칙(database.rules.json)을 콘솔에 게시했는지 확인해 주세요 (제재 중이어도 이래요)':'보내지 못했어요: '+c.slice(0,60),3.4);i.value=x})})}}}
 function openCm(){cmEl.hidden=false;renderCm();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
+function chatSubOff(){if(CM.chatSub){try{CM.chatSub()}catch(e){}CM.chatSub=null}}
+new MutationObserver(()=>{if(cmEl.hidden)chatSubOff()}).observe(cmEl,{attributes:true,attributeFilter:['hidden']});
 cmEl.addEventListener('click',e=>{if(e.target===cmEl){cmEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;
   if(b.dataset.cmx!==undefined){cmEl.hidden=true;return}
   if(b.dataset.cmdel){if(b.dataset.arm){firebase.database().ref('chat/g/'+b.dataset.cmdel).remove().catch(()=>say('지우지 못했어요',1.4))}else{b.dataset.arm=1;b.textContent='한 번 더'}return}
@@ -7304,11 +7411,12 @@ function renderMail(){const can=fbOk();const L=CM.mail;
   const sanc=[['ban','이용 정지'],['mute','채팅 금지'],['rank','랭크 금지']].filter(([k])=>banLeft(k)>0);
   mbEl.innerHTML=`<div class="nt-card wide"><div class="nt-head"><b>메시지함 <small>운영자가 보낸 메일 · 안내</small></b><button type="button" class="mini" data-mbx>닫기</button></div><div class="nt-body">
   ${sanc.length?`<p class="cm-warn">현재 제재: ${sanc.map(([k,n])=>`${n} ${banTxt(banLeft(k))} 남음`).join(' · ')}${CM.ban.r?` — 사유: ${esc(CM.ban.r)}`:''}</p>`:''}
-  ${!can?'<p class="pk-tip">메시지함은 사이트에서 로그인하면 쓸 수 있어요.</p>':L.length?`<div class="mb-list">${L.map(m=>`<div class="mb-it${m.rd?'':' new'}${mbOpen===m.k?' open':''}" data-mbk="${esc(m.k)}"><div class="mb-h"><b>${m.rd?'':'● '}${esc(m.s||'(제목 없음)')}</b><small>${esc(m.n||'운영자')} · ${fmtT(m.t)} (${agoT(m.t)})</small></div>${mbOpen===m.k?`<div class="mb-x">${esc(m.x||'').replace(/\n/g,'<br>')}</div><div class="mb-a"><button type="button" class="mini" data-mbdel="${esc(m.k)}">삭제</button></div>`:''}</div>`).join('')}</div>`:'<p class="pk-tip">받은 메일이 없어요.</p>'}
+  ${!can?'<p class="pk-tip">메시지함은 사이트에서 로그인하면 쓸 수 있어요.</p>':L.length?`<div class="mb-list">${L.map(m=>`<div class="mb-it${m.rd?'':' new'}${mbOpen===m.k?' open':''}" data-mbk="${esc(m.k)}"><div class="mb-h"><b>${m.rd?'':'● '}${esc(m.s||'(제목 없음)')}</b><small>${esc(m.n||'운영자')} · ${fmtT(m.t)} (${agoT(m.t)})</small></div>${m.g?`<div class="mb-g">🎁 ${esc(giftName(m.g))} ${!GIFT.inv[m.g]?'<small>(회수됨)</small>':GIFT.inv[m.g].c===true?'<small>받음 ✓</small>':`<button type="button" class="btn sm" data-mbgift="${esc(m.g)}">받기</button>`}</div>`:''}${mbOpen===m.k?`<div class="mb-x">${esc(m.x||'').replace(/\n/g,'<br>')}</div><div class="mb-a"><button type="button" class="mini" data-mbdel="${esc(m.k)}">삭제</button></div>`:''}</div>`).join('')}</div>`:'<p class="pk-tip">받은 메일이 없어요.</p>'}
   <p class="pk-tip">친구와 주고받는 쪽지는 계정 → 친구 목록의 「쪽지」에서 볼 수 있어요.</p></div></div>`}
 function openMail(){mbEl.hidden=false;renderMail();if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
 mbEl.addEventListener('click',e=>{if(e.target===mbEl){mbEl.hidden=true;return}const b=e.target.closest('button,[data-mbk]');if(!b)return;
   if(b.dataset.mbx!==undefined){mbEl.hidden=true;return}
+  if(b.dataset.mbgift){b.disabled=true;giftClaim(b.dataset.mbgift).then(()=>renderMail());return}
   if(b.dataset.mbdel){if(b.dataset.arm){firebase.database().ref('mail/'+fbUid()+'/'+b.dataset.mbdel).remove().catch(()=>{});mbOpen=null}else{b.dataset.arm=1;b.textContent='한 번 더 누르면 삭제'}return}
   if(b.dataset.mbk){const k=b.dataset.mbk;mbOpen=mbOpen===k?null:k;const m=CM.mail.find(x=>x.k===k);if(m&&!m.rd&&fbOk())firebase.database().ref('mail/'+fbUid()+'/'+k+'/rd').set(1).catch(()=>{});renderMail()}});
 addEventListener('keydown',e=>{if(!mbEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();mbEl.hidden=true}},true);
@@ -7322,6 +7430,7 @@ function renderUA(){const T=CM.adminTarget;if(!T)return;const B=T.ban,left=k=>{c
   uaEl.innerHTML=`<div class="nt-card"><div class="nt-head"><b>유저 관리 · ${esc(T.nick)}</b><button type="button" class="mini" data-uax>닫기</button></div><div class="nt-body ua-body">
   <p class="pk-tip">현재 제재: ${B?[['ban','이용 정지'],['mute','채팅 금지'],['rank','랭크 금지']].map(([k,n])=>left(k)>0?`<b>${n} ${banTxt(left(k))}</b>`:'').filter(Boolean).join(' · ')||'없음':'불러오는 중…'}${B&&B.r?` (사유: ${esc(B.r)})`:''}</p>
   <h3>메일 보내기</h3><input id="uaSub" maxlength="60" placeholder="제목" autocomplete="off"><textarea id="uaTx" maxlength="1000" rows="4" placeholder="내용 — 이 유저의 메시지함으로 바로 가요"></textarea><button type="button" class="btn sm" data-uamail>메일 보내기</button>
+  <h3>🎁 선물 보내기</h3><div class="ua-row"><select id="uaGift">${giftOpts(T.nick)}</select><button type="button" class="btn sm" data-uagift>선물 보내기</button></div>
   <h3>이름 강제 변경</h3><div class="ua-row"><input id="uaNick" maxlength="10" placeholder="새 이름 (2~10자)" autocomplete="off"><button type="button" class="btn sm" data-uanick>이름 바꾸기</button></div><p class="pk-tip">게임에 보이는 이름만 바뀌어요. 로그인할 때 쓰는 아이디는 그대로예요.</p>
   <h3>제재</h3><div class="ua-row"><select id="uaK"><option value="mute">채팅 금지 (커뮤니티·방 채팅)</option><option value="rank">랭크 금지</option><option value="ban">이용 정지 (대전·협동·채팅 모두)</option></select><select id="uaD">${DURS.map(([v,n])=>`<option value="${v}"${v==='86400000'?' selected':''}>${n}</option>`).join('')}</select></div>
   <input id="uaR" maxlength="120" placeholder="사유 (유저에게 보여요)" autocomplete="off"><div class="ua-row"><button type="button" class="btn sm" data-uaban>제재 걸기</button><button type="button" class="btn sm ghost" data-uaunban>모든 제재 풀기</button></div>
@@ -7329,6 +7438,7 @@ function renderUA(){const T=CM.adminTarget;if(!T)return;const B=T.ban,left=k=>{c
   uaEl.querySelectorAll('input,textarea,select').forEach(i=>i.addEventListener('keydown',e=>e.stopPropagation()))}
 async function uaMail(uid,s,x){return firebase.database().ref('mail/'+uid).push().set({f:fbUid(),n:'👑 운영자',s:String(s).slice(0,60),x:String(x).slice(0,1000),t:fbTS(),rd:0})}
 uaEl.addEventListener('click',async e=>{if(e.target===uaEl){uaEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;const T=CM.adminTarget,st=uaEl.querySelector('#uaSt');if(!T)return;
+  if(b.dataset.uagift!==undefined){const id=uaEl.querySelector('#uaGift').value;b.disabled=true;try{await giftSend(T.uid,T.nick,id);st.textContent=`「${giftName(id)}」 선물을 메시지함으로 보냈어요`;sfx('pick')}catch(err){st.textContent='보내지 못했어요: '+String(err&&(err.code||err.message)||err).slice(0,80)}b.disabled=false;return}
   if(b.dataset.uax!==undefined){uaEl.hidden=true;return}
   try{
     if(b.dataset.uamail!==undefined){const s=uaEl.querySelector('#uaSub').value.trim(),x=uaEl.querySelector('#uaTx').value.trim();if(!x){st.textContent='내용을 써 주세요';return}b.disabled=true;await uaMail(T.uid,s||'운영자 메일',x);st.textContent='보냈어요 ✔';uaEl.querySelector('#uaTx').value='';b.disabled=false;return}
@@ -7674,7 +7784,7 @@ const ACHS=[
  {id:'hit10k',g:'격',n:'일격필살 II',d:'한 방에 피해 10000',c:()=>AST('maxHit')>=1e4},
  {id:'perf3',g:'결',n:'무결',d:'3층 연속으로 한 대도 맞지 않기',c:()=>AST('perfBest')>=3},
  {id:'hard40',g:'역',n:'역경',d:'고난 합계 40단계를 버티고 층 넘기기',c:()=>AST('hardMax')>=40},
- {id:'allW',g:'장',n:'무기 장인',d:'모든 무기로 적 처치',c:()=>cnt('wk')>=WEAP.filter(w=>!w.admin).length,p:()=>[cnt('wk'),WEAP.filter(w=>!w.admin).length]},
+ {id:'allW',g:'장',n:'무기 장인',d:'모든 무기로 적 처치',c:()=>cnt('wk')>=WEAP.filter(w=>!w.admin&&!w.unrel).length,p:()=>[cnt('wk'),WEAP.filter(w=>!w.admin&&!w.unrel).length]},
  {id:'bow200',g:'궁',n:'명궁',d:'활로 200마리 처치',c:()=>((ACH.st.wk||{})[4]|0)>=200,p:()=>[(ACH.st.wk||{})[4]|0,200]},
  {id:'scy200',g:'사',n:'사신',d:'낫으로 200마리 처치',c:()=>((ACH.st.wk||{})[26]|0)>=200,p:()=>[(ACH.st.wk||{})[26]|0,200]},
  {id:'pvp10',g:'노',n:'백전노장',d:'대전에서 10번 이기기',c:()=>AST('pvpWin')>=10,p:()=>[AST('pvpWin'),10]},
@@ -7712,6 +7822,20 @@ achEl.addEventListener('click',e=>{if(e.target===achEl||e.target.closest('[data-
 addEventListener('keydown',e=>{if(!achEl.hidden&&e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();achEl.hidden=true}},true);
 {const b=document.createElement('button');b.type='button';b.id='achBtn';b.textContent='업적';b.addEventListener('click',e=>{e.currentTarget.blur();b.classList.remove('has-new');openAch()});document.getElementById('tools').prepend(b);
 }
+// ---- 조작키 설정 창 ----
+const kbEl=document.createElement('div');kbEl.className='notice';kbEl.id='kbWin';kbEl.hidden=true;kbEl.setAttribute('role','dialog');kbEl.setAttribute('aria-label','조작키 설정');document.getElementById('stage').appendChild(kbEl);
+function renderKB(){kbEl.innerHTML=`<div class="nt-card wide"><div class="nt-head"><b>조작키 설정 <small>바꿀 칸을 누르고 원하는 키를 누르세요</small></b><button type="button" class="mini" data-kbx>닫기</button></div><div class="nt-body">
+  <div class="kb-grid">${KB_ACT.map(([d,n])=>{const k=kbOf(d);return `<div class="kb-row${k!==d?' chg':''}"><span>${n}</span><button type="button" class="kb-key${KB_CAP===d?' wait':''}" data-kb="${d}">${KB_CAP===d?'키를 누르세요…':esc(kbName(k))}</button></div>`}).join('')}</div>
+  <p class="pk-tip">이미 쓰는 키를 고르면 두 동작의 키가 서로 바뀌어요. Esc는 취소예요. 마우스(왼쪽 공격 · 오른쪽 조준/막기 · 휠 무기 바꾸기)는 그대로예요.</p>
+  <div class="ua-row"><button type="button" class="btn sm ghost" data-kbreset>기본값으로</button></div></div></div>`}
+function kbSet(d,code){const old=kbOf(d);for(const [o] of KB_ACT)if(o!==d&&kbOf(o)===code){KB[o]=old}KB[d]=code;for(const k in KB)if(KB[k]===k)delete KB[k];try{localStorage.setItem('gd-keys',JSON.stringify(KB))}catch(e){}kbBuild()}
+function openKB(){KB_CAP=null;renderKB();kbEl.hidden=false;if(state==='play')pause();try{document.exitPointerLock&&document.exitPointerLock()}catch(e){}}
+kbEl.addEventListener('click',e=>{if(e.target===kbEl){KB_CAP=null;kbEl.hidden=true;return}const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.kbx!==undefined){KB_CAP=null;kbEl.hidden=true;return}
+  if(b.dataset.kbreset!==undefined){KB={};KB_CAP=null;try{localStorage.removeItem('gd-keys')}catch(_){}kbBuild();renderKB();say('조작키를 기본값으로 되돌렸어요',1.2);return}
+  if(b.dataset.kb){KB_CAP=KB_CAP===b.dataset.kb?null:b.dataset.kb;renderKB()}});
+addEventListener('keydown',e=>{if(kbEl.hidden)return;if(KB_CAP){e.preventDefault();e.stopImmediatePropagation();if(e.code!=='Escape'&&e.code)kbSet(KB_CAP,e.code);KB_CAP=null;renderKB();return}if(e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();kbEl.hidden=true}},true);
+{const b=document.createElement('button');b.type='button';b.id='kbBtn';b.textContent='조작키';b.addEventListener('click',e=>{e.currentTarget.blur();openKB()});document.getElementById('tools').appendChild(b)}
 // 혹시 숨겨진 무기를 아직 못 열었는데 장착돼 있으면 기본 검으로
 if(wLocked(melee)){melee=2;if(cur===CADI)cur=2}
 
