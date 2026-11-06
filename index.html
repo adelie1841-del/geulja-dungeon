@@ -133,17 +133,23 @@ window.GD_FIREBASE_CONFIG = {
     build();
     const notify=()=>{if(raf)return;raf=requestAnimationFrame(()=>{raf=0;build();for(const f of subs){try{f({peers:snap,joined:[],left:[],updated:[]})}catch(e){console.error(e)}}})};
     let swept=false;const raw={};let dirtyAll=true;
+    // 나간 사람 흔적 지우기: 서버 시간 기준으로 15초 넘게 소식이 없는 사람은 방에서 뺌 (창을 그냥 닫거나 폰이 잠들어 연결 끊김 처리가 늦을 때)
+    let off=0;try{fdb().ref('.info/serverTimeOffset').on('value',v=>{off=+v.val()||0})}catch(_){}
+    const STALE=15000,fresh=e=>{const t=+e.t||0;return !t||Date.now()+off-t<STALE};
     // 바뀐 사람 것만 받아서 처리 (예전엔 누가 움직일 때마다 방 전체를 다시 읽어서 사람이 많을수록 렉이 심했음)
     const rebuild=changed=>{const now=Date.now(),next=new Map(),me=uid(),best={};
       for(const k in raw){const e=raw[k]||{};if(!e.u)continue;if(k!==PEER&&e.u===me){if(!swept)try{base.child(k).remove()}catch(_){}continue}const b=best[e.u];if(!b||(+e.t||0)>(+raw[b].t||0))best[e.u]=k}
       swept=true;
-      for(const k in raw){if(k===PEER)continue;const e=raw[k]||{};if(e.u&&best[e.u]!==k)continue;const old=others.get(k);
+      for(const k in raw){if(k===PEER)continue;const e=raw[k]||{};if(e.u&&best[e.u]!==k)continue;if(!fresh(e))continue;const old=others.get(k);
         if(old&&changed!==k&&!dirtyAll){next.set(k,old);continue}
         const pres=e.p||{};next.set(k,old&&JSON.stringify(old.presence)===JSON.stringify(pres)?old:Object.freeze({peer:k,by:e.u||null,isMe:false,sameTab:false,kind:'viewer',guest:false,presence:pres,updatedAt:now}))}
       dirtyAll=false;others=next;notify()};
     const onAdd=s=>{raw[s.key]=s.val();dirtyAll=true;rebuild(s.key)},onChg=s=>{const was=raw[s.key];raw[s.key]=s.val();if(!was||(was.u!==raw[s.key].u))dirtyAll=true;rebuild(s.key)},onRem=s=>{delete raw[s.key];dirtyAll=true;rebuild(null)};
     base.on('child_added',onAdd);base.on('child_changed',onChg);base.on('child_removed',onRem);
     myRef.onDisconnect().remove();
+    // 가만히 있어도 4초마다 살아 있다고 알림 · 3초마다 오래된 사람 다시 거르기
+    const hb=setInterval(()=>{if(!live)return;try{myRef.update({t:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{})}catch(_){}},4000);
+    let lastSig='';const sw=setInterval(()=>{if(!live)return;const sig=Object.keys(raw).filter(k=>k!==PEER&&raw[k]&&fresh(raw[k])).sort().join(',');if(sig!==lastSig){lastSig=sig;dirtyAll=true;rebuild(null)}},3000);
     // 내 상태도 바뀐 칸만 보냄 (가끔은 통째로 다시 써서 끊겼다 붙어도 안전)
     let sent=null,fullT=0;
     try{fdb().ref('.info/connected').on('value',c=>{if(c.val()===true){sent=null;try{myRef.onDisconnect().remove()}catch(_){}}})}catch(_){}
@@ -159,7 +165,7 @@ window.GD_FIREBASE_CONFIG = {
       onPeers(fn){subs.add(fn);setTimeout(()=>fn({peers:snap,joined:snap,left:[],updated:[]}),0);return()=>subs.delete(fn)},
       connected:()=>live,
       onConnection(fn){setTimeout(()=>fn(live),0);return()=>{}},
-      leave:async()=>{live=false;base.off('child_added',onAdd);base.off('child_changed',onChg);base.off('child_removed',onRem);subs.clear();delete rooms[name];try{await myRef.onDisconnect().cancel()}catch(e){}await myRef.remove()}
+      leave:async()=>{live=false;clearInterval(hb);clearInterval(sw);base.off('child_added',onAdd);base.off('child_changed',onChg);base.off('child_removed',onRem);subs.clear();delete rooms[name];try{await myRef.onDisconnect().cancel()}catch(e){}await myRef.remove()}
     };
   }
   let lobby=null;
@@ -7046,8 +7052,9 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 // ================= 공지 · 패치노트 =================
-const NOTICE_VER='2026-11-06a';
+const NOTICE_VER='2026-11-06b';
 const NOTICE=[
+ {v:'2026-11-06 오후',t:'대전 유령 플레이어 수정',items:['대전·협동·로비에서 이미 나간 사람이 방에 계속 서 있던 문제 수정: 15초 넘게 소식이 없는 사람은 방에서 빠져요 (창을 그냥 닫거나 폰이 잠들어 연결 끊김 처리가 늦을 때)','가만히 서 있어도 4초마다 살아 있다는 신호를 보내서, 멈춰 있는 사람이 잘못 빠지지 않아요']},
  {v:'2026-11-06',t:'달리기 없앰',items:['달리기(Shift · 모바일 조이스틱 끝까지 밀기)와 기력 막대를 없앴어요 — 늘 같은 속도로 움직여요','스나이퍼 조준 중 Shift 숨 참기는 그대로예요']},
  {v:'2026-11-03 낮',t:'렉 줄임 · 조작키 설정 · 운영자 선물',items:['멀티(대전·협동) 렉 줄임: 바뀐 정보만 주고받아서 통신량이 크게 줄었어요 (협동 기준 약 1/7)','상단 바 「조작키」: 이동·점프·재장전·수류탄 등 모든 키를 원하는 키로 바꿀 수 있어요 (겹치면 서로 바뀜 · 「기본값으로」로 되돌리기)','운영자 선물: 운영자가 메시지함으로 선물을 보내면 「받기」를 눌러 받아요 — 받은 미공개 무기는 상점·무기 선택(B)에 나타나요','아이패드에서 버튼을 빠르게 누르면 화면이 확대되던 문제 고침']},
  {v:'2026-11-03',t:'커뮤니티 · 메시지함',items:['상단 바 「커뮤니티」: 플레이하는 모두가 함께 쓰는 전체 채팅 (사이트 로그인 필요 · 2초에 한 번 · 200자)','상단 바 「메시지함」: 운영자가 보낸 메일과 안내가 와요 — 새 메일이 오면 숫자와 알림으로 알려 줘요','욕설·도배 등은 운영자가 채팅 금지 · 랭크 금지 · 이용 정지를 걸 수 있어요 (기간과 사유는 메시지함으로 안내)','부적절한 이름은 운영자가 바꿀 수 있어요 (로그인 아이디는 그대로 · 메시지함으로 안내)']},
